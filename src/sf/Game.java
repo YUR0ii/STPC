@@ -37,13 +37,14 @@ public class Game extends JFrame
 	JLabel roundTimer = new JLabel("3");
 	JLabel winText = new JLabel("");
 	boolean start = false;
+	InputManager inputManager;
 	
 	Game(Character p1, Character p2)
 	{
 		initCharacters(p1, p2);
 		initPanel();
 		updateTimer = new Timer();
-		updateTimer.scheduleAtFixedRate(new TimerTask(){@Override public void run(){Update(InputManager.getInstance());}}, 0, 17);
+		updateTimer.scheduleAtFixedRate(new TimerTask(){@Override public void run(){Update();}}, 0, 17);
 		updateTimer.scheduleAtFixedRate(new TimerTask(){@Override public void run()
 		{
 			roundTimerInt--;
@@ -79,7 +80,7 @@ public class Game extends JFrame
 		
 		public void Update()
 		{
-			this.width = (int) (650 * ((double) p.health / 35000));
+			this.width = (int) (650 * ((double) p.health / 175));
 			if(!p1)
 				this.x = 1600-this.width;
 		}
@@ -87,9 +88,10 @@ public class Game extends JFrame
 	
 	class DrawPanel extends JPanel
 	{
+		private BufferedImage background;
 		DrawPanel()
 		{
-			
+			try{background = ImageIO.read(new File("ryuStage.jpg"));}catch(Exception e) {};
 			this.add(roundTimer);
 			roundTimer.setBounds(750, 0, 50, 50);
 			roundTimer.setFont(new Font("Monospace", 1, 50));
@@ -140,12 +142,11 @@ public class Game extends JFrame
 			AffineTransform at = new AffineTransform();
 			
 			at.setToScale(1.25, 1.25);
-			try {g2.drawImage(ImageIO.read(new File("ryuStage.jpg")), new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), 0, 0);} catch (Exception e1) {}
+			g2.drawImage(background, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), 0, 0);
 			
 			for(Player p : Players)
 			{
-				InputManager e = InputManager.getInstance();
-				if(e.isKeyDown(KeyEvent.VK_F9))
+				if(inputManager.isKeyDown(KeyEvent.VK_F9))
 				{
 					for (Hurtbox h : p.body.body)
 					{
@@ -184,25 +185,26 @@ public class Game extends JFrame
 				}
 				
 				
-				int lr = 0;
-				if(p.right)
-				{
-					lr = 1;
-					at.setToScale(4, 4);
-				}
-				else
-				{
-					lr = -1;
-					at.setToScale(-4, 4);
-				}
+			
 				
 				for(Hitbox h : p.projectiles)
 				{
-//					g2.setColor(Color.YELLOW);
+					int lr = 0;
+					if(p.right)
+					{
+						at.setToScale(4, 4);
+					}
+					else
+					{
+						lr = h.width;
+						at.setToScale(-4, 4);
+					}
+					
 					if(h.active)
 					{
+//						g2.setColor(Color.YELLOW);
 //						g2.fill(h);
-						g2.drawImage(h.image, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), h.x - (int) Math.copySign((h.image.getWidth()/2), (h.image.getWidth()/2)), h.y - (int) Math.copySign(10, lr));
+						g2.drawImage(h.image, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), h.x + lr, h.y);
 					}
 				}
 				
@@ -265,13 +267,19 @@ public class Game extends JFrame
 
 		p1 = new Player(p1Char, new Point(100,0), p1Controls, true);
 		p2 = new Player(p2Char, new Point(1300,0), p2Controls, false);
+		inputManager = new InputManager
+				(
+				new int[] {p1Controls[0], p1Controls[1], p1Controls[2], p1Controls[3]},
+				new int[] {p2Controls[0], p2Controls[1], p2Controls[2], p2Controls[3]}
+				);
 
 		Players = new Player[] {p1, p2};
 	}
 
 	private void initPanel()
 	{
-		this.addKeyListener(InputManager.getInstance());
+		this.addKeyListener(inputManager);
+		
 		DrawPanel d = new DrawPanel();
 		this.add(d);
 		p1b = new HealthBar(p1, true);
@@ -284,14 +292,9 @@ public class Game extends JFrame
 		this.setVisible(true);
 	}
 	
-	private void Update(InputManager e)
-	{		
-		for(int i = 255; i >= 0; i--)
-		{
-			if(e.lastFrame[i] == 2)
-				e.lastFrame[i] = 0;
-		}
-
+	private void Update()
+	{
+//		long time = System.currentTimeMillis();
 		for(Player p : Players)
 		{
 			p.isUpdating = false;
@@ -326,8 +329,9 @@ public class Game extends JFrame
 			
 			if(start)
 			{
-				p.attackEvents(e);
-				p.movementEvents(e);
+				inputManager.doDirection(p.p1);
+				p.attackEvents(inputManager);
+				p.movementEvents(inputManager);
 			}
 			
 			p.Animate();
@@ -496,6 +500,7 @@ public class Game extends JFrame
 						}
 					}
 				}
+				
 				boolean clank = false;
 				for(Iterator<Hitbox> i = p.hitboxes.iterator(); i.hasNext();)
 				{
@@ -580,6 +585,8 @@ public class Game extends JFrame
 				
 			}
 			
+			
+			
 //			if(p.location.x < 0 || p.location.x > this.getWidth())
 //			{
 //				p.location.x -= p.location.x/4;
@@ -612,8 +619,8 @@ public class Game extends JFrame
 					}
 					else
 					{
-						p.Wakeup(e);
-						p.lag = p.character.Wakeup().maxFrame;
+						p.Wakeup(inputManager);
+						p.lag = p.character.Wakeup.maxFrame;
 					}
 					p.location.y = floorLevel;
 					p.moving = 0;
@@ -626,9 +633,9 @@ public class Game extends JFrame
 				if(p.inHitStun)
 				{
 					if(p.crouching)
-						p.setAnim(p.character.DamageC());
+						p.setAnim(p.character.DamageC);
 					else
-						p.setAnim(p.character.Damage());
+						p.setAnim(p.character.Damage);
 				}
 				p.lag--;
 			}
@@ -647,7 +654,7 @@ public class Game extends JFrame
 			
 			p.bodyPosUpdate();
 		}
-
+		
 		p1b.Update();
 		p2b.Update();
 		
@@ -655,6 +662,7 @@ public class Game extends JFrame
 			gameEnd();
 		
 		this.repaint();
+//		System.out.println(System.currentTimeMillis() - time);
 	}
 	
 	void gameEnd()

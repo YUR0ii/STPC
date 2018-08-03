@@ -1,5 +1,6 @@
 package sf;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public abstract class Character
@@ -9,55 +10,70 @@ public abstract class Character
 	int forwardSpeed;
 	int backSpeed;
 	int airSpeed;
+	int width;
 	
-	abstract Animation Stand();
-	abstract Animation Crouch();
-	abstract Animation Block();
-	abstract Animation BlockC();
-	abstract Animation Damage();
-	abstract Animation DamageC();
-	abstract Animation WalkF();
-	abstract Animation WalkB();
-	abstract Animation Jump();
-	abstract Animation Knockdown();
-	abstract Animation Wakeup();
-	abstract Animation GrabF();
-	abstract Animation GrabB();
-	abstract Animation Grabbed();
-	abstract Animation BlockDmg();
-	abstract Animation BlockDmgC();
+	public BufferedImage selectIcon;
 	
-	abstract Attack P7();
-	abstract Attack P8();
-	abstract Attack P9();
-	abstract Attack K4();
-	abstract Attack K5();
-	abstract Attack K6();
-	abstract Attack G1();
-	abstract Attack G2();
-	abstract Attack S3();
+	Animation Stand;
+	Animation Crouch;
+	Animation Damage;
+	Animation DamageC;
+	Animation WalkF;
+	Animation WalkB;
+	Animation Jump;
+	Animation Knockdown;
+	Animation Wakeup;
+	Animation GrabF;
+	Animation GrabB;
+	Animation Grabbed;
+	Animation BlockDmg;
+	Animation BlockDmgC;
 	
-	abstract Attack P7C();
-	abstract Attack P8C();
-	abstract Attack P9C();
-	abstract Attack K4C();
-	abstract Attack K5C();
-	abstract Attack K6C();
+	Attack JabC;
+	Attack JabF;
+	Attack StrongC;
+	Attack StrongF;
+	Attack FierceC;
+	Attack FierceF;
+	Attack ShortC;
+	Attack ShortF;
+	Attack ForwardC;
+	Attack ForwardF;
+	Attack RoundhouseC;
+	Attack RoundhouseF;
+	Command fGrab;
+	Command bGrab;
 	
-	abstract Attack P7A();
-	abstract Attack P8A();
-	abstract Attack P9A();
-	abstract Attack K4A();
-	abstract Attack K5A();
-	abstract Attack K6A();
+	Attack P7C;
+	Attack P8C;
+	Attack P9C;
+	Attack K4C;
+	Attack K5C;
+	Attack K6C;
 	
-	public Character(String name, int jumpsquat, int forwardSpeed, int backSpeed, int airSpeed)
+	Attack P7A;
+	Attack P8A;
+	Attack P9A;
+	Attack K4A;
+	Attack K5A;
+	Attack K6A;
+	
+	abstract void setupAnims();
+	abstract void setupNormals();
+	abstract void setupCommands();
+	Command[] Commands;
+	
+	public Character(String name, int jumpsquat, int forwardSpeed, int backSpeed, int airSpeed, int width)
 	{
 		this.name = name;
 		this.jumpsquat = jumpsquat;
 		this.forwardSpeed = forwardSpeed;
 		this.backSpeed = backSpeed;
 		this.airSpeed = airSpeed;
+		this.width = width;
+		setupAnims();
+		setupNormals();
+		setupCommands();
 	}
 	
 	static Character read(File f)

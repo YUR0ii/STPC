@@ -13,25 +13,16 @@ public class Animation
 	Body[] positions;
 	BufferedImage[] images;
 	int id;
+	static int maxID = 0;
 	
-	Animation(int id, int[] keyframes, Body[] positions, BufferedImage[] images)
+	Animation(int[] keyframes, Body[] positions, BufferedImage[] images)
 	{
-		this.id = id;
+		this.id = maxID;
+		System.out.println(maxID);
+		maxID++;
 		this.keyframes = keyframes;
 		this.positions = positions;
 		this.images = images;
-		for(int i : keyframes)
-		{
-			if(i > maxFrame)
-				maxFrame = i;
-		}
-	}
-	
-	Animation(int id, int[] keyframes, Body[] positions)
-	{
-		this.id = id;
-		this.keyframes = keyframes;
-		this.positions = positions;
 		for(int i : keyframes)
 		{
 			if(i > maxFrame)

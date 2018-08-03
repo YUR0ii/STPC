@@ -6,13 +6,12 @@ import java.util.ArrayList;
 
 public class Player
 {
-	static final int JUMP = 0;
+	static final int UP = 0;
 	static final int LEFT = 1;
-	static final int CROUCH = 2;
+	static final int DOWN = 2;
 	static final int RIGHT = 3;
-	static final int A7 = 4, A8 = 5, A9 = 6;
-	static final int A4 = 7, A5 = 8, A6 = 9;
-	static final int A1 = 10, A2 = 11, A3 = 12;
+	static final int JAB = 4, STRONG = 5, FIERCE = 6;
+	static final int SHORT = 7, FORWARD = 8, ROUNDHOUSE = 9;
 	static final int BLOCK = 13;
 
 	Character character;
@@ -28,7 +27,8 @@ public class Player
 
 	public int lag = 0;
 	int moving = 0;
-	int health = 35000;
+	int health = 175;
+	double meter = 0;
 	boolean right = true;
 	public boolean blocking = false;
 	public boolean crouching = false;
@@ -61,9 +61,9 @@ public class Player
 		character = c;
 
 		this.p1 = p1;
-		setAnim(c.Stand(), true);
-		body = c.Stand().positions[0];
-		sprite = c.Stand().images[0];
+		setAnim(c.Stand, true);
+		body = c.Stand.positions[0];
+		sprite = c.Stand.images[0];
 		Animate();
 
 		if(!p1)
@@ -81,137 +81,190 @@ public class Player
 
 	public void attackEvents(InputManager e)
 	{
-		try
+		boolean special = false;
+		if(lag == 0 && !jumpSquat)
 		{
-			if(lag == 0 && !blocking && !jumpSquat)
+			for(Command c : character.Commands)
 			{
-				if(grounded)
+				if(e.keyCheck(Controls[c.button], true))
 				{
-					if(!crouching)
+					int pos = 0;
+					boolean valid = true;
+
+					for(int i = c.directions.length-1; i >= 0 && valid; i--)
 					{
-						if(e.keyCheck(Controls[A7]))
-							attack(character.P7());
-						if(e.keyCheck(Controls[A8]))
-							attack(character.P8());
-						if(e.keyCheck(Controls[A9]))
-							attack(character.P9());
-						if(e.keyCheck(Controls[A4]))
-							attack(character.K4());
-						if(e.keyCheck(Controls[A5]))
-							attack(character.K5());
-						if(e.keyCheck(Controls[A6]))
-							attack(character.K6());
-						if(e.keyCheck(Controls[A1]))
-							attack(character.G1());
-						if(e.keyCheck(Controls[A2]))
-							attack(character.G2());
-						if(e.keyCheck(Controls[A3]))
-							attack(character.S3());
+						pos = e.posInHistory(directionConvert(c.directions[i][0]), pos, c.directions[i][1], p1);
+						if(pos == -1)
+							valid = false;
 					}
-					else
+
+					if(valid && meter >= c.meterCost)
 					{
-						if(e.keyCheck(Controls[A7]))
-							attack(character.P7C());
-						if(e.keyCheck(Controls[A8]))
-							attack(character.P8C());
-						if(e.keyCheck(Controls[A9]))
-							attack(character.P9C());
-						if(e.keyCheck(Controls[A4]))
-							attack(character.K4C());
-						if(e.keyCheck(Controls[A5]))
-							attack(character.K5C());
-						if(e.keyCheck(Controls[A6]))
-							attack(character.K6C());
+						attack(c.attack);
+						meter -= c.meterCost;
+						special = true;
 					}
-				}
-				else
-				{
-					if(e.keyCheck(Controls[A7]))
-						attack(character.P7A());
-					if(e.keyCheck(Controls[A8]))
-						attack(character.P8A());
-					if(e.keyCheck(Controls[A9]))
-						attack(character.P9A());
-					if(e.keyCheck(Controls[A4]))
-						attack(character.K4A());
-					if(e.keyCheck(Controls[A5]))
-						attack(character.K5A());
-					if(e.keyCheck(Controls[A6]))
-						attack(character.K6A());
 				}
 			}
-		} catch(Exception exc) {System.out.println("Unprogrammed Attack");}
+
+			if(!special)
+			{
+				try{
+					if(grounded)
+					{
+						if(!crouching)
+						{
+							if(e.keyCheck(Controls[JAB]))
+								attack(character.JabC);
+							if(e.keyCheck(Controls[STRONG]))
+								attack(character.StrongC);
+							if(e.keyCheck(Controls[FIERCE]))
+								attack(character.FierceC);
+							if(e.keyCheck(Controls[SHORT]))
+								attack(character.ShortC);
+							if(e.keyCheck(Controls[FORWARD]))
+								attack(character.ForwardC);
+							if(e.keyCheck(Controls[ROUNDHOUSE]))
+								attack(character.RoundhouseC);
+						}
+						else
+						{
+							if(e.keyCheck(Controls[JAB]))
+								attack(character.P7C);
+							if(e.keyCheck(Controls[STRONG]))
+								attack(character.P8C);
+							if(e.keyCheck(Controls[FIERCE]))
+								attack(character.P9C);
+							if(e.keyCheck(Controls[SHORT]))
+								attack(character.K4C);
+							if(e.keyCheck(Controls[FORWARD]))
+								attack(character.K5C);
+							if(e.keyCheck(Controls[ROUNDHOUSE]))
+								attack(character.K6C);
+						}
+					}
+					else if(!knockdown)
+					{
+						if(e.keyCheck(Controls[JAB]))
+							attack(character.P7A);
+						if(e.keyCheck(Controls[STRONG]))
+							attack(character.P8A);
+						if(e.keyCheck(Controls[FIERCE]))
+							attack(character.P9A);
+						if(e.keyCheck(Controls[SHORT]))
+							attack(character.K4A);
+						if(e.keyCheck(Controls[FORWARD]))
+							attack(character.K5A);
+						if(e.keyCheck(Controls[ROUNDHOUSE]))
+							attack(character.K6A);
+					}
+				}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
+			}
 	}
+}
 	public void movementEvents(InputManager e)
 	{
 		if(lag == 0 && grounded && !attacking)
 		{
-			if(!blocking && !crouching && !jumpSquat)
+			if(!jumpSquat)
 			{
-				if(e.isKeyDown(Controls[LEFT]))
+				switch(directionConvert(e.direction(p1)))
 				{
-					if(right)
-					{
-						setAnim(character.WalkB());
-						moving = -character.backSpeed;
-					}
-					else
-					{
-						setAnim(character.WalkF());
-						moving = -character.forwardSpeed;
-					}
-				}
-				else if(e.isKeyDown(Controls[RIGHT]))
-				{
-					if(!right)
-					{
-						setAnim(character.WalkB());
-						moving = character.backSpeed;
-					}
-					else
-					{
-						setAnim(character.WalkF());
-						moving = character.forwardSpeed;
-					}
-				}
-				else
-				{
-					setAnim(character.Stand());
+				case 1:
+					blocking = true;
+					crouching = true;
+					setAnim(character.Crouch);
 					moving = 0;
-				}
-
-				if(e.isKeyDown(Controls[JUMP]))
-				{
+					break;
+				case 2:
+					blocking = false;
+					crouching = true;
+					setAnim(character.Crouch);
+					moving = 0;
+					break;
+				case 3:
+					blocking = false;
+					crouching = true;
+					setAnim(character.Crouch);
+					moving = 0;
+					break;
+				case 4:
+					setAnim(character.WalkB);
+					if(right)
+						moving = -character.backSpeed;
+					else
+						moving = character.backSpeed;
+					blocking = true;
+					crouching = false;
+					break;
+				case 6:
+					setAnim(character.WalkF);
+					if(right)
+						moving = character.forwardSpeed;
+					else
+						moving = -character.forwardSpeed;
+					blocking = false;
+					crouching = false;
+					break;
+				case 7:
+					if(right)
+						moving = -1;
+					else
+						moving = 1;
+					crouching = false;
 					Jump();
+					break;
+				case 8:
+					moving = 0;
+					Jump();
+					crouching = false;
+					break;
+				case 9:
+					if(right)
+						moving = 1;
+					else
+						moving = -1;
+					crouching = false;
+					Jump();
+					break;
+				default:
+					setAnim(character.Stand);
+					moving = 0;
+					blocking = false;
+					crouching = false;
+					break;
 				}
 			}
-
-			if(e.isKeyDown(Controls[CROUCH]))
-			{
-				setAnim(character.Crouch());
-				moving = 0;
-				crouching = true;
-			}
 			else
-				crouching = false;
-
-			if(e.isKeyDown(Controls[BLOCK]))
 			{
-				if(crouching)
-					setAnim(character.BlockC());
-				else
-					setAnim(character.Block());
-				moving = 0;
-				blocking = true;
+				switch(directionConvert(e.direction(p1)))
+				{
+				case 1:
+				case 4:
+				case 7:
+					if(right)
+						moving = -1;
+					else
+						moving = 1;
+					break;
+				case 9:
+				case 6:
+				case 3:
+					if(right)
+						moving = 1;
+					else
+						moving = -1;
+					break;
+				default:
+					break;
+				}
 			}
-			else
-				blocking = false;
 		}
 	}
 
 	private void Jump()
 	{
-		setAnim(character.Jump());
+		setAnim(character.Jump);
 		lag += character.jumpsquat;
 		jumpSquat = true;
 		airTime = 0;
@@ -255,11 +308,11 @@ public class Player
 	{
 		if(right)
 		{
-			front = location.x + body.width;
+			front = location.x + (2 * character.width);
 		}
 		else
 		{
-			front = location.x - body.width;
+			front = location.x - (2 * character.width);
 		}
 
 		this.top = location.y - body.height;
@@ -320,7 +373,7 @@ public class Player
 
 		if(h.direction == 0 || h.speed != 0)
 		{
-			if(!target.blocking || (!target.crouching && h.hitsLow))
+			if(!target.blocking || (!target.crouching && h.hitsLow) || (target.crouching && !grounded))
 			{
 				target.health -= h.dmg;
 	
@@ -351,9 +404,9 @@ public class Player
 			else
 			{
 				if(target.crouching)
-					target.setAnim(target.character.BlockDmgC());
+					target.setAnim(target.character.BlockDmgC);
 				else
-					target.setAnim(target.character.BlockDmg());
+					target.setAnim(target.character.BlockDmg);
 				
 				if(target.health - h.blockDmg > 0)
 					target.health -= h.blockDmg;
@@ -380,17 +433,17 @@ public class Player
 		{
 			target.blocking = false;
 			target.grabbed = true;
-			target.setAnim(target.character.Damage());
+			target.setAnim(target.character.Damage);
 			target.health -= h.dmg;
 			if(h.direction == 1)
 			{
-				setAnim(character.GrabB());
+				setAnim(character.GrabB);
 				target.location.x = location.x;
 				Flip();
 			}
 			else
 			{
-				setAnim(character.GrabF());
+				setAnim(character.GrabF);
 				target.location.x = front;
 			}
 			
@@ -403,7 +456,7 @@ public class Player
 	{
 		grabbed = false;
 		knockdown = true;
-		setAnim(character.Knockdown());
+		setAnim(character.Knockdown);
 		airTime = 0;
 		grounded = false;
 		if(right)
@@ -416,7 +469,7 @@ public class Player
 	{
 		knockdown = false;
 		
-		setAnim(character.Wakeup());
+		setAnim(character.Wakeup);
 	}
 
 	public void Flip()
@@ -427,5 +480,31 @@ public class Player
 			location.x -= body.width;
 
 		right = !right;
+	}
+	
+	private int directionConvert(int direction)
+	{
+		if(!right)
+		{
+			switch(direction)
+			{
+			case 1:
+				return 3;
+			case 4:
+				return 6;
+			case 7:
+				return 9;
+			case 3:
+				return 1;
+			case 6:
+				return 4;
+			case 9:
+				return 7;
+			default:
+					return direction;
+			}
+		}
+		else
+			return direction;
 	}
 }
