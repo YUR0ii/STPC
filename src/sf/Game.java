@@ -146,6 +146,7 @@ public class Game extends JFrame
 			
 			for(Player p : Players)
 			{
+				//<editor-fold desc="Hit/Hurtbox Debug">
 				if(inputManager.isKeyDown(KeyEvent.VK_F9))
 				{
 					for (Hurtbox h : p.body.body)
@@ -182,11 +183,14 @@ public class Game extends JFrame
 						if(h.active)
 							g2.fill(h);
 					}
+					for(Hitbox h : p.projectiles)
+					{
+						g2.setColor(Color.YELLOW);
+						g2.fill(h);
+					}
 				}
-				
-				
-			
-				
+				//</editor-fold>
+
 				for(Hitbox h : p.projectiles)
 				{
 					int lr = 0;
@@ -201,20 +205,16 @@ public class Game extends JFrame
 					}
 					
 					if(h.active)
-					{
-//						g2.setColor(Color.YELLOW);
-//						g2.fill(h);
 						g2.drawImage(h.image, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), h.x + lr, h.y);
-					}
 				}
 				
 				if(p.right)
-					at.setToScale(4.36, 5);
+					at.setToScale(5, 5);
 				else
-					at.setToScale(-4.36, 5);
+					at.setToScale(-5, 5);
 				
 				
-				g2.drawImage(p.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), p.location.x, p.location.y - (p.sprite.getHeight() * 5));
+				g2.drawImage(p.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), p.location.x + p.hitlagShake.x, p.location.y  + p.hitlagShake.y - (p.sprite.getHeight() * 5));
 			}
 			
 			g2.setColor(Color.red);
@@ -584,9 +584,9 @@ public class Game extends JFrame
 			{
 				
 			}
-			
-			
-			
+
+
+
 //			if(p.location.x < 0 || p.location.x > this.getWidth())
 //			{
 //				p.location.x -= p.location.x/4;
@@ -627,17 +627,24 @@ public class Game extends JFrame
 				}
 			}
 
-			
+
 			if(p.lag != 0)
 			{
 				if(p.inHitStun)
 				{
-					if(p.crouching)
+					if (p.crouching)
 						p.setAnim(p.character.DamageC);
 					else
 						p.setAnim(p.character.Damage);
 				}
-				p.lag--;
+
+				if(p.hitlag != 0)
+				{
+					p.Hitlag();
+					p.hitlag--;
+				}
+				else
+					p.lag--;
 			}
 			else if(p.jumpSquat)
 				p.grounded = false;
@@ -647,11 +654,7 @@ public class Game extends JFrame
 				p.inHitStun = false;
 			else if(p.attacking)
 				p.attacking = false;
-//			else if(p.knockdown)
-//			{
-//				p.Wakeup(e);
-//			}
-			
+
 			p.bodyPosUpdate();
 		}
 		

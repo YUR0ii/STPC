@@ -3,6 +3,7 @@ package sf;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Player
 {
@@ -12,7 +13,6 @@ public class Player
 	static final int RIGHT = 3;
 	static final int JAB = 4, STRONG = 5, FIERCE = 6;
 	static final int SHORT = 7, FORWARD = 8, ROUNDHOUSE = 9;
-	static final int BLOCK = 13;
 
 	Character character;
 	int[] Controls;
@@ -26,6 +26,8 @@ public class Player
 	public BufferedImage sprite;
 
 	public int lag = 0;
+	public int hitlag = 0;
+	public Point hitlagShake = new Point(0,0);
 	int moving = 0;
 	int health = 175;
 	double meter = 0;
@@ -352,7 +354,10 @@ public class Player
 	
 	public void Animate()
 	{
-		currentFrame++;
+		if(hitlag == 0)
+		{
+			currentFrame++;
+		}
 		
 		int oldFront = front;
 		body = currentAnim.boxAnimate(currentFrame, this);
@@ -385,6 +390,8 @@ public class Player
 				{
 					target.lag = h.stunCalc(target);
 					target.inHitStun = true;
+					target.hitlag = 14;
+					this.hitlag = 14;
 					if(h.type != AttackType.JL && h.type != AttackType.JM && h.type != AttackType.JH) {
 						if (right) {
 							if (target.location.x + h.width / 4 < 1600)
@@ -480,6 +487,17 @@ public class Player
 			location.x -= body.width;
 
 		right = !right;
+	}
+
+	public void Hitlag()
+	{
+	    if(hitlag == 0)
+	        hitlagShake = new Point(0,0);
+	    else
+		{
+            Random rand = new Random();
+            hitlagShake = new Point((-1 + rand.nextInt(2)) * hitlag, (-1 + rand.nextInt(2)) * hitlag);
+        }
 	}
 	
 	private int directionConvert(int direction)

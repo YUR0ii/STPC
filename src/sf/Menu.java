@@ -32,14 +32,13 @@ public class Menu extends JFrame
 	class charBox extends Rectangle
 	{
 		BufferedImage icon;
-		
-		charBox(Character c)
-		{
+
+		charBox(Character c) {
 			this.setSize(100, 100);
 			this.icon = c.selectIcon;
 		}
 	}
-	
+
 	class charSelect extends JPanel
 	{
 		charBox[] characters;
