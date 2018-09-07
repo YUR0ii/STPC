@@ -166,81 +166,81 @@ public class Player
 }
 	public void movementEvents(InputManager e)
 	{
-		if(lag == 0 && grounded && !attacking)
+		int premove = 0;
+		if(!jumpSquat)
 		{
-			if(!jumpSquat)
+			switch(directionConvert(e.direction(p1)))
 			{
-				switch(directionConvert(e.direction(p1)))
-				{
 				case 1:
 					blocking = true;
 					crouching = true;
 					setAnim(character.Crouch);
-					moving = 0;
+					premove = 0;
 					break;
 				case 2:
 					blocking = false;
 					crouching = true;
 					setAnim(character.Crouch);
-					moving = 0;
+					premove = 0;
 					break;
 				case 3:
 					blocking = false;
 					crouching = true;
 					setAnim(character.Crouch);
-					moving = 0;
+					premove = 0;
 					break;
 				case 4:
 					setAnim(character.WalkB);
-					if(right)
-						moving = -character.backSpeed;
+					if (right)
+						premove = -character.backSpeed;
 					else
-						moving = character.backSpeed;
+						premove = character.backSpeed;
 					blocking = true;
 					crouching = false;
 					break;
 				case 6:
 					setAnim(character.WalkF);
-					if(right)
-						moving = character.forwardSpeed;
+					if (right)
+						premove = character.forwardSpeed;
 					else
-						moving = -character.forwardSpeed;
+						premove = -character.forwardSpeed;
 					blocking = false;
 					crouching = false;
 					break;
 				case 7:
-					if(right)
-						moving = -1;
+					if (right)
+						premove = -1;
 					else
-						moving = 1;
+						premove = 1;
 					crouching = false;
 					Jump();
 					break;
 				case 8:
-					moving = 0;
+					premove = 0;
 					Jump();
 					crouching = false;
 					break;
 				case 9:
-					if(right)
-						moving = 1;
+					if (right)
+						premove = 1;
 					else
-						moving = -1;
+						premove = -1;
 					crouching = false;
 					Jump();
 					break;
 				default:
 					setAnim(character.Stand);
-					moving = 0;
+					premove = 0;
 					blocking = false;
 					crouching = false;
 					break;
-				}
 			}
-			else
+		}
+		//<editor-fold desc="Jumpsquat Direction">
+		else
+		{
+			switch(directionConvert(e.direction(p1)))
 			{
-				switch(directionConvert(e.direction(p1)))
-				{
 				case 1:
 				case 4:
 				case 7:
@@ -259,8 +259,11 @@ public class Player
 					break;
 				default:
 					break;
-				}
 			}
+		}
+		//</editor-fold>
+		if(lag == 0 && grounded && !attacking)
+		{
 		}
 	}
 
@@ -390,8 +393,11 @@ public class Player
 				{
 					target.lag = h.stunCalc(target);
 					target.inHitStun = true;
-					target.hitlag = 14;
-					this.hitlag = 14;
+					if(h.speed == 0)
+					{
+						target.hitlag = 14;
+						this.hitlag = 14;
+					}
 					if(h.type != AttackType.JL && h.type != AttackType.JM && h.type != AttackType.JH) {
 						if (right) {
 							if (target.location.x + h.width / 4 < 1600)
@@ -491,7 +497,7 @@ public class Player
 
 	public void Hitlag()
 	{
-	    if(hitlag == 0)
+	    if(hitlag == 0 || !inHitStun)
 	        hitlagShake = new Point(0,0);
 	    else
 		{
