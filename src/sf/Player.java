@@ -166,81 +166,81 @@ public class Player
 }
 	public void movementEvents(InputManager e)
 	{
-		int premove = 0;
-		if(!jumpSquat)
+		if(lag == 0 && grounded)
 		{
-			switch(directionConvert(e.direction(p1)))
+			if(!jumpSquat)
 			{
+				switch(directionConvert(e.direction(p1)))
+				{
 				case 1:
 					blocking = true;
 					crouching = true;
 					setAnim(character.Crouch);
-					premove = 0;
+					moving = 0;
 					break;
 				case 2:
 					blocking = false;
 					crouching = true;
 					setAnim(character.Crouch);
-					premove = 0;
+					moving = 0;
 					break;
 				case 3:
 					blocking = false;
 					crouching = true;
 					setAnim(character.Crouch);
-					premove = 0;
+					moving = 0;
 					break;
 				case 4:
 					setAnim(character.WalkB);
-					if (right)
-						premove = -character.backSpeed;
+					if(right)
+						moving = -character.backSpeed;
 					else
-						premove = character.backSpeed;
+						moving = character.backSpeed;
 					blocking = true;
 					crouching = false;
 					break;
 				case 6:
 					setAnim(character.WalkF);
-					if (right)
-						premove = character.forwardSpeed;
+					if(right)
+						moving = character.forwardSpeed;
 					else
-						premove = -character.forwardSpeed;
+						moving = -character.forwardSpeed;
 					blocking = false;
 					crouching = false;
 					break;
 				case 7:
-					if (right)
-						premove = -1;
+					if(right)
+						moving = -1;
 					else
-						premove = 1;
+						moving = 1;
 					crouching = false;
 					Jump();
 					break;
 				case 8:
-					premove = 0;
+					moving = 0;
 					Jump();
 					crouching = false;
 					break;
 				case 9:
-					if (right)
-						premove = 1;
+					if(right)
+						moving = 1;
 					else
-						premove = -1;
+						moving = -1;
 					crouching = false;
 					Jump();
 					break;
 				default:
 					setAnim(character.Stand);
-					premove = 0;
+					moving = 0;
 					blocking = false;
 					crouching = false;
 					break;
+				}
 			}
-		}
-		//<editor-fold desc="Jumpsquat Direction">
-		else
-		{
-			switch(directionConvert(e.direction(p1)))
+			else
 			{
+				switch(directionConvert(e.direction(p1)))
+				{
 				case 1:
 				case 4:
 				case 7:
@@ -259,11 +259,8 @@ public class Player
 					break;
 				default:
 					break;
+				}
 			}
-		}
-		//</editor-fold>
-		if(lag == 0 && grounded && !attacking)
-		{
 		}
 	}
 

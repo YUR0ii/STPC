@@ -330,8 +330,8 @@ public class Game extends JFrame
 			if(start)
 			{
 				inputManager.doDirection(p.p1);
-				p.attackEvents(inputManager);
 				p.movementEvents(inputManager);
+				p.attackEvents(inputManager);
 			}
 			
 			p.Animate();
