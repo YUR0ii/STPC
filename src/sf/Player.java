@@ -389,12 +389,15 @@ public class Player
 				else
 				{
 					target.lag = h.stunCalc(target);
-					target.inHitStun = true;
 					if(h.speed == 0)
 					{
-						target.hitlag = 14;
-						this.hitlag = 14;
+						if(target.inHitStun)
+							target.hitlag = 12;
+						else
+							target.hitlag = 13;
+						this.hitlag = 12;
 					}
+					target.inHitStun = true;
 					if(h.type != AttackType.JL && h.type != AttackType.JM && h.type != AttackType.JH) {
 						if (right) {
 							if (target.location.x + h.width / 4 < 1600)

@@ -500,73 +500,78 @@ public class Game extends JFrame
 						}
 					}
 				}
-				
-				boolean clank = false;
 				for(Iterator<Hitbox> i = p.hitboxes.iterator(); i.hasNext();)
 				{
 					Hitbox h = i.next();
-
-					if(clank)
+					if(h.getDelete())
+					{
 						i.remove();
+					}
 					else
 					{
-						if(h.startup == 1)
+						if (h.startup == 1)
 						{
 							h.active = true;
 							h.y = p.location.y - h.offset.y - h.height;
-							if(p.right)
+							if (p.right)
 								h.x = p.location.x + h.offset.x;
 							else
 								h.x = p.location.x - h.offset.x - h.width;
 
-							if(h.testClank(p, other))
-							{
-								i.remove();
-								clank = true;
-							}
-
-							if(h.testCollision(other))
+							if (h.testCollision(other))
 								p.Hit(other, h);
 
-							if(h.activeFrames == 0)
-								i.remove();
+							if (h.activeFrames == 0)
+								h.delete();
 							else
 								h.activeFrames--;
 						}
 						else
 							h.startup--;
 					}
-					
-					
 				}
 				
-				clank = false;
+				boolean clank = false;
 				for(Iterator<Hitbox> i = p.projectiles.iterator(); i.hasNext();)
 				{
 					Hitbox h = i.next();
-
-					if(h.startup == 0)
+					if(h.getDelete())
 					{
-						h.active = true;
-						if(h.direction == 1)
-							h.x += h.speed;
-						else
-							h.x -= h.speed;
-
-						if(h.testCollision(other))
-							p.Hit(other, h);
-						
-						if(h.getMaxX() < 0 || h.getMinX() > this.getWidth() || h.activeFrames == 0 || h.testClank(p, other))
-							i.remove();
+						i.remove();
 					}
 					else
 					{
-						h.startup--;
-						h.y = p.location.y - h.offset.y;
-						if(p.right)
-							h.x = p.location.x + h.offset.x;
+						if (h.startup == 0)
+						{
+							h.active = true;
+							if (h.direction == 1)
+								h.x += h.speed;
+							else
+								h.x -= h.speed;
+
+							if (h.testCollision(other))
+								p.Hit(other, h);
+
+							if (h.getMaxX() < 0 || h.getMinX() > this.getWidth() || h.activeFrames == 0)
+								h.delete();
+							for (Hitbox j : other.projectiles)
+							{
+								if (h.testClank(j))
+								{
+									h.delete();
+									j.delete();
+								}
+							}
+						}
 						else
-							h.x = p.location.x - h.offset.x - h.width;
+						{
+							h.startup--;
+							h.y = p.location.y - h.offset.y;
+							if (p.right)
+								h.x = p.location.x + h.offset.x;
+							else
+								h.x = p.location.x - h.offset.x - h.width;
+						}
 					}
 					
 				}
@@ -579,10 +584,6 @@ public class Game extends JFrame
 						p.jumpSquat = false;
 					}
 				}
-			}
-			else
-			{
-				
 			}
 
 

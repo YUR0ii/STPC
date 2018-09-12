@@ -21,6 +21,8 @@ public class Hitbox extends Rectangle
 	int direction = 0;
 	int speed = 0;
 	BufferedImage image;
+
+	private boolean delete = false;
 	
 	public Hitbox(Hitbox h)
 	{
@@ -88,16 +90,23 @@ public class Hitbox extends Rectangle
 		size = dimension;
 	}
 	
-	public boolean testClank(Player one, Player two)
+	public boolean testClank(Hitbox h)
 	{
-		for(Hitbox h : two.hitboxes)
-		{
-			if (this.intersects(h))
+			if (this.intersects(h) && h.speed != 0)
 			{
 				return true;
 			}
-		}
 		return false;
+	}
+
+	public void delete()
+	{
+		delete = true;
+	}
+
+	public boolean getDelete()
+	{
+		return delete;
 	}
 
 	public boolean testCollision(Player opponent)
