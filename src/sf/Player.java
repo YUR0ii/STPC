@@ -375,6 +375,7 @@ public class Player
 	{
 		h.activeFrames = 0;
 		target.hitboxes.clear();
+		target.projectiles.clear();
 
 		if(h.direction == 0 || h.speed != 0)
 		{
@@ -382,21 +383,21 @@ public class Player
 			{
 				target.health -= h.dmg;
 	
-				if(h.knockdown || (!target.grounded && !target.attacking))
+				if(h.knockdown || (!target.grounded))
 				{
 					target.Knockdown();
 				}
 				else
 				{
 					target.lag = h.stunCalc(target);
-					if(h.speed == 0)
-					{
+
 						if(target.inHitStun)
 							target.hitlag = 12;
 						else
 							target.hitlag = 13;
-						this.hitlag = 12;
-					}
+						if(h.speed == 0)
+							this.hitlag = 12;
+
 					target.inHitStun = true;
 					if(h.type != AttackType.JL && h.type != AttackType.JM && h.type != AttackType.JH) {
 						if (right) {

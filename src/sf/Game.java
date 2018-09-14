@@ -310,7 +310,7 @@ public class Game extends JFrame
 			{
 				if(p.right)
 				{
-					if(p.lag == 0 && !p.blocking)
+					if(p.lag == 0)
 						p.Flip();
 					else
 						p.crossedup = true;
@@ -320,7 +320,7 @@ public class Game extends JFrame
 			{
 				if(!p.right)
 				{
-					if(p.lag == 0 && !p.blocking)
+					if(p.lag == 0)
 						p.Flip();
 					else
 						p.crossedup = true;
@@ -631,14 +631,6 @@ public class Game extends JFrame
 
 			if(p.lag != 0)
 			{
-				if(p.inHitStun)
-				{
-					if (p.crouching)
-						p.setAnim(p.character.DamageC);
-					else
-						p.setAnim(p.character.Damage);
-				}
-
 				if(p.hitlag != 0)
 				{
 					p.Hitlag();
@@ -646,6 +638,14 @@ public class Game extends JFrame
 				}
 				else
 					p.lag--;
+
+				if(p.inHitStun)
+				{
+					if (p.crouching)
+						p.setAnim(p.character.DamageC);
+					else
+						p.setAnim(p.character.Damage);
+				}
 			}
 			else if(p.jumpSquat)
 				p.grounded = false;

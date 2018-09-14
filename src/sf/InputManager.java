@@ -7,7 +7,7 @@ public final class InputManager implements KeyListener
 {
 	private boolean[] keyUp = new boolean[256];
 	private boolean[] keyDown = new boolean[256];
-	private boolean[] lastFrame = new boolean[256];
+	private int[] lastFrame = new int[256];
 	private int[] keysP1 = new int[4];
 	private int[] keysP2 = new int[4];
 	private int[] historyP1 = new int[29];
@@ -37,7 +37,9 @@ public final class InputManager implements KeyListener
 		{
 			keyUp[e.getKeyCode()] = true;
 			keyDown[e.getKeyCode()] = false;
-			lastFrame[e.getKeyCode()] = false;
+			lastFrame[e.getKeyCode()]++;
+			if(lastFrame[e.getKeyCode()] == 2)
+				lastFrame[e.getKeyCode()] = 0;
 		}
 	}
 
@@ -143,9 +145,9 @@ public final class InputManager implements KeyListener
 
 	public boolean keyCheck(int key)
 	{	
-		if(keyDown[key] && !lastFrame[key])
+		if(keyDown[key] && !(lastFrame[key] == 1))
 		{
-			lastFrame[key] = true;
+			lastFrame[key] = 1;
 			return true;
 		}
 		else
@@ -154,7 +156,7 @@ public final class InputManager implements KeyListener
 	
 	public boolean keyCheck(int key, boolean special)
 	{	
-		if(keyDown[key] && !lastFrame[key])
+		if((keyDown[key] && !(lastFrame[key] == 1)) || keyUp[key] && lastFrame[key] == 1)
 			return true;
 		else
 			return false;
