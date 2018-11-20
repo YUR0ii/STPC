@@ -117,7 +117,10 @@ public class Player
 						if(!crouching)
 						{
 							if(e.keyCheck(Controls[JAB]))
-								attack(character.JabC);
+								if(e.direction(p1) == 4)
+									attack(character.JabC);
+								else
+									attack(character.JabF);
 							if(e.keyCheck(Controls[STRONG]))
 								attack(character.StrongC);
 							if(e.keyCheck(Controls[FIERCE]))

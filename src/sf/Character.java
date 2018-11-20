@@ -28,7 +28,9 @@ public abstract class Character
 	Animation Grabbed;
 	Animation BlockDmg;
 	Animation BlockDmgC;
-	
+
+	//5/6 for far, 4 for close
+	//jab + strong for forward throw, strong + fierce for back
 	Attack JabC;
 	Attack JabF;
 	Attack StrongC;

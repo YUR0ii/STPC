@@ -10,12 +10,12 @@ import java.nio.file.FileSystem;
 
 import javax.imageio.ImageIO;
 
-public class Ryu extends Character
+class Ryu extends Character
 {
-	public Ryu()
+	Ryu()
 	{
 		super("Ryu", 4, 7, 5, 24, 100);
-		try{this.selectIcon = ImageIO.read(new File(System.getProperty("user.dir") + "/characters/ryu/selectIcon.png"));}catch(Exception e){};
+		try{this.selectIcon = ImageIO.read(new File(System.getProperty("user.dir") + "/characters/ryu/selectIcon.png"));}catch(Exception ignored){};
 	}
 	
 	@Override
@@ -140,7 +140,7 @@ public class Ryu extends Character
 */
 	
 	
-	Animation Stand() throws IOException
+	private Animation Stand() throws IOException
 	{
 		
 			return new Animation(new int[] {0,10,20,30,40},
@@ -177,7 +177,7 @@ public class Ryu extends Character
 		
 	}
 	
-	Animation Crouch() throws IOException
+	private Animation Crouch() throws IOException
 	{
 		
 		return new Animation(new int[] {0},
@@ -196,7 +196,7 @@ public class Ryu extends Character
 			
 	}
 	
-	Animation Damage() throws IOException
+	private Animation Damage() throws IOException
 	{
 		return new Animation(new int[] {0},
 				new Body[] {
@@ -230,7 +230,7 @@ public class Ryu extends Character
 	
 	}
 	
-	Animation WalkF() throws IOException
+	private Animation WalkF() throws IOException
 	{
 		
 		return new Animation(new int[] {0,5,10,15,20,25,30},
@@ -279,7 +279,7 @@ public class Ryu extends Character
 			
 	}
 	
-	Animation WalkB() throws IOException
+	private Animation WalkB() throws IOException
 	{
 		
 		return new Animation(new int[] {0,5,10,15,20,25,30},
@@ -328,7 +328,7 @@ public class Ryu extends Character
 			
 	}
 	
-	Animation Jump() throws IOException
+	private Animation Jump() throws IOException
 	{
 		
 		return new Animation(new int[] {0,6,12,18,24,30,36,42},
@@ -382,7 +382,7 @@ public class Ryu extends Character
 	}
 
 	
-	Animation Knockdown() throws IOException
+	private Animation Knockdown() throws IOException
 	{
 		
 		return new Animation(new int[] {0},
@@ -404,7 +404,7 @@ public class Ryu extends Character
 
 
 	
-	Animation Wakeup() throws IOException
+	private Animation Wakeup() throws IOException
 	{
 		
 		return new Animation(new int[] {0,15,30,40,50,60},
@@ -452,7 +452,7 @@ public class Ryu extends Character
 			
 	}
 	
-	Animation Grabbed() throws IOException
+	private Animation Grabbed() throws IOException
 	{
 		
 		return new Animation(new int[] {0},
@@ -471,7 +471,7 @@ public class Ryu extends Character
 			
 	}
 	
-	Animation BlockDmg() throws IOException
+	private Animation BlockDmg() throws IOException
 	{
 		return new Animation(new int[] {0},
 				new Body[] {
@@ -488,7 +488,7 @@ public class Ryu extends Character
 	
 	}
 	
-	Animation BlockDmgC() throws IOException
+	private Animation BlockDmgC() throws IOException
 	{
 		return new Animation(new int[] {0},
 				new Body[] {
@@ -506,7 +506,7 @@ public class Ryu extends Character
 	}
 
 	
-	Attack P7() throws IOException
+	private Attack P7() throws IOException
 	{
 		
 		return new Attack("Stand LP Close",
@@ -536,7 +536,7 @@ public class Ryu extends Character
 				12);
 	}
 	
-	Attack P8() throws IOException
+	private Attack P8() throws IOException
 	{
 		
 		return new Attack("Stand MP Far",
@@ -572,7 +572,7 @@ public class Ryu extends Character
 				14);
 	}
 	
-	Attack P9() throws IOException
+	private Attack P9() throws IOException
 	{
 		
 		return new Attack("Stand HP Close",
@@ -609,7 +609,7 @@ public class Ryu extends Character
 				35);
 	}
 	
-	Attack K4() throws IOException
+	private Attack K4() throws IOException
 	{
 		
 		return new Attack("Stand LK Close",
@@ -645,7 +645,7 @@ public class Ryu extends Character
 				16);
 	}
 	
-	Attack K5() throws IOException
+	private Attack K5() throws IOException
 	{
 		
 		return new Attack("Stand MK Far",
@@ -684,7 +684,7 @@ public class Ryu extends Character
 				23);
 	}
 	
-	Attack K6() throws IOException
+	private Attack K6() throws IOException
 	{
 		
 		return new Attack("Stand HK Close",
@@ -728,7 +728,7 @@ public class Ryu extends Character
 	}
 
 	
-	Attack P7C() throws IOException
+	private Attack P7C() throws IOException
 	{
 		
 		return new Attack("Crouch LP",
@@ -758,7 +758,7 @@ public class Ryu extends Character
 				12);
 	}
 	
-	Attack P8C() throws IOException
+	private Attack P8C() throws IOException
 	{
 		
 		return new Attack("Crouch MP",
@@ -794,7 +794,7 @@ public class Ryu extends Character
 				14);
 	}
 	
-	Attack P9C() throws IOException
+	private Attack P9C() throws IOException
 	{
 		
 		return new Attack("Crouch HP",
@@ -831,7 +831,7 @@ public class Ryu extends Character
 				38);
 	}
 	
-	Attack K4C() throws IOException
+	private Attack K4C() throws IOException
 	{
 		
 		return new Attack("Crouch LK",
@@ -863,7 +863,7 @@ public class Ryu extends Character
 				13);
 	}
 	
-	Attack K5C() throws IOException
+	private Attack K5C() throws IOException
 	{
 		
 		return new Attack("Crouch MK",
@@ -902,7 +902,7 @@ public class Ryu extends Character
 				18);
 	}
 	
-	Attack K6C() throws IOException
+	private Attack K6C() throws IOException
 	{
 		
 		return new Attack("Crouch HK",
@@ -953,7 +953,7 @@ public class Ryu extends Character
 	}
 
 	
-	Attack P7A() throws IOException
+	private Attack P7A() throws IOException
 	{
 		
 		return new Attack("Jump LP Forward",
@@ -983,7 +983,7 @@ public class Ryu extends Character
 		43);
 	}
 	
-	Attack P8A() throws IOException
+	private Attack P8A() throws IOException
 	{
 		
 		return new Attack("Jump MP Neutral",
@@ -1019,7 +1019,7 @@ public class Ryu extends Character
 		44);
 	}
 	
-	Attack P9A() throws IOException
+	private Attack P9A() throws IOException
 	{
 		
 		return new Attack("Jump HP Forward",
@@ -1054,7 +1054,7 @@ public class Ryu extends Character
 		43);
 	}
 	
-	Attack K4A() throws IOException
+	private Attack K4A() throws IOException
 	{
 		
 		return new Attack("Jump LK Forward",
@@ -1090,7 +1090,7 @@ public class Ryu extends Character
 		43);
 	}
 	
-	Attack K5A() throws IOException
+	private Attack K5A() throws IOException
 	{
 		
 		return new Attack("Jump MK Neutral",
@@ -1120,7 +1120,7 @@ public class Ryu extends Character
 		44);
 	}
 	
-	Attack K6A() throws IOException
+	private Attack K6A() throws IOException
 	{
 		return new Attack("Jump HK Forward",
 				new Hitbox[]
@@ -1159,7 +1159,7 @@ public class Ryu extends Character
 		43);
 	}
 	
-	Command jabHadouken() throws IOException
+	private Command jabHadouken() throws IOException
 	{
 		return new Command(new int[][] {{2,6}, {3,6}, {6,10}}, Player.JAB, 0, new Attack("Jab Hadouken",
 				new Hitbox[]
