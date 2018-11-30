@@ -44,7 +44,7 @@ class Ryu extends Character
 		try
 		{
 			 JabC = P7();
-//			 JabF;
+			 JabF = P7();
 			 StrongC = P8();
 //			 StrongF;
 			 FierceC = P9();
@@ -54,7 +54,7 @@ class Ryu extends Character
 			 ForwardC = K5();
 //			 ForwardF;
 			 RoundhouseC = K6();
-//			 RoundhouseF;
+			 RoundhouseF = K6();
 			 
 			 P7C = P7C();
 			 P8C = P8C();

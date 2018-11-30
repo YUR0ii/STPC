@@ -122,15 +122,30 @@ public class Player
 								else
 									attack(character.JabF);
 							if(e.keyCheck(Controls[STRONG]))
-								attack(character.StrongC);
+								if(e.direction(p1) == 4)
+									attack(character.StrongC);
+								else
+									attack(character.StrongF);
 							if(e.keyCheck(Controls[FIERCE]))
-								attack(character.FierceC);
+								if(e.direction(p1) == 4)
+									attack(character.FierceC);
+								else
+									attack(character.FierceF);
 							if(e.keyCheck(Controls[SHORT]))
-								attack(character.ShortC);
+								if(e.direction(p1) == 4)
+									attack(character.ShortC);
+								else
+									attack(character.ShortF);
 							if(e.keyCheck(Controls[FORWARD]))
-								attack(character.ForwardC);
+								if(e.direction(p1) == 4)
+									attack(character.ForwardC);
+								else
+									attack(character.ForwardF);
 							if(e.keyCheck(Controls[ROUNDHOUSE]))
-								attack(character.RoundhouseC);
+								if(e.direction(p1) == 4)
+									attack(character.RoundhouseC);
+								else
+									attack(character.RoundhouseF);
 						}
 						else
 						{
@@ -378,11 +393,11 @@ public class Player
 	{
 		h.activeFrames = 0;
 		target.hitboxes.clear();
-		target.projectiles.clear();
+//		target.projectiles.clear();
 
 		if(h.direction == 0 || h.speed != 0)
 		{
-			if(!target.blocking || (!target.crouching && h.hitsLow) || (target.crouching && !grounded))
+			if(!target.blocking || target.inHitStun || (!target.crouching && h.hitsLow) || (target.crouching && !grounded))
 			{
 				target.health -= h.dmg;
 	
@@ -398,7 +413,7 @@ public class Player
 							target.hitlag = 12;
 						else
 							target.hitlag = 13;
-						if(h.speed == 0)
+						if(h.speed == 0 && grounded)
 							this.hitlag = 12;
 
 					target.inHitStun = true;

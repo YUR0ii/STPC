@@ -154,7 +154,10 @@ public class Game extends JFrame
 						if(p.lag != 0)
 						{
 							if(p.inHitStun)
-								g2.setColor(Color.RED);
+								if(p.lag < 5)
+									g2.setColor(Color.BLUE);
+								else
+									g2.setColor(Color.RED);
 							else
 								if(p.blocking)
 									g2.setColor(Color.ORANGE);
