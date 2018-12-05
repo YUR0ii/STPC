@@ -83,63 +83,8 @@ class Ryu extends Character
 				};
 	}catch(Exception e){System.out.println("Command setup failed:"); e.printStackTrace(System.out);}
 	}
-	
-	/*
-	@Override
-	Attack G1()
-	{
-		try{
-		return new Attack("LGrab",
-				new Hitbox[]
-				{
-						new Hitbox(new Point(68,63), new Dimension(20,13), 5300, 2, 6, false)
-				},
-				new Animation(41, new int[] {6,8,32},
-						new Body[]
-								{
-										new Body(new Hurtbox[]
-												{
-													new Hurtbox(new Point(5,0), new Dimension(40,96)),
-													new Hurtbox(new Point(24,94), new Dimension(24,20))
-												}),
-										new Body(new Hurtbox[]
-												{
-														new Hurtbox(new Point(5,0), new Dimension(40,96)),
-														new Hurtbox(new Point(24,94), new Dimension(24,20))
-												})
-								},
-						animStore[22]),
-				30);
-	}
-	@Override
-	Attack G2()
-	{
-		try{
-		return new Attack("RGrab",
-				new Hitbox[]
-				{
-						new Hitbox(new Point(68,63), new Dimension(20,13), 5300, 2, 6, true)
-				},
-				new Animation(42, new int[] {6,8,32},
-						new Body[]
-								{
-										new Body(new Hurtbox[]
-												{
-													new Hurtbox(new Point(5,0), new Dimension(40,96)),
-													new Hurtbox(new Point(24,94), new Dimension(24,20))
-												}),
-										new Body(new Hurtbox[]
-												{
-														new Hurtbox(new Point(5,0), new Dimension(40,96)),
-														new Hurtbox(new Point(24,94), new Dimension(24,20))
-												})
-								},
-						animStore[23]),
-				30);
-	}
-*/
-	
-	
+
+
 	private Animation Stand() throws IOException
 	{
 		
@@ -514,7 +459,7 @@ class Ryu extends Character
 				{
 						new Hitbox(new Point(40,100), new Dimension(38,22), AttackType.L, 3, 4, 4, false, false)
 				},
-				new Animation(new int[] {3,7,14},
+				new Animation(new int[] {0,3,7,12},
 						new Body[]
 								{
 										new Body(new Hurtbox[]
@@ -526,10 +471,16 @@ class Ryu extends Character
 												{
 													new Hurtbox(new Point(0,0), new Dimension(41,96)),
 													new Hurtbox(new Point(18,93), new Dimension(24,22))
+												}),
+										new Body(new Hurtbox[]
+												{
+														new Hurtbox(new Point(0,0), new Dimension(41,96)),
+														new Hurtbox(new Point(18,93), new Dimension(24,22))
 												})
 								},
 								new BufferedImage[]
 										{
+												ImageIO.read(new File(System.getProperty("user.dir") + "/characters/ryu/standing/close/closelp (2).png")),
 												ImageIO.read(new File(System.getProperty("user.dir") + "/characters/ryu/standing/close/closelp(1).png")),
 												ImageIO.read(new File(System.getProperty("user.dir") + "/characters/ryu/standing/close/closelp (2).png"))
 										}),
