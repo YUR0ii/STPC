@@ -156,7 +156,7 @@ public final class InputManager implements KeyListener
 	
 	public boolean keyCheck(int key, boolean special)
 	{
-		System.out.println(lastFrame[key]);
+//		System.out.println(lastFrame[key]);
 		if((keyDown[key] && !(lastFrame[key] == 1)) || keyUp[key] && lastFrame[key] == 1)
 			return true;
 		else
