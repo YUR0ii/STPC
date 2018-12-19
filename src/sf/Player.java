@@ -1,9 +1,10 @@
 package sf;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
+
+import sf.Box.BoxType;
 
 public class Player
 {
@@ -16,16 +17,15 @@ public class Player
 
 	Character character;
 	int[] Controls;
+	InputManager inputs;
 
-	public Body body;
 	Point location;
-	public ArrayList<Hitbox> hitboxes = new ArrayList<Hitbox>();
-	public ArrayList<Hitbox> projectiles = new ArrayList<Hitbox>();
-	Animation currentAnim;
-	private int currentFrame = 0;
-	public BufferedImage sprite;
+	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+	Animation anim;
+	animFrame currentFrame;
+	private int frame = 0;
 
-	public int lag = 0;
+	public int hitstun = 0;
 	public int hitlag = 0;
 	public Point hitlagShake = new Point(0,0);
 	int moving = 0;
@@ -36,16 +36,8 @@ public class Player
 	public boolean crouching = false;
 	public boolean grounded = true;
 	public boolean jumpSquat = false;
-	public boolean inHitStun = false;
-	public boolean isUpdating = true;
-	public boolean crossedup = false;
 	public boolean knockdown = false;
-	public boolean attacking = false;
-	public boolean grabbed = false;
 
-	int top;
-	int front;
-	int center;
 	int airTime = 0;
 
 	boolean p1;
@@ -61,11 +53,10 @@ public class Player
 		location = Location;
 		Controls = controls;
 		character = c;
+		inputs = new InputManager(controls, character.Commands);
 
 		this.p1 = p1;
 		setAnim(c.Stand, true);
-		body = c.Stand.positions[0];
-		sprite = c.Stand.images[0];
 		Animate();
 
 		if(!p1)
@@ -81,30 +72,23 @@ public class Player
 			return character.name + " (P2)";
 	}
 
-	public void attackEvents(InputManager e)
+	public void attackEvents(int distance)
 	{
 		boolean special = false;
-		if(lag == 0 && !jumpSquat)
+		if(hitstun == 0 && !jumpSquat)
 		{
-			for(Command c : character.Commands)
+			for(int i = 0; i < character.Commands.length; i++)
 			{
-				if(e.keyCheck(Controls[c.button], true))
+				Command c = character.Commands[i];
+				if(inputs.keyCheck(c.button) && inputs.getCommandProgress(i) == c.directions.length-1)
 				{
-					int pos = 0;
-					boolean valid = true;
-
-					for(int i = c.directions.length-1; i >= 0 && valid; i--)
+					attack(c, true);
+				}
+				else
+				{
+					if(inputs.getDir() == c.directions[inputs.getCommandProgress(i)][0])
 					{
-						pos = e.posInHistory(directionConvert(c.directions[i][0]), pos, c.directions[i][1], p1);
-						if(pos == -1)
-							valid = false;
-					}
-
-					if(valid && meter >= c.meterCost)
-					{
-						attack(c.attack);
-						meter -= c.meterCost;
-						special = true;
+						inputs.checkCommandValid(c,i);
 					}
 				}
 			}
@@ -116,79 +100,80 @@ public class Player
 					{
 						if(!crouching)
 						{
-							if(e.keyCheck(Controls[JAB]))
-								if(e.direction(p1) == 4)
-									attack(character.JabC);
+							if(inputs.keyCheck(Controls[JAB]))
+								if(distance < character.JabC.range)
+									attack(character.JabC, false);
 								else
-									attack(character.JabF);
-							if(e.keyCheck(Controls[STRONG]))
-								if(e.direction(p1) == 4)
-									attack(character.StrongC);
+									attack(character.JabF, false);
+							if(inputs.keyCheck(Controls[STRONG]))
+								if(distance < character.StrongC.range)
+									attack(character.StrongC, false);
 								else
-									attack(character.StrongF);
-							if(e.keyCheck(Controls[FIERCE]))
-								if(e.direction(p1) == 4)
-									attack(character.FierceC);
+									attack(character.StrongF, false);
+							if(inputs.keyCheck(Controls[FIERCE]))
+								if(distance < character.FierceC.range)
+									attack(character.FierceC, false);
 								else
-									attack(character.FierceF);
-							if(e.keyCheck(Controls[SHORT]))
-								if(e.direction(p1) == 4)
-									attack(character.ShortC);
+									attack(character.FierceF, false);
+							if(inputs.keyCheck(Controls[SHORT]))
+								if(distance < character.ShortC.range)
+									attack(character.ShortC, false);
 								else
-									attack(character.ShortF);
-							if(e.keyCheck(Controls[FORWARD]))
-								if(e.direction(p1) == 4)
-									attack(character.ForwardC);
+									attack(character.ShortF, false);
+							if(inputs.keyCheck(Controls[FORWARD]))
+								if(distance < character.ForwardC.range)
+									attack(character.ForwardC, false);
 								else
-									attack(character.ForwardF);
-							if(e.keyCheck(Controls[ROUNDHOUSE]))
-								if(e.direction(p1) == 4)
-									attack(character.RoundhouseC);
+									attack(character.ForwardF, false);
+							if(inputs.keyCheck(Controls[ROUNDHOUSE]))
+								if(distance < character.RoundhouseC.range)
+									attack(character.RoundhouseC, false);
 								else
-									attack(character.RoundhouseF);
+									attack(character.RoundhouseF, false);
 						}
 						else
 						{
-							if(e.keyCheck(Controls[JAB]))
-								attack(character.P7C);
-							if(e.keyCheck(Controls[STRONG]))
-								attack(character.P8C);
-							if(e.keyCheck(Controls[FIERCE]))
-								attack(character.P9C);
-							if(e.keyCheck(Controls[SHORT]))
-								attack(character.K4C);
-							if(e.keyCheck(Controls[FORWARD]))
-								attack(character.K5C);
-							if(e.keyCheck(Controls[ROUNDHOUSE]))
-								attack(character.K6C);
+							if(inputs.keyCheck(Controls[JAB]))
+								attack(character.P7C, false);
+							if(inputs.keyCheck(Controls[STRONG]))
+								attack(character.P8C, false);
+							if(inputs.keyCheck(Controls[FIERCE]))
+								attack(character.P9C, false);
+							if(inputs.keyCheck(Controls[SHORT]))
+								attack(character.K4C, false);
+							if(inputs.keyCheck(Controls[FORWARD]))
+								attack(character.K5C, false);
+							if(inputs.keyCheck(Controls[ROUNDHOUSE]))
+								attack(character.K6C, false);
 						}
 					}
 					else if(!knockdown)
 					{
-						if(e.keyCheck(Controls[JAB]))
-							attack(character.P7A);
-						if(e.keyCheck(Controls[STRONG]))
-							attack(character.P8A);
-						if(e.keyCheck(Controls[FIERCE]))
-							attack(character.P9A);
-						if(e.keyCheck(Controls[SHORT]))
-							attack(character.K4A);
-						if(e.keyCheck(Controls[FORWARD]))
-							attack(character.K5A);
-						if(e.keyCheck(Controls[ROUNDHOUSE]))
-							attack(character.K6A);
+						if(inputs.keyCheck(Controls[JAB]))
+							attack(character.P7A, false);
+						if(inputs.keyCheck(Controls[STRONG]))
+							attack(character.P8A, false);
+						if(inputs.keyCheck(Controls[FIERCE]))
+							attack(character.P9A, false);
+						if(inputs.keyCheck(Controls[SHORT]))
+							attack(character.K4A, false);
+						if(inputs.keyCheck(Controls[FORWARD]))
+							attack(character.K5A, false);
+						if(inputs.keyCheck(Controls[ROUNDHOUSE]))
+							attack(character.K6A, false);
 					}
 				}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
 			}
+		}
 	}
-}
-	public void movementEvents(InputManager e)
+	
+	public void movementEvents()
 	{
-		if(lag == 0 && grounded)
+		if(hitstun == 0 && grounded)
 		{
 			if(!jumpSquat)
 			{
-				switch(directionConvert(e.direction(p1)))
+				switch(directionConvert(inputs.getDir()))
 				{
 				case 1:
 					blocking = true;
@@ -257,7 +242,7 @@ public class Player
 			}
 			else
 			{
-				switch(directionConvert(e.direction(p1)))
+				switch(directionConvert(inputs.getDir()))
 				{
 				case 1:
 				case 4:
@@ -285,37 +270,27 @@ public class Player
 	private void Jump()
 	{
 		setAnim(character.Jump);
-		lag += character.jumpsquat;
+		hitstun += character.jumpsquat;
 		jumpSquat = true;
 		airTime = 0;
-//		grounded = false;
+		//		grounded = false;
 	}
 
-	private void attack(Attack a)
+	private void attack(Attack a, boolean command)
 	{
-		attacking = true;
 		setAnim(a.animation);
-		lag = a.faf;
+
 		if(grounded)
 		{
 			moving = 0;
 		}
+
+		if(command)
+			((Command) a).customEvents();
+
 		if(a.proj)
 		{
-			for(Hitbox g : a.Hitboxes)
-			{
-				Hitbox h = new Hitbox(g);
-				
-				if(!right)
-					h.direction = -h.direction;
-				
-				projectiles.add(h);
-			}
-		}
-		else
-		{
-			for(Hitbox h : a.Hitboxes)
-				hitboxes.add(new Hitbox(h));
+			projectiles.add(a.projectile);
 		}
 	}
 
@@ -324,169 +299,109 @@ public class Player
 		return location.y >= ground;
 	}
 
-	public void posCalcs()
+	public void posUpdate()
 	{
-		if(right)
+		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
-			front = location.x + (2 * character.width);
-		}
-		else
-		{
-			front = location.x - (2 * character.width);
-		}
-
-		this.top = location.y - body.height;
-		
-		this.center = (location.x + front)/2;
-	}
-	
-	public void bodyPosUpdate()
-	{
-		for(Hurtbox h : body.body)
-		{
-			if(right)
-				h.x = location.x + h.offset.x;
+			Box b = currentFrame.boxes[i];
+			b.y = location.y - b.offset.y - b.height;
+			if (right)
+				b.x = location.x + b.offset.x;
 			else
-				h.x = location.x + (-h.offset.x - h.width);
-			
-			h.y = location.y - h.offset.y;
+				b.x = location.x - b.offset.x - b.width;
+		}
+		
+		
+	}
+
+	public void hitboxCalc(Player other)
+	{
+		for(Box b : currentFrame.boxes)
+		{
+			if(b.type == Box.BoxType.HIT)
+			{
+				Hitbox h = (Hitbox) b;
+
+				if (h.testCollision(other, BoxType.HURT))
+					Hit(other, h);
+			}
 		}
 	}
-	
+
 	public void setAnim(Animation a)
 	{
-		if(!currentAnim.equals(a))
+		if(!anim.equals(a))
 		{
-			currentFrame = 0;
-			currentAnim = a;
-			isUpdating = true;
+			frame = 0;
+			anim = a;
 		}
 	}
-	
+
 	private void setAnim(Animation a, boolean noCheck)
 	{
-		currentFrame = 0;
-		currentAnim = a;
-		isUpdating = true;
+		frame = 0;
+		anim = a;
 	}
-	
+
 	public void Animate()
 	{
 		if(hitlag == 0)
 		{
-			currentFrame++;
+			frame++;
 		}
-		
-		int oldFront = front;
-		body = currentAnim.boxAnimate(currentFrame, this);
-		sprite = currentAnim.spriteAnimate(currentFrame, this);
-		posCalcs();
-		int newFront = front;
-		
-		if((right && newFront > oldFront) || (!right && newFront < oldFront))
-			isUpdating = true;
-		
-		
+
+		currentFrame = anim.getFrame(frame, this);
+		posUpdate();
 	}
 
 	public void Hit(Player target, Hitbox h)
 	{
-		h.activeFrames = 0;
-		target.hitboxes.clear();
-//		target.projectiles.clear();
-
-		if(h.direction == 0 || h.speed != 0)
+		if(!target.blocking || (!target.crouching && h.low) || (target.crouching && !grounded))
 		{
-			if(!target.blocking || target.inHitStun || (!target.crouching && h.hitsLow) || (target.crouching && !grounded))
-			{
-				target.health -= h.dmg;
-	
-				if(h.knockdown || (!target.grounded))
-				{
-					target.Knockdown();
-				}
-				else
-				{
-					target.lag = h.stunCalc(target);
+			target.health -= h.dmg;
 
-						if(target.inHitStun)
-							target.hitlag = 12;
-						else
-							target.hitlag = 13;
-						if(h.speed == 0 && grounded)
-							this.hitlag = 12;
-
-					target.inHitStun = true;
-					if(h.type != AttackType.JL && h.type != AttackType.JM && h.type != AttackType.JH) {
-						if (right) {
-							if (target.location.x + h.width / 4 < 1600)
-								target.location.x += h.width / 4;
-							else if (h.speed == 0)
-								location.x -= h.width / 4;
-						} else {
-							if (target.location.x - h.width / 4 > 0)
-								target.location.x -= h.width / 4;
-							else if (h.speed == 0)
-								location.x += h.width / 4;
-						}
-					}
-
-				}
-			}
+			if(h.knockdown || (!target.grounded))
+				target.Knockdown();
 			else
 			{
-				if(target.crouching)
-					target.setAnim(target.character.BlockDmgC);
+				if(target.hitstun != 0)
+					target.hitlag = 12;
 				else
-					target.setAnim(target.character.BlockDmg);
-				
-				if(target.health - h.blockDmg > 0)
-					target.health -= h.blockDmg;
-				else
-					target.health = 1;
-				target.lag = h.stunCalc(target);
-				if(right)
+					target.hitlag = 13;
+				if(h.type != BoxType.PROJ && grounded)
+					this.hitlag = 12;
+
+				target.hitstun = h.stunCalc(target);
+
+				if(h.strength != Hitbox.AttackType.JL && h.strength != Hitbox.AttackType.JM && h.strength != Hitbox.AttackType.JH)
 				{
-					if(target.location.x + h.width/6 < 1600)
-						target.location.x += h.width/6;
-					else if (h.speed == 0)
-						location.x -= h.width/6;
+					//TODO Attack pushback
 				}
-				else
-				{
-					if(target.location.x - h.width/6 > 0)
-						target.location.x -= h.width/6;
-					else if (h.speed == 0)
-						location.x += h.width/6;
-				}		
+
 			}
 		}
 		else
 		{
-			target.blocking = false;
-			target.grabbed = true;
-			target.setAnim(target.character.Damage);
-			target.health -= h.dmg;
-			if(h.direction == 1)
-			{
-				setAnim(character.GrabB);
-				target.location.x = location.x;
-				Flip();
-			}
+			if(target.crouching)
+				target.setAnim(target.character.BlockDmgC);
 			else
-			{
-				setAnim(character.GrabF);
-				target.location.x = front;
-			}
-			
-			lag = 40;
-			target.lag = 40;
+				target.setAnim(target.character.BlockDmg);
+
+			if(target.health - h.blockDmg > 0)
+				target.health -= h.blockDmg;
+			else
+				target.health = 1;
+
+			target.hitstun = h.stunCalc(target);
+
+			//TODO Attack pushback on block
 		}
+		
+		//TODO Grabs
 	}
 
 	public void Knockdown()
 	{
-		grabbed = false;
 		knockdown = true;
 		setAnim(character.Knockdown);
 		airTime = 0;
@@ -496,35 +411,25 @@ public class Player
 		else
 			moving = character.airSpeed;
 	}
-	
-	public void Wakeup(InputManager e)
+
+	public void Wakeup()
 	{
 		knockdown = false;
-		
+
 		setAnim(character.Wakeup);
 	}
 
 	public void Flip()
 	{
-		if(right)
-			location.x += body.width;
-		else
-			location.x -= body.width;
-
 		right = !right;
 	}
 
-	public void Hitlag()
+	public void doHitlagShake()
 	{
-	    if(hitlag == 0 || !inHitStun)
-	        hitlagShake = new Point(0,0);
-	    else
-		{
-            Random rand = new Random();
-            hitlagShake = new Point((-1 + rand.nextInt(2)) * hitlag, (-1 + rand.nextInt(2)) * hitlag);
-        }
+			Random rand = new Random();
+			hitlagShake = new Point((-1 + rand.nextInt(2)) * hitlag, (-1 + rand.nextInt(2)) * hitlag);
 	}
-	
+
 	private int directionConvert(int direction)
 	{
 		if(!right)
@@ -544,7 +449,7 @@ public class Player
 			case 9:
 				return 7;
 			default:
-					return direction;
+				return direction;
 			}
 		}
 		else

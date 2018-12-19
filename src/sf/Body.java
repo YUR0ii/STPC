@@ -2,17 +2,17 @@ package sf;
 
 public class Body
 {
-	Hurtbox[] body;
+	Box[] body;
 	int width;
 	int height;
 	
-	Body(Hurtbox[] body)
+	Body(Box[] body)
 	{
 		this.body = body;
 		
 		int maxx = 0;
 		int maxy = 0;
-		for(Hurtbox h : this.body)
+		for(Box h : this.body)
 		{
 			if(h.offset.x + h.width > maxx)
 				maxx = h.offset.x + h.width;

@@ -2,24 +2,30 @@ package sf;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public final class InputManager implements KeyListener
 {
 	private boolean[] keyUp = new boolean[256];
 	private boolean[] keyDown = new boolean[256];
 	private int[] lastFrame = new int[256];
-	private int[] keysP1 = new int[4];
-	private int[] keysP2 = new int[4];
-	private int[] historyP1 = new int[29];
-	private int[] historyP2 = new int[29];
-	private int dirP1;
-	private int dirP2;
+	private int[] keys = new int[4];
+
+	//first is progress, second is frames since last input
+	int[][] commandValid;
+
+	private int dir;
 
 
-	public InputManager(int[] keysP1, int[] keysP2)
+	public InputManager(int[] keys, Command[] commands)
 	{
-		this.keysP1 = keysP1;
-		this.keysP2 = keysP2;
+		this.keys = keys;
+		commandValid = new int[commands.length][2];
+	}
+
+	public int getCommandProgress(int command)
+	{
+		return commandValid[command][0];
 	}
 
 	public void keyPressed(KeyEvent e)
@@ -45,67 +51,25 @@ public final class InputManager implements KeyListener
 
 	public void keyTyped(KeyEvent e){}
 	
-	int posInHistory(int direction, int start, int range, boolean p1)
+	public int getDir()
 	{
-		int[] history = historyP2;
-		if(p1)
-			history = historyP1;
-		
-		int pos = -1;
-		for(int i = start; i < start + range; i++)
+		return dir;
+	}
+
+	public void checkCommandValid(Command c, int i)
+	{
+		if(commandValid[i][1] < c.directions[commandValid[i][0]][1])
 		{
-			if(history[i] == direction)
-				pos = i;
+			commandValid[i][0]++;
+			commandValid[i][1] = 0;
 		}
-		
-		return pos;
 	}
 	
-	public int direction(boolean p1)
+	public void Update()
 	{
-		if(p1)
-			return dirP1;
-		else
-			return dirP2;
-	}
-	
-	public void doDirection(boolean p1)
-	{
-		int dir;
-		int[] keys;
-		int[] history;
-		if(p1)
-		{
-			keys = keysP1;
-			history = historyP1;
-		}
-		else
-		{
-			keys = keysP2;
-			history = historyP2;
-		}
-		
 		dir = directionCheck(keys);
-		
-		int holder = history[0];
-		int holder2;
-		history[0] = dir;
-		for(int i = 1; i < 28; i+=2)
-		{
-			holder2 = history[i];
-			history[i] = holder;
-			holder = history[i+1];
-			history[i+1] = holder2;
-		}
-		
-		if(p1)
-			dirP1 = dir;
-		else
-			dirP2 = dir;
-		
-//		for(int i = 0; i < 29; i++)
-//			System.out.print(history[i]);
-//		System.out.println();
+		for(int i = 0; i < commandValid.length; i++)
+			commandValid[i][1]++;
 	}
 	
 	private int directionCheck(int[] keys)

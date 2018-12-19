@@ -2,26 +2,32 @@ package sf;
 
 public class Attack
 {
-	String Name;
-	Hitbox[] Hitboxes;
+	String name;
 	Animation animation;
-	int faf;
 	boolean proj = false;
+	Projectile projectile;
+	int range;
 	
-	Attack(String Name, Hitbox[] Hitboxes, Animation animation, int faf)
+	Attack(String name, Animation animation)
 	{
-		this.Name = Name;
-		this.Hitboxes = Hitboxes;
+		this.name = name;
 		this.animation = animation;
-		this.faf = faf;
+		range = -1;
+	}
+
+
+	Attack(String name, Animation animation, int range)
+	{
+		this.name = name;
+		this.animation = animation;
+		this.range = range;
 	}
 	
-	Attack(String Name, Hitbox[] Hitboxes, Animation animation, int faf, boolean proj)
+	Attack(String name, Animation animation, Projectile p)
 	{
-		this.Name = Name;
-		this.Hitboxes = Hitboxes;
+		this.name = name;
 		this.animation = animation;
-		this.faf = faf;
 		this.proj = true;
+		projectile = p;
 	}
 }
