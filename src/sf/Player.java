@@ -42,12 +42,6 @@ public class Player
 
 	boolean p1;
 
-	Player(Point Location, int[] controls)
-	{
-		location = Location;
-		Controls = controls;
-	}
-
 	Player(Character c, Point Location, int[] controls, boolean p1)
 	{
 		location = Location;

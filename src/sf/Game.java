@@ -1,11 +1,6 @@
 package sf;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -23,6 +18,8 @@ import javax.swing.*;
 
 import sf.Box.BoxType;
 
+//http://zachd.com/nki/ST/data.html
+
 public class Game extends JFrame
 {
 	Graphics2D g2;
@@ -31,13 +28,13 @@ public class Game extends JFrame
 	HealthBar p2b;
 	Player p2;
 	Player[] Players;
-	public int floorLevel;
 	Timer updateTimer;
 	int roundTimerInt = 3;
 	JLabel roundTimer = new JLabel("3");
 	JLabel winText = new JLabel("");
 	boolean start = false;
 	boolean debug = false;
+	Dimension screenSize;
 
 	Game(Character p1, Character p2)
 	{
@@ -125,35 +122,6 @@ public class Game extends JFrame
 			winText.setFont(new Font("Monospace", 1, 150));
 			winText.setLocation(600, 600);
 			winText.setForeground(Color.WHITE);
-
-			addComponentListener(new ComponentListener()
-			{
-				@Override
-				public void componentHidden(ComponentEvent e) {
-
-				}
-
-				@Override
-				public void componentMoved(ComponentEvent e) {
-
-				}
-
-				@Override
-				public void componentResized(ComponentEvent e)
-				{
-					floorLevel = getHeight();
-					for(Player p : Players)
-					{
-						p.location.y = floorLevel;
-					}
-				}
-
-				@Override
-				public void componentShown(ComponentEvent e) {
-
-				}
-
-			});
 		}
 
 		public void paintComponent(Graphics g)
@@ -223,9 +191,6 @@ public class Game extends JFrame
 
 					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), h.x + lr, h.y);
 				}
-
-
-
 
 				g2.drawImage(p.currentFrame.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), p.location.x + p.hitlagShake.x, p.location.y  + p.hitlagShake.y - (p.currentFrame.sprite.getHeight() * 5));
 			}
@@ -298,6 +263,7 @@ public class Game extends JFrame
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setUndecorated(true);
 		this.setVisible(true);
+		screenSize = this.getSize();
 	}
 
 	private void Update()
