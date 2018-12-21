@@ -19,6 +19,9 @@ public class Player
 	int[] Controls;
 	InputManager inputs;
 
+	double x;
+	double y;
+	//TODO switch to double position
 	Point location;
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	Animation anim;
@@ -29,7 +32,7 @@ public class Player
 	public int hitlag = 0;
 	public Point hitlagShake = new Point(0,0);
 	int moving = 0;
-	int health = 175;
+	int health = 144;
 	double meter = 0;
 	boolean right = true;
 	public boolean blocking = false;
@@ -421,7 +424,7 @@ public class Player
 	public void doHitlagShake()
 	{
 			Random rand = new Random();
-			hitlagShake = new Point((-1 + rand.nextInt(2)) * hitlag, (-1 + rand.nextInt(2)) * hitlag);
+			hitlagShake = new Point((int) (-.5 + rand.nextDouble() * hitlag), (int) (-.5 + rand.nextDouble() * hitlag));
 	}
 
 	private int directionConvert(int direction)

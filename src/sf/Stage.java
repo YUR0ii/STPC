@@ -2,9 +2,10 @@ package sf;
 
 import java.awt.image.BufferedImage;
 
-public class animFrame
+public class Stage
 {
+	int length;
+	int floorHeight;
 	BufferedImage sprite;
-	Box[] boxes;
-	boolean actionable;
+	String name;
 }

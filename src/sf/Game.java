@@ -19,7 +19,25 @@ import javax.swing.*;
 import sf.Box.BoxType;
 
 //http://zachd.com/nki/ST/data.html
-
+/*
+Stage Lengths:
+Ryu: 462
+Ken: 457
+Honda: 462
+Chun: 449
+Blanka: 466
+Zangief: 449
+Guile: 459
+Dhalsim: 444
+Hawk: 458
+Cammy: 459
+Fei Long: 458
+DeeJay: 459
+Boxer: 463
+Claw: 443
+Sagat: 445
+ */
+//Screen is 384x224
 public class Game extends JFrame
 {
 	Graphics2D g2;
@@ -34,10 +52,13 @@ public class Game extends JFrame
 	JLabel winText = new JLabel("");
 	boolean start = false;
 	boolean debug = false;
-	Dimension screenSize;
+	double screenScale;
+	final Dimension defaultRes = new Dimension(384,224);
+	Stage stage;
 
-	Game(Character p1, Character p2)
+	Game(Character p1, Character p2, Stage stage)
 	{
+		this.stage = stage;
 		initCharacters(p1, p2);
 		initPanel();
 		updateTimer = new Timer();
@@ -91,7 +112,7 @@ public class Game extends JFrame
 
 		HealthBar(Player p, boolean p1)
 		{
-			super(650,50);
+			super(scale(150),scale(15));
 			this.p = p;
 			this.p1 = p1;
 
@@ -129,8 +150,8 @@ public class Game extends JFrame
 			super.paintComponent(g);
 			g2 = (Graphics2D) g;
 			AffineTransform at = new AffineTransform();
+			at.setToScale(screenScale, screenScale);
 
-			at.setToScale(1.25, 1.25);
 			g2.drawImage(background, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), 0, 0);
 
 			for(Player p : Players)
@@ -178,29 +199,20 @@ public class Game extends JFrame
 				}
 				//</editor-fold>
 
-				if(p.right)
-					at.setToScale(5, 5);
-				else
-					at.setToScale(-5, 5);
+				if(!p.right)
+					at.setToScale(-screenScale, screenScale);
 
 				for(Projectile h : p.projectiles)
-				{
-					int lr = 0;
-					if(!p.right)
-						lr = h.width;
-
-					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), h.x + lr, h.y);
-				}
-
-				g2.drawImage(p.currentFrame.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), p.location.x + p.hitlagShake.x, p.location.y  + p.hitlagShake.y - (p.currentFrame.sprite.getHeight() * 5));
+					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(h.x), scale(h.y));
+				g2.drawImage(p.currentFrame.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.location.x + p.hitlagShake.x), scale(p.location.y  + p.hitlagShake.y - (p.currentFrame.sprite.getHeight() * 5)));
 			}
 
 			g2.setColor(Color.red);
 			g2.fill(p1b);
 			g2.fill(p2b);
-			winText.setFont(new Font("Monospace", 1, 150));
-			winText.setLocation(800-(winText.getWidth()/2), 450-(winText.getHeight()/2));
-			roundTimer.setLocation(800-(roundTimer.getWidth()/2), 0);
+			winText.setFont(new Font("Monospace", 1, scale(36)));
+			winText.setLocation(scale(192)-(winText.getWidth()/2), scale(108)-(winText.getHeight()/2));
+			roundTimer.setLocation(scale(192)-(roundTimer.getWidth()/2), 0);
 		}  
 	}
 
@@ -242,8 +254,8 @@ public class Game extends JFrame
 						KeyEvent.VK_ENTER
 				};
 
-		p1 = new Player(p1Char, new Point(100,0), p1Controls, true);
-		p2 = new Player(p2Char, new Point(1300,0), p2Controls, false);
+		p1 = new Player(p1Char, new Point(scale(50),0), p1Controls, true);
+		p2 = new Player(p2Char, new Point(scale(300),0), p2Controls, false);
 
 		Players = new Player[] {p1, p2};
 	}
@@ -259,11 +271,11 @@ public class Game extends JFrame
 		p2b = new HealthBar(p2, false);
 
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-//		this.setSize(1600,900);
+		//		this.setSize(1600,900);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setUndecorated(true);
 		this.setVisible(true);
-		screenSize = this.getSize();
+		screenScale = defaultRes.getHeight() / getSize().getHeight();
 	}
 
 	private void Update()
@@ -295,7 +307,7 @@ public class Game extends JFrame
 
 			p.Animate();
 			p.posUpdate();
-			
+
 			//TODO Movement Here
 
 			for(int i = 0; i < p.currentFrame.boxes.length; i++)
@@ -306,126 +318,131 @@ public class Game extends JFrame
 					b.x = p.location.x + b.offset.x;
 				else
 					b.x = p.location.x - b.offset.x - b.width;
-				
+
 				if(p.currentFrame.boxes[i].type == BoxType.HIT)
 				{
 					Hitbox h = (Hitbox) p.currentFrame.boxes[i];
-					
-					
+
+
 
 					if (h.testCollision(other, BoxType.HURT))
 						p.Hit(other, h);
 				}
 			}
 
-				for(Iterator<Projectile> i = p.projectiles.iterator(); i.hasNext();)
+			for(Iterator<Projectile> i = p.projectiles.iterator(); i.hasNext();)
+			{
+				Projectile h = i.next();
+				if(h.getDelete())
+					i.remove();
+				else
 				{
-					Projectile h = i.next();
-					if(h.getDelete())
-						i.remove();
+					if (h.right)
+						h.x += h.speed;
 					else
-					{
-						if (h.right)
-							h.x += h.speed;
-						else
-							h.x -= h.speed;
+						h.x -= h.speed;
 
-						if (h.testCollision(other, BoxType.HURT))
+					if (h.testCollision(other, BoxType.HURT))
+					{
+						p.Hit(other, h);
+						h.delete();
+					}
+
+					if (h.getMaxX() < 0 || h.getMinX() > this.getWidth() || h.lifespan == 0)
+						h.delete();
+
+					for (Projectile j : other.projectiles)
+					{
+						if (h.intersects(j))
 						{
-							p.Hit(other, h);
 							h.delete();
+							j.delete();
 						}
-
-						if (h.getMaxX() < 0 || h.getMinX() > this.getWidth() || h.lifespan == 0)
-							h.delete();
-						
-						for (Projectile j : other.projectiles)
-						{
-							if (h.intersects(j))
-							{
-								h.delete();
-								j.delete();
-							}
-						}
-					}
-
-				}
-
-				if(p.jumpSquat)
-				{
-					if(p.hitstun == 0)
-					{
-						p.grounded = false;
-						p.jumpSquat = false;
 					}
 				}
 
+			}
 
-				if(!p.grounded)
+			if(p.jumpSquat)
+			{
+				if(p.hitstun == 0)
 				{
-					p.airTime++;
-					p.location.y = floorLevel - (int) ( (75 * p.airTime) - (Math.pow((double) p.airTime * 1.5, 2)) );
-					p.grounded = p.checkGrounded(floorLevel);
-					if(p.knockdown)
-					{
-						if(p.right && p.location.x - 5 > 0)
-							p.location.x -= 5;
-						else if(p.location.x + 5 < this.getWidth())
-							p.location.x += 5;
-					}
-					if(p.grounded)
-					{
-						if(!p.knockdown)
-							p.hitstun = 4;
-						else
-						{
-							p.Wakeup();
-							p.hitstun = p.character.Wakeup.maxFrame;
-						}
-						p.location.y = floorLevel;
-						p.moving = 0;
-					}
-				}
-
-
-				if(p.hitstun != 0)
-				{
-					if(p.hitlag != 0)
-					{
-						p.doHitlagShake();
-						p.hitlag--;
-					}
-					else
-						p.hitstun--;
-
-					if(p.hitstun != 0)
-					{
-						if (p.crouching)
-							p.setAnim(p.character.DamageC);
-						else
-							p.setAnim(p.character.Damage);
-					}
+					p.grounded = false;
+					p.jumpSquat = false;
 				}
 			}
 
-			p1b.Update();
-			p2b.Update();
 
-			if(p1.health <= 0 || p2.health <= 0 || roundTimerInt == 0)
-				gameEnd();
+			if(!p.grounded)
+			{
+				p.airTime++;
+				p.location.y = floorLevel - (int) ( (75 * p.airTime) - (Math.pow((double) p.airTime * 1.5, 2)) );
+				p.grounded = p.checkGrounded(floorLevel);
+				if(p.knockdown)
+				{
+					if(p.right && p.location.x - 5 > 0)
+						p.location.x -= 5;
+					else if(p.location.x + 5 < this.getWidth())
+						p.location.x += 5;
+				}
+				if(p.grounded)
+				{
+					if(!p.knockdown)
+						p.hitstun = 4;
+					else
+					{
+						p.Wakeup();
+						p.hitstun = p.character.Wakeup.maxFrame;
+					}
+					p.location.y = floorLevel;
+					p.moving = 0;
+				}
+			}
 
-			this.repaint();
-			//		System.out.println(System.currentTimeMillis() - time);
+
+			if(p.hitstun != 0)
+			{
+				if(p.hitlag != 0)
+				{
+					p.doHitlagShake();
+					p.hitlag--;
+				}
+				else
+					p.hitstun--;
+
+				if(p.hitstun != 0)
+				{
+					if (p.crouching)
+						p.setAnim(p.character.DamageC);
+					else
+						p.setAnim(p.character.Damage);
+				}
+			}
 		}
 
-		void gameEnd()
-		{
-			start = false;
-			if(p1.health > p2.health)
-				winText.setText(p1.toString() + " wins");
-			else
-				winText.setText(p2.toString() + " wins");
+		p1b.Update();
+		p2b.Update();
 
-			updateTimer.cancel();
-		}
+		if(p1.health <= 0 || p2.health <= 0 || roundTimerInt == 0)
+			gameEnd();
+
+		this.repaint();
+		//		System.out.println(System.currentTimeMillis() - time);
 	}
+
+	void gameEnd()
+	{
+		start = false;
+		if(p1.health > p2.health)
+			winText.setText(p1.toString() + " wins");
+		else
+			winText.setText(p2.toString() + " wins");
+
+		updateTimer.cancel();
+	}
+
+	private int scale(double num)
+	{
+		return (int) (num * screenScale);
+	}
+}
