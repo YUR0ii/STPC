@@ -19,10 +19,16 @@ public class Player
 	int[] Controls;
 	InputManager inputs;
 
-	double x;
-	double y;
-	//TODO switch to double position
-	Point location;
+	private double x;
+	int getX()
+	{
+		return (int) x;
+	}
+	private double y;
+	int getY()
+	{
+		return (int) y;
+	}
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	Animation anim;
 	animFrame currentFrame;
@@ -47,7 +53,8 @@ public class Player
 
 	Player(Character c, Point Location, int[] controls, boolean p1)
 	{
-		location = Location;
+		x = Location.x;
+		y = Location.y;
 		Controls = controls;
 		character = c;
 		inputs = new InputManager(controls, character.Commands);
@@ -68,10 +75,14 @@ public class Player
 		else
 			return character.name + " (P2)";
 	}
-
-	public void attackEvents(int distance)
+	
+	public boolean actionable()
 	{
-		boolean special = false;
+		return currentFrame.actionable;
+	}
+	
+	public boolean checkCommands()
+	{
 		if(hitstun == 0 && !jumpSquat)
 		{
 			for(int i = 0; i < character.Commands.length; i++)
@@ -80,6 +91,7 @@ public class Player
 				if(inputs.keyCheck(c.button) && inputs.getCommandProgress(i) == c.directions.length-1)
 				{
 					attack(c, true);
+					return true;
 				}
 				else
 				{
@@ -89,6 +101,14 @@ public class Player
 					}
 				}
 			}
+		}
+		return false;
+	}
+
+	public void checkNormals(int distance)
+	{
+		boolean special = false;
+		
 
 			if(!special)
 			{
@@ -161,10 +181,9 @@ public class Player
 					}
 				}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
 			}
-		}
 	}
 	
-	public void movementEvents()
+	public void checkMovement()
 	{
 		if(hitstun == 0 && grounded)
 		{
@@ -293,7 +312,7 @@ public class Player
 
 	public boolean checkGrounded(int ground)
 	{
-		return location.y >= ground;
+		return y >= ground;
 	}
 
 	public void posUpdate()
@@ -301,14 +320,12 @@ public class Player
 		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
 			Box b = currentFrame.boxes[i];
-			b.y = location.y - b.offset.y - b.height;
+			b.y = getY() - b.offset.y - b.height;
 			if (right)
-				b.x = location.x + b.offset.x;
+				b.x = getX() + b.offset.x;
 			else
-				b.x = location.x - b.offset.x - b.width;
+				b.x = getX() - b.offset.x - b.width;
 		}
-		
-		
 	}
 
 	public void hitboxCalc(Player other)

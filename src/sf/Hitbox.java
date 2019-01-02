@@ -50,7 +50,6 @@ public class Hitbox extends Box
 		this.low = low;
 		if(projectile)
 			this.type = BoxType.PROJ;
-		this.type = BoxType.HIT;
 	}
 
 	public int stunCalc(Player opponent)

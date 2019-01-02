@@ -204,7 +204,7 @@ public class Game extends JFrame
 
 				for(Projectile h : p.projectiles)
 					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(h.x), scale(h.y));
-				g2.drawImage(p.currentFrame.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.location.x + p.hitlagShake.x), scale(p.location.y  + p.hitlagShake.y - (p.currentFrame.sprite.getHeight() * 5)));
+				g2.drawImage(p.currentFrame.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.getX() + p.hitlagShake.x), scale(p.getX()  + p.hitlagShake.y - (p.currentFrame.sprite.getHeight() * 5)));
 			}
 
 			g2.setColor(Color.red);
@@ -290,7 +290,7 @@ public class Game extends JFrame
 			else
 				other = p1;
 
-			if(p.location.x > other.location.x)
+			if(p.getX() > other.getX())
 				if(p.right)
 					if(p.hitstun == 0)
 						p.Flip();
@@ -299,12 +299,12 @@ public class Game extends JFrame
 							if(p.hitstun == 0)
 								p.Flip();
 
-			if(start)
+			if(p.actionable())
 			{
-				p.movementEvents();
-				p.attackEvents(Math.abs(p1.location.x - p2.location.x));
+				if(!p.checkCommands())
+					p.checkNormals(Math.abs(p1.getX() - p2.getX()));
+				p.checkMovement();
 			}
-
 			p.Animate();
 			p.posUpdate();
 
@@ -312,19 +312,9 @@ public class Game extends JFrame
 
 			for(int i = 0; i < p.currentFrame.boxes.length; i++)
 			{
-				Box b = p.currentFrame.boxes[i];
-				b.y = p.location.y - b.offset.y - b.height;
-				if (p.right)
-					b.x = p.location.x + b.offset.x;
-				else
-					b.x = p.location.x - b.offset.x - b.width;
-
 				if(p.currentFrame.boxes[i].type == BoxType.HIT)
 				{
 					Hitbox h = (Hitbox) p.currentFrame.boxes[i];
-
-
-
 					if (h.testCollision(other, BoxType.HURT))
 						p.Hit(other, h);
 				}
@@ -369,33 +359,6 @@ public class Game extends JFrame
 				{
 					p.grounded = false;
 					p.jumpSquat = false;
-				}
-			}
-
-
-			if(!p.grounded)
-			{
-				p.airTime++;
-				p.location.y = floorLevel - (int) ( (75 * p.airTime) - (Math.pow((double) p.airTime * 1.5, 2)) );
-				p.grounded = p.checkGrounded(floorLevel);
-				if(p.knockdown)
-				{
-					if(p.right && p.location.x - 5 > 0)
-						p.location.x -= 5;
-					else if(p.location.x + 5 < this.getWidth())
-						p.location.x += 5;
-				}
-				if(p.grounded)
-				{
-					if(!p.knockdown)
-						p.hitstun = 4;
-					else
-					{
-						p.Wakeup();
-						p.hitstun = p.character.Wakeup.maxFrame;
-					}
-					p.location.y = floorLevel;
-					p.moving = 0;
 				}
 			}
 
