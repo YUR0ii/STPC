@@ -12,7 +12,7 @@ public final class InputManager implements KeyListener
 	private int[] keys = new int[4];
 
 	//first is progress, second is frames since last input
-	int[][] commandValid;
+	private int[][] commandValid;
 
 	private int dir;
 

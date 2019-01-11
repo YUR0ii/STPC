@@ -19,25 +19,7 @@ import javax.swing.*;
 import sf.Box.BoxType;
 
 //http://zachd.com/nki/ST/data.html
-/*
-Stage Lengths:
-Ryu: 462
-Ken: 457
-Honda: 462
-Chun: 449
-Blanka: 466
-Zangief: 449
-Guile: 459
-Dhalsim: 444
-Hawk: 458
-Cammy: 459
-Fei Long: 458
-DeeJay: 459
-Boxer: 463
-Claw: 443
-Sagat: 445
- */
-//Screen is 384x224
+//https://classicreload.com/super-street-fighter-2-turbo.html
 public class Game extends JFrame
 {
 	Graphics2D g2;
@@ -117,14 +99,14 @@ public class Game extends JFrame
 			this.p1 = p1;
 
 			if(!p1)
-				this.x = 950;
+				this.x = scale(228);
 		}
 
 		public void Update()
 		{
-			this.width = (int) (650 * ((double) p.health / 175));
+			this.width = (int) (scale(150) * ((double) p.getHealth() / 30));
 			if(!p1)
-				this.x = 1600-this.width;
+				this.x = scale(384)-this.width;
 		}
 	}
 
@@ -135,13 +117,13 @@ public class Game extends JFrame
 		{
 			try{background = ImageIO.read(new File("ryuStage.jpg"));}catch(Exception e) {};
 			this.add(roundTimer);
-			roundTimer.setBounds(750, 0, 50, 50);
-			roundTimer.setFont(new Font("Monospace", 1, 50));
+			roundTimer.setBounds(scale(180), 0, scale(12), scale(12));
+			roundTimer.setFont(new Font("Monospace", 1, scale(12)));
 			roundTimer.setForeground(Color.WHITE);
 
 			this.add(winText);
-			winText.setFont(new Font("Monospace", 1, 150));
-			winText.setLocation(600, 600);
+			winText.setFont(new Font("Monospace", 1, scale(36)));
+			winText.setLocation(scale(144), scale(144));
 			winText.setForeground(Color.WHITE);
 		}
 
@@ -159,7 +141,7 @@ public class Game extends JFrame
 				//<editor-fold desc="Hit/Hurtbox Debug">
 				if(debug)
 				{
-					for (Box h : p.currentFrame.boxes)
+					for (Box h : p.boxes())
 					{
 						switch(h.type)
 						{
@@ -167,12 +149,12 @@ public class Game extends JFrame
 							g2.setColor(Color.RED);
 							break;
 						case HURT:
-							if(p.hitstun != 0)
+//							if(p.hitstun != 0)
 								g2.setColor(Color.BLUE);
-							else if(p.blocking)
-								g2.setColor(Color.CYAN);
-							else if(p.crouching)
-								g2.setColor(Color.MAGENTA);
+//							else if(p.blocking)
+//								g2.setColor(Color.CYAN);
+//							else if(p.crouching)
+//								g2.setColor(Color.MAGENTA);
 							break;
 						case PUSH:
 							g2.setColor(Color.GREEN);
@@ -199,12 +181,12 @@ public class Game extends JFrame
 				}
 				//</editor-fold>
 
-				if(!p.right)
+				if(!p.facingR())
 					at.setToScale(-screenScale, screenScale);
 
 				for(Projectile h : p.projectiles)
 					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(h.x), scale(h.y));
-				g2.drawImage(p.currentFrame.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.getX() + p.hitlagShake.x), scale(p.getX()  + p.hitlagShake.y - (p.currentFrame.sprite.getHeight() * 5)));
+				g2.drawImage(p.sprite(), new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.getX() + p.hitlagShake.x), scale(p.getX()  + p.hitlagShake.y - (p.sprite().getHeight() * 5)));
 			}
 
 			g2.setColor(Color.red);
@@ -254,17 +236,14 @@ public class Game extends JFrame
 						KeyEvent.VK_ENTER
 				};
 
-		p1 = new Player(p1Char, new Point(scale(50),0), p1Controls, true);
-		p2 = new Player(p2Char, new Point(scale(300),0), p2Controls, false);
+		p1 = new Player(p1Char, new Point(scale(50),0), p1Controls, true, this);
+		p2 = new Player(p2Char, new Point(scale(300),0), p2Controls, false, this);
 
 		Players = new Player[] {p1, p2};
 	}
 
 	private void initPanel()
 	{
-		this.addKeyListener(p1.inputs);
-		this.addKeyListener(p2.inputs);
-
 		DrawPanel d = new DrawPanel();
 		this.add(d);
 		p1b = new HealthBar(p1, true);
@@ -283,111 +262,42 @@ public class Game extends JFrame
 		//		long time = System.currentTimeMillis();
 		for(Player p : Players)
 		{
-			p.inputs.Update();
+			p.readInput();
 			Player other;
-			if(p.p1)
+			if(p.isP1())
 				other = p2;
 			else
 				other = p1;
-
-			if(p.getX() > other.getX())
-				if(p.right)
-					if(p.hitstun == 0)
-						p.Flip();
-					else
-						if(!p.right)
-							if(p.hitstun == 0)
-								p.Flip();
 
 			if(p.actionable())
 			{
 				if(!p.checkCommands())
 					p.checkNormals(Math.abs(p1.getX() - p2.getX()));
-				p.checkMovement();
+				if(p.isGrounded())
+				{
+					if(p.getX() > other.getX())
+					{
+						if(p.facingR())
+							p.Flip();
+					}
+					else
+						if(!p.facingR())
+							p.Flip();
+					
+					p.checkMovement();
+				}
 			}
-			p.Animate();
+			p.doMovement();
 			p.posUpdate();
-
-			//TODO Movement Here
-
-			for(int i = 0; i < p.currentFrame.boxes.length; i++)
-			{
-				if(p.currentFrame.boxes[i].type == BoxType.HIT)
-				{
-					Hitbox h = (Hitbox) p.currentFrame.boxes[i];
-					if (h.testCollision(other, BoxType.HURT))
-						p.Hit(other, h);
-				}
-			}
-
-			for(Iterator<Projectile> i = p.projectiles.iterator(); i.hasNext();)
-			{
-				Projectile h = i.next();
-				if(h.getDelete())
-					i.remove();
-				else
-				{
-					if (h.right)
-						h.x += h.speed;
-					else
-						h.x -= h.speed;
-
-					if (h.testCollision(other, BoxType.HURT))
-					{
-						p.Hit(other, h);
-						h.delete();
-					}
-
-					if (h.getMaxX() < 0 || h.getMinX() > this.getWidth() || h.lifespan == 0)
-						h.delete();
-
-					for (Projectile j : other.projectiles)
-					{
-						if (h.intersects(j))
-						{
-							h.delete();
-							j.delete();
-						}
-					}
-				}
-
-			}
-
-			if(p.jumpSquat)
-			{
-				if(p.hitstun == 0)
-				{
-					p.grounded = false;
-					p.jumpSquat = false;
-				}
-			}
-
-
-			if(p.hitstun != 0)
-			{
-				if(p.hitlag != 0)
-				{
-					p.doHitlagShake();
-					p.hitlag--;
-				}
-				else
-					p.hitstun--;
-
-				if(p.hitstun != 0)
-				{
-					if (p.crouching)
-						p.setAnim(p.character.DamageC);
-					else
-						p.setAnim(p.character.Damage);
-				}
-			}
+			p.hitboxCalc(other);
+			p.doHitstun();
+			p.Animate();
 		}
 
 		p1b.Update();
 		p2b.Update();
 
-		if(p1.health <= 0 || p2.health <= 0 || roundTimerInt == 0)
-			gameEnd();
+		//TODO game end
 
 		this.repaint();
 		//		System.out.println(System.currentTimeMillis() - time);
@@ -395,13 +305,7 @@ public class Game extends JFrame
 
 	void gameEnd()
 	{
-		start = false;
-		if(p1.health > p2.health)
-			winText.setText(p1.toString() + " wins");
-		else
-			winText.setText(p2.toString() + " wins");
-
-		updateTimer.cancel();
+		
 	}
 
 	private int scale(double num)

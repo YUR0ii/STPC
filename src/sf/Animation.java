@@ -22,6 +22,7 @@ public class Animation
 		this.frames = frames;
 	}
 	
+	//TODO clean this up
 	public animFrame getFrame(int frame, Player p)
 	{
 		int key = 0;
@@ -41,8 +42,8 @@ public class Animation
 					}
 				}
 			}
-			else
-				return p.currentFrame;
+//			else
+//				return p.currentFrame;
 		}
 
 		return frames[key];
@@ -57,4 +58,6 @@ public class Animation
 	{
 			return this.id == a.id;
 	}
+	
+	void customEvents(Player parent, int frame) {};
 }

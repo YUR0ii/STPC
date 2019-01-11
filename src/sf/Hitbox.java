@@ -56,7 +56,7 @@ public class Hitbox extends Box
 	{
 		if(customStunStand != -1)
 		{
-			if(opponent.crouching)
+			if(opponent.isCrouching())
 				return customStunCrouch;
 			else
 				return customStunStand;
@@ -74,14 +74,14 @@ public class Hitbox extends Box
 			case JL:
 				return 11;
 			case JM:
-				if(opponent.crouching || opponent.blocking)
+				if(opponent.isCrouching() || opponent.isBlocking())
 					return 16;
 				else
 					return 11;
 			case JH:
-				if(opponent.crouching)
+				if(opponent.isCrouching())
 					return 21;
-				else if (opponent.blocking)
+				else if (opponent.isBlocking())
 					return 20;
 				else
 					return 11;

@@ -26,7 +26,7 @@ public class Box extends Rectangle
 
 	public boolean testCollision(Player opponent, BoxType testType)
 	{
-		for(Box h : opponent.currentFrame.boxes)
+		for(Box h : opponent.boxes())
 		{
 			if (h.type == testType && this.intersects(h))
 			{

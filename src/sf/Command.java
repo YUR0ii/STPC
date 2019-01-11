@@ -9,7 +9,6 @@ public class Command extends Attack
 	int meterCost;
 	Attack attack;
 	
-	
 	Command(String name, Animation animation, int[][] directions, int button, int meterCost, Attack attack)
 	{
 		super(name, animation);
@@ -18,6 +17,4 @@ public class Command extends Attack
 		this.meterCost = meterCost;
 		this.attack = attack;
 	}
-
-	void customEvents(){}
 }
