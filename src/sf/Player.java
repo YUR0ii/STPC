@@ -49,14 +49,16 @@ public class Player
 	private int hitlag = 0;
 	public Point hitlagShake = new Point(0,0);
 	private int moving = 0;
+
 	//SF2-like
 	private int health = 30;
+	//SFV-like
+	//	private int health = 144;
 	public int getHealth()
 	{
 		return health;
 	}
-	//SFV-like
-	//	private int health = 144;
+
 	private double meter = 0;
 	private boolean right = true;
 	public boolean facingR()
@@ -290,27 +292,27 @@ public class Player
 			break;
 		case 4:
 			setAnim(character.WalkB);
+			moving = character.backSpeed;
 			if(right)
-				moving = -character.backSpeed;
-			else
-				moving = character.backSpeed;
+				moving = -moving;
+
 			blocking = true;
 			crouching = false;
 			break;
 		case 6:
 			setAnim(character.WalkF);
-			if(right)
-				moving = character.forwardSpeed;
-			else
-				moving = -character.forwardSpeed;
+			moving = character.forwardSpeed;
+			if(!right)
+				moving = -moving;
+
 			blocking = false;
 			crouching = false;
 			break;
 		case 7:
+			moving = character.airSpeed;
 			if(right)
-				moving = -1;
-			else
-				moving = 1;
+				moving = -moving;
+
 			crouching = false;
 			Jump();
 			break;
@@ -320,10 +322,10 @@ public class Player
 			crouching = false;
 			break;
 		case 9:
-			if(right)
-				moving = 1;
-			else
-				moving = -1;
+			moving = character.airSpeed;
+			if(!right)
+				moving = -moving;
+
 			crouching = false;
 			Jump();
 			break;
@@ -368,7 +370,7 @@ public class Player
 	//TODO movement
 	public void doMovement()
 	{
-
+		x += moving;
 	}
 
 	public void hitboxCalc(Player other)

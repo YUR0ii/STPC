@@ -80,6 +80,4 @@ public abstract class Character
 	{
 		return null;
 	}
-	
-	
 }
