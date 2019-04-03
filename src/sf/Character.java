@@ -6,11 +6,10 @@ import java.io.File;
 public abstract class Character
 {
 	String name;
-	int jumpsquat;
-	int forwardSpeed;
-	int backSpeed;
-	int airSpeed;
-	int width;
+	int fSpeed;
+	int bSpeed;
+	int fASpeed;
+	int bASpeed;
 	
 	public BufferedImage selectIcon;
 	
@@ -63,14 +62,8 @@ public abstract class Character
 	abstract void setupCommands();
 	Command[] Commands;
 	
-	public Character(String name, int jumpsquat, int forwardSpeed, int backSpeed, int airSpeed, int width)
+	public Character()
 	{
-		this.name = name;
-		this.jumpsquat = jumpsquat;
-		this.forwardSpeed = forwardSpeed;
-		this.backSpeed = backSpeed;
-		this.airSpeed = airSpeed;
-		this.width = width;
 		setupAnims();
 		setupNormals();
 		setupCommands();

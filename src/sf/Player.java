@@ -292,7 +292,7 @@ public class Player
 			break;
 		case 4:
 			setAnim(character.WalkB);
-			moving = character.backSpeed;
+			moving = character.bSpeed;
 			if(right)
 				moving = -moving;
 
@@ -301,7 +301,7 @@ public class Player
 			break;
 		case 6:
 			setAnim(character.WalkF);
-			moving = character.forwardSpeed;
+			moving = character.fSpeed;
 			if(!right)
 				moving = -moving;
 
@@ -309,7 +309,7 @@ public class Player
 			crouching = false;
 			break;
 		case 7:
-			moving = character.airSpeed;
+			moving = character.fASpeed;
 			if(right)
 				moving = -moving;
 
@@ -322,7 +322,7 @@ public class Player
 			crouching = false;
 			break;
 		case 9:
-			moving = character.airSpeed;
+			moving = character.fASpeed;
 			if(!right)
 				moving = -moving;
 
@@ -502,7 +502,7 @@ public class Player
 		{
 			frame++;
 		}
-		currentFrame = anim.getFrame(frame, this);
+		currentFrame = anim.getFrame(frame);
 		anim.customEvents(this, frame);
 	}
 }
