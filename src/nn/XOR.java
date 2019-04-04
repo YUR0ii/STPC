@@ -2,8 +2,11 @@ package nn;
 
 public class XOR
 {
-	Topology t = new Topology();
-	t.input_neurons = 2;
-
-	NeuralNetwork nn = new NeuralNetwork(t);
+	public static void main(String[] args)
+	{
+		NeuralNetwork nn = new NeuralNetwork();
+		nn.input_neurons = 2;
+		nn.hidden_neurons = 3;
+		nn.output_neurons = 2;
+	}
 }
