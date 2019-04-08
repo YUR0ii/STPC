@@ -1,45 +1,36 @@
 package nn;
 
-import java.util.Random;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
 public class NeuralNetwork
 {
-	// TODO: more options for activation functions
-
-	private Random prng;
-
 	/*
 	 * TODO: Later on, having more layers or support for an
 	 * arbitrary number of layers could be worth the effort
 	 */
 
+	// the number of neurons in each layer
 	public int input_neurons;
 	public int hidden_neurons;
 	public int output_neurons;
 
-	// weights and biases for each layer
-	private DoubleMatrix weights1;
-	private DoubleMatrix weights2;
-	private DoubleMatrix biases1;
-	private DoubleMatrix biases2;
+	// the weights and biases
+	protected DoubleMatrix W0;
+	protected DoubleMatrix W1;
+	protected DoubleMatrix B0;
+	protected DoubleMatrix B1;
 
-	public NeuralNetwork()
-	{
-		// we seed the prng for consistency
-		prng = new Random(0);
-	}
-
-	private DoubleMatrix input_layer;
-	private DoubleMatrix hidden_layer;
-	private DoubleMatrix output_layer;
+	// the layers
+	protected DoubleMatrix A0;	// input layer
+	protected DoubleMatrix A1;	// hidden layer
+	protected DoubleMatrix A2;	// output layer
 
 	public void forward_prop(DoubleMatrix input)
 	{
-		input_layer = input;
-		hidden_layer = MatrixFunctions.tanh(input_layer.mmul(weights1).add(biases1));
-		output_layer = MatrixFunctions.tanh(hidden_layer.mmul(weights2).add(biases2));
+		A0 = input;
+		A1 = MatrixFunctions.tanh(A0.mmul(W0.transpose()).addRowVector(B0));
+		A2 = MatrixFunctions.tanh(A1.mmul(W1.transpose()).addRowVector(B1));
 	}
 
 	public static DoubleMatrix tanh_derivative(DoubleMatrix A)
@@ -52,6 +43,32 @@ public class NeuralNetwork
 
 	public void backward_prop()
 	{
-		DoubleMatrix delta_output = tanh_derivative(output_layer);
+		// TODO: stub
+	}
+	
+	public class TrainingHyperparameters
+	{
+		// TODO: add more hyperparameters
+		int epochs = 10_000;
+		double learning_rate = 0.01;
+	}
+	
+	public void train(DoubleMatrix input_data, DoubleMatrix output_data, TrainingHyperparameters thp)
+	{
+		// we seed jblas's prng for consistency
+		org.jblas.util.Random.seed(0);
+		
+		// generate random weights and biases
+		W0 = DoubleMatrix.rand(hidden_neurons, input_neurons);
+		B0 = DoubleMatrix.rand(hidden_neurons);
+		W1 = DoubleMatrix.rand(output_neurons, hidden_neurons);
+		B1 = DoubleMatrix.rand(output_neurons);
+
+		// main training loop
+		for (int i = 0; i < thp.epochs; i++)
+		{
+			forward_prop(input_data);
+			backward_prop();
+		}
 	}
 }
