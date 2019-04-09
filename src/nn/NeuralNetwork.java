@@ -26,14 +26,8 @@ public class NeuralNetwork
 	protected DoubleMatrix A1;	// hidden layer
 	protected DoubleMatrix A2;	// output layer
 
-	public void forward_prop(DoubleMatrix input)
-	{
-		A0 = input;
-		A1 = MatrixFunctions.tanh(A0.mmul(W0.transpose()).addRowVector(B0));
-		A2 = MatrixFunctions.tanh(A1.mmul(W1.transpose()).addRowVector(B1));
-	}
-
-	public static DoubleMatrix tanh_derivative(DoubleMatrix A)
+	// applies the derivative of tanh to each item of the DoubleMatrix A
+	public static DoubleMatrix d_tanh(DoubleMatrix A)
 	{
 		// TODO: optimizations and caching
 		DoubleMatrix tanh = MatrixFunctions.tanh(A);
@@ -41,23 +35,35 @@ public class NeuralNetwork
 		return ones.sub(tanh.mul(tanh));
 	}
 
-	public void backward_prop()
+	// loads the input into the first layer and computes all of the other layers
+	public void feedforward(DoubleMatrix input)
+	{
+		A0 = input;
+		A1 = MatrixFunctions.tanh(A0.mmul(W0.transpose()).addRowVector(B0));
+		A2 = MatrixFunctions.tanh(A1.mmul(W1.transpose()).addRowVector(B1));
+	}
+
+	public void backprop()
 	{
 		// TODO: stub
 	}
-	
+
+	// hyperparameters for training
 	public class TrainingHyperparameters
 	{
 		// TODO: add more hyperparameters
+
+		// the default parameter values
 		int epochs = 10_000;
 		double learning_rate = 0.01;
 	}
-	
+
+	// trains the neural network on the given dataset using the given hyperparameters
 	public void train(DoubleMatrix input_data, DoubleMatrix output_data, TrainingHyperparameters thp)
 	{
 		// we seed jblas's prng for consistency
 		org.jblas.util.Random.seed(0);
-		
+
 		// generate random weights and biases
 		W0 = DoubleMatrix.rand(hidden_neurons, input_neurons);
 		B0 = DoubleMatrix.rand(hidden_neurons);
@@ -67,8 +73,8 @@ public class NeuralNetwork
 		// main training loop
 		for (int i = 0; i < thp.epochs; i++)
 		{
-			forward_prop(input_data);
-			backward_prop();
+			feedforward(input_data);
+			backprop();
 		}
 	}
 }
