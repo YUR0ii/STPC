@@ -4,7 +4,6 @@ public class Animation
 {
 	animFrame[] frames;
 	int[] keyframes;
-	int maxFrame = 0;
 	int id;
 	static int maxID = 0;
 	
@@ -14,39 +13,17 @@ public class Animation
 		System.out.println(maxID);
 		maxID++;
 		this.keyframes = keyframes;
-		for(int i : keyframes)
-		{
-			if(i > maxFrame)
-				maxFrame = i;
-		}
 		this.frames = frames;
 	}
 	
 	//TODO clean this up
-	public animFrame getFrame(int frame, Player p)
+	public animFrame getFrame(int frame)
 	{
-		int key = 0;
+		for(int i = 0; i < keyframes.length; i++)
+			if(keyframes[i] > frame)
+				return frames[i+1];
 		
-		if(keyframes.length > 1)
-		{
-			if(frame >= keyframes[0])
-			{
-				for(int i = 0; i < keyframes.length; i++)
-				{
-					if(frame%maxFrame >= keyframes[i])
-					{
-						if(i == keyframes.length-1)
-							key = i-1;
-						else
-							key = i;
-					}
-				}
-			}
-//			else
-//				return p.currentFrame;
-		}
-
-		return frames[key];
+		return frames[0];
 	}
 	
 	@Override
