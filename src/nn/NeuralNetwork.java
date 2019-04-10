@@ -26,6 +26,9 @@ public class NeuralNetwork
 	protected DoubleMatrix A1;	// hidden layer
 	protected DoubleMatrix A2;	// output layer
 
+	// loss
+	protected DoubleMatrix loss;
+
 	// applies the derivative of tanh to each item of the DoubleMatrix A
 	public static DoubleMatrix d_tanh(DoubleMatrix A)
 	{
@@ -43,9 +46,21 @@ public class NeuralNetwork
 		A2 = MatrixFunctions.tanh(A1.mmul(W1.transpose()).addRowVector(B1));
 	}
 
-	public void backprop()
+	public void backprop(DoubleMatrix desired_output)
 	{
-		// TODO: stub
+		// implementation of the squared loss function
+		DoubleMatrix loss = DoubleMatrix.zeros(A2.rows);
+		for (int i = 0; i < output_neurons; i++)
+		{
+			loss.add(MatrixFunctions.pow(A2.getRow(i).sub(desired_output.getRow(i)), 2));
+		}
+
+		// take the derivative of the loss function with respect to the weights
+		// TODO: caching
+		DoubleMatrix d_loss = A2.sub(desired_output).mul(2);
+		DoubleMatrix tmp = d_loss.mmul(d_tanh(A2));
+		DoubleMatrix d_W1 = A1.transpose().mmul(tmp);
+		DoubleMatrix d_W0 = A0.transpose().mmul(tmp.mmul(W1.transpose().mmul(d_tanh(A1))));
 	}
 
 	// hyperparameters for training
@@ -74,7 +89,7 @@ public class NeuralNetwork
 		for (int i = 0; i < thp.epochs; i++)
 		{
 			feedforward(input_data);
-			backprop();
+			backprop(output_data);
 		}
 	}
 }
