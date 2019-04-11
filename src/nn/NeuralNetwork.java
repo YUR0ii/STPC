@@ -58,9 +58,16 @@ public class NeuralNetwork
 		// take the derivative of the loss function with respect to the weights
 		// TODO: caching
 		DoubleMatrix d_loss = A2.sub(desired_output).mul(2);
-		DoubleMatrix tmp = d_loss.mmul(d_tanh(A2));
-		DoubleMatrix d_W1 = A1.transpose().mmul(tmp);
-		DoubleMatrix d_W0 = A0.transpose().mmul(tmp.mmul(W1.transpose().mmul(d_tanh(A1))));
+		DoubleMatrix d_loss_d_A2 = d_loss.mul(d_tanh(A2));
+		DoubleMatrix d_W1 = A1.transpose().mmul(d_loss_d_A2);
+
+		System.out.println(d_loss_d_A2.rows);
+		System.out.println(d_loss_d_A2.columns);
+		System.out.println(W1.transpose().rows);
+		System.out.println(W1.transpose().columns);
+
+		DoubleMatrix tmp = d_loss_d_A2.mmul(W1);
+		DoubleMatrix d_W0 = A0.transpose().mmul(tmp).mmul(d_tanh(A1));
 	}
 
 	// hyperparameters for training
