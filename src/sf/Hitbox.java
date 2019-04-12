@@ -2,6 +2,7 @@ package sf;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 
 public class Hitbox extends Box
 {
@@ -16,9 +17,9 @@ public class Hitbox extends Box
 	int customStunStand = -1;
 	int customStunCrouch = -1;
 
-	public Hitbox(Point offset, Dimension size, AttackType strength, int dmg, boolean knockdown, boolean low)
+	public Hitbox(Rectangle r, AttackType strength, int dmg, boolean knockdown, boolean low)
 	{
-		super(offset, size);
+		super(BoxType.HIT, r);
 		this.knockdown = knockdown;
 		this.dmg = dmg;
 		this.blockDmg = 0;
@@ -27,9 +28,9 @@ public class Hitbox extends Box
 		this.type = BoxType.HIT;
 	}
 
-	public Hitbox(Point offset, Dimension size, AttackType strength, int dmg, boolean knockdown, boolean low, int customStunStand, int customStunCrouch)
+	public Hitbox(Rectangle r, AttackType strength, int dmg, boolean knockdown, boolean low, int customStunStand, int customStunCrouch)
 	{
-		super(offset, size);
+		super(BoxType.HIT, r);
 		this.knockdown = knockdown;
 		this.dmg = dmg;
 		this.blockDmg = 0;
@@ -40,9 +41,9 @@ public class Hitbox extends Box
 		this.customStunCrouch = customStunCrouch;
 	}
 	
-	public Hitbox(Point offset, Dimension size, int dmg, boolean knockdown, boolean low, boolean projectile)
+	public Hitbox(Rectangle r, int dmg, boolean knockdown, boolean low, boolean projectile)
 	{
-		super(offset, size);
+		super(BoxType.HIT, r);
 		this.knockdown = knockdown;
 		this.dmg = dmg;
 		this.blockDmg = 0;

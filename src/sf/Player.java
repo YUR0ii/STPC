@@ -343,11 +343,11 @@ public class Player
 		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
 			Box b = currentFrame.boxes[i];
-			b.y = getY() - b.offset.y - b.height;
+			b.y = getY() - b.y - b.height;
 			if (right)
-				b.x = getX() + b.offset.x;
+				b.x = getX() + b.x;
 			else
-				b.x = getX() - b.offset.x - b.width;
+				b.x = getX() - b.x - b.width;
 		}
 		for(Iterator<Projectile> i = projectiles.iterator(); i.hasNext();)
 		{
@@ -502,7 +502,15 @@ public class Player
 		{
 			frame++;
 		}
-		currentFrame = anim.getFrame(frame);
-		anim.customEvents(this, frame);
+		animFrame newFrame = anim.getFrame(frame);
+		if(newFrame == null)
+		{
+			setAnim(character.Stand, true);
+		}
+		else
+		{
+			currentFrame = anim.getFrame(frame);
+			anim.customEvents(this, frame);
+		}
 	}
 }

@@ -3,27 +3,25 @@ package sf;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 public class Box extends Rectangle
 {
-	enum BoxType {HIT, HURT, PUSH, PROJ, THROW, THROWABLEG, THROWABLEA}
-	BoxType type;
-	Point offset;
-	Dimension size;
+	public enum BoxType {HIT, HURT, PUSH, PROJ, THROW, THROWABLEG, THROWABLEA}
+	public BoxType type;
 
-	public Box(Box h)
+	public Box(BoxType t, Rectangle r)
 	{
-		super(h.getLocation(), h.getSize());
-		type = h.type;
+		super(r);
+		type = t;
 	}
-
-	public Box(Point point, Dimension dimension)
+	
+	public Box(Box b)
 	{
-		super(point, dimension);
-		offset = point;
-		size = dimension;
+		super(b);
+		type = b.type;
 	}
-
+	
 	public boolean testCollision(Player opponent, BoxType testType)
 	{
 		for(Box h : opponent.boxes())
@@ -35,5 +33,4 @@ public class Box extends Rectangle
 		}
 		return false;
 	}
-
 }
