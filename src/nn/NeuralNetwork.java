@@ -58,23 +58,16 @@ public class NeuralNetwork
 		}
 
 		// take the derivative of the loss function with respect to the weights
-		// TODO: caching
-		DoubleMatrix d_loss = A2.sub(desired_output).mul(2);
+		// TODO: caching and cleanup
+		DoubleMatrix d_loss = desired_output.sub(A2).mul(2);
 		DoubleMatrix d_loss_d_A2 = d_loss.mul(d_tanh(A2));
 		DoubleMatrix d_W1 = A1.transpose().mmul(d_loss_d_A2);
 		DoubleMatrix tmp = d_loss_d_A2.mmul(W1);
 		DoubleMatrix tmp2 = (tmp).mul(d_tanh(A1));
 		DoubleMatrix d_W0 = A0.transpose().mmul(tmp2);
 
-//		System.out.println(d_W0.rows);
-//		System.out.println(d_W0.columns);
-//		System.out.println(W0.rows);
-//		System.out.println(W0.columns);
-
-		//System.out.println(d_loss);
-
-		W1.add(d_W1.transpose().mul(thp.learning_rate));
-		W0.add(d_W0.transpose().mul(thp.learning_rate));
+		W1 = W1.add(d_W1.transpose().mul(thp.learning_rate));
+		W0 = W0.add(d_W0.transpose().mul(thp.learning_rate));
 	}
 
 	// hyperparameters for training
@@ -93,17 +86,10 @@ public class NeuralNetwork
 		// we seed jblas's prng for consistency
 		org.jblas.util.Random.seed(0);
 
-		// generate random weights and biases
-//		W0 = DoubleMatrix.rand(hidden_neurons, input_neurons);
-//		B0 = DoubleMatrix.rand(hidden_neurons);
-//		W1 = DoubleMatrix.rand(output_neurons, hidden_neurons);
-//		B1 = DoubleMatrix.rand(output_neurons);
-
-		//W0 = W0.mul(2).sub(1);
-		//W1 = W1.mul(2).sub(1);
-
 		W0 = DoubleMatrix.randn(hidden_neurons, input_neurons);
+		B0 = DoubleMatrix.randn(hidden_neurons);
 		W1 = DoubleMatrix.randn(output_neurons, hidden_neurons);
+		B1 = DoubleMatrix.randn(output_neurons);
 
 		// main training loop
 		for (int i = 0; i < thp.epochs; i++)

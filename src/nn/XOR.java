@@ -30,20 +30,21 @@ public class XOR
 		);
 
 		NeuralNetwork.TrainingHyperparameters thp = nn.new TrainingHyperparameters();
-		thp.epochs = 100_000;
+		thp.epochs = 10_000;
 		thp.learning_rate = 0.01;
 
+		// training
 		long nt = System.nanoTime();
 		nn.train(inputs, outputs, thp);
 		System.out.println("Finished training in " + (System.nanoTime() - nt) / 1_000_000 + " ms");
 
+		// testing
 		nn.feedforward(inputs);
-
 		for (int i = 0; i < outputs.length; i++)
 		{
 			System.out.println("\nTest");
-			System.out.println(nn.A2.get(i));
-			System.out.println(outputs.get(i));
+			System.out.println("Desired: " + outputs.get(i));
+			System.out.println("Acutal: " + nn.A2.get(i));
 		}
 	}
 }
