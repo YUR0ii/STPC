@@ -46,13 +46,5 @@ public class XOR
 			System.out.println("Desired: " + outputs.get(i));
 			System.out.println("Acutal: " + nn.A2.get(i));
 		}
-		
-		NeuralNetwork.TrainingHyperparameters thp = nn.new TrainingHyperparameters();
-		thp.epochs = 40_000;
-		thp.learning_rate = 0.1;
-		
-		long nt = System.nanoTime();
-		nn.train(inputs, outputs, thp);
-		System.out.println("Finished training in " + (System.nanoTime() - nt) / 1_000_000 + " ms");
 	}
 }
