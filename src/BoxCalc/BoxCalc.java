@@ -37,7 +37,7 @@ public class BoxCalc extends JFrame
 	ArrayList<singleViz> vizs = new ArrayList<singleViz>();
 	display d;
 	ArrayList<JButton> vizChoose = new ArrayList<JButton>();
-	
+
 	JSlider xSlider;
 	JSlider ySlider;
 	JCheckBox actionableB;
@@ -51,13 +51,19 @@ public class BoxCalc extends JFrame
 		d = new display();
 		addFrame();
 		switchTo(0);
-		
-		
-		
+
+		add(ySlider);
+		add(d);
+		add(xSlider);
+		add(actionableB);
+		add(frames);
+		add(save);
+		add(newFrame);
+
 		setSize(400,400);
 		setLayout(new FlowLayout());
-		
-		
+
+
 		setTitle("Box Calculator");
 		setVisible(true);
 		setDefaultCloseOperation(3);
@@ -71,18 +77,18 @@ public class BoxCalc extends JFrame
 				System.out.println("Saved Succesfully");
 			}
 		});
-		
+
 		newFrame.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				addFrame();
-				
+
 			}
-			
+
 		});
 	}
-	
+
 	void addFrame()
 	{
 		singleViz s = new singleViz();
@@ -96,45 +102,51 @@ public class BoxCalc extends JFrame
 			public void actionPerformed(ActionEvent e) {
 				switchTo(vizChoose.indexOf(newButton));
 			}
-			
+
 		});
-		
+
 	}
-	
+
 	void switchTo(int index)
 	{
 		if(vizs.size() > 1)
 			vizChoose.get(vizs.indexOf(current)).setEnabled(true);
 		current = vizs.get(index);
-		
+
 		vizChoose.get(index).setEnabled(false);
-		
-		
-		
+
+
+
 		setupComponents();
-		
+
 		d.repaint();
 		repaint();
 	}
-	
+
 	void setupComponents()
 	{
-//		removeAll();
 		setLayout(new FlowLayout());
-		
+
+		if(vizs.size() > 1)
+		{
+			this.remove(xSlider);
+			this.remove(ySlider);
+			this.remove(actionableB);
+			this.remove(frames);
+		}
+
 		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()), current.hitboxViz.getWidth()-current.sprite.getWidth(), 0);
 		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()), current.hitboxViz.getHeight()-current.sprite.getHeight(), 0);
 		actionableB = new JCheckBox("Actionable", current.actionable);
 		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
-		
+
 		add(ySlider);
-		add(d);
 		add(xSlider);
 		add(actionableB);
 		add(frames);
-		add(save);
-		add(newFrame);
-		
+
+
+
 		xSlider.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -174,6 +186,7 @@ public class BoxCalc extends JFrame
 		});
 
 		validate();
+		repaint();
 	}
 
 	void saveToFile(File f)
@@ -315,7 +328,7 @@ public class BoxCalc extends JFrame
 			setPreferredSize(new Dimension(current.hitboxViz.getWidth() * 5, current.hitboxViz.getHeight() * 5));
 		}
 	}
-	
+
 	class singleViz
 	{
 		BufferedImage sprite;
@@ -339,7 +352,7 @@ public class BoxCalc extends JFrame
 			{
 				System.out.println("File Inavlid");
 			}
-//			calculateBoxes();
+			//			calculateBoxes();
 			repaint();
 		}
 
@@ -355,50 +368,50 @@ public class BoxCalc extends JFrame
 						done = true;
 					else
 					{
-							//HURT, PUSH, PROJ, PROJVULN, THROW, GTHROW, ATHROW
-							sf.Box.BoxType b = null;
-							switch(i)
-							{
-							case 0:
-								b = BoxType.HIT;
-								break;
-							case 1:
-								b = BoxType.HURT;
-								break;
-							case 2:
-								b = BoxType.PUSH;
-								break;
-							case 3:
-								b = BoxType.PROJ;
-								break;
-							case 4:
-								b = BoxType.HURT;
-								break;
-							case 5:
-								b = BoxType.THROW;
-								break;
-							case 6:
-								b = BoxType.THROWABLEG;
-								break;
-							case 7:
-								b = BoxType.THROWABLEA;
-								break;
-							}
-							Box bx = new Box(b, r);
-							if(b == BoxType.HIT || b == BoxType.PROJ)
-								hitboxes.add(bx);
-							else
-								boxes.add(bx);
+						//HURT, PUSH, PROJ, PROJVULN, THROW, GTHROW, ATHROW
+						sf.Box.BoxType b = null;
+						switch(i)
+						{
+						case 0:
+							b = BoxType.HIT;
+							break;
+						case 1:
+							b = BoxType.HURT;
+							break;
+						case 2:
+							b = BoxType.PUSH;
+							break;
+						case 3:
+							b = BoxType.PROJ;
+							break;
+						case 4:
+							b = BoxType.HURT;
+							break;
+						case 5:
+							b = BoxType.THROW;
+							break;
+						case 6:
+							b = BoxType.THROWABLEG;
+							break;
+						case 7:
+							b = BoxType.THROWABLEA;
+							break;
+						}
+						Box bx = new Box(b, r);
+						if(b == BoxType.HIT || b == BoxType.PROJ)
+							hitboxes.add(bx);
+						else
+							boxes.add(bx);
 					}
 				}
 			}
 		}
-		
+
 		void calculateHitboxes()
 		{
 			for(int i = 0; i < hitboxes.size(); i++)
 			{
-//				boxes.add(new Hitbox(hitboxes.get(i), )
+				//				boxes.add(new Hitbox(hitboxes.get(i), )
 			}
 		}
 
@@ -414,7 +427,7 @@ public class BoxCalc extends JFrame
 			frame = new animFrame(actionable, frames, sprite, boxes.toArray(new Box[0]));
 		}
 	}
-	
+
 	public static void main(String[] args)
 	{
 		new BoxCalc();
