@@ -24,7 +24,8 @@ public class NeuralNetwork
 	// the layers
 	protected DoubleMatrix A0;	// input layer
 	protected DoubleMatrix A1;	// hidden layer
-	public DoubleMatrix A2;		// output layer
+
+  public DoubleMatrix A2;		// output layer
 
 	// loss
 	protected DoubleMatrix loss;
