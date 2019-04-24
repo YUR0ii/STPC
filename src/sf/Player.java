@@ -172,66 +172,66 @@ public class Player
 				if(!crouching)
 				{
 					if(inputs.keyCheck(Controls[JAB]))
-						if(distance < character.JabC.range)
-							attack(character.JabC);
+						if(distance < character.JabCl.range)
+							attack(character.JabCl);
 						else
-							attack(character.JabF);
+							attack(character.JabFa);
 					if(inputs.keyCheck(Controls[STRONG]))
-						if(distance < character.StrongC.range)
-							attack(character.StrongC);
+						if(distance < character.StrongCl.range)
+							attack(character.StrongCl);
 						else
-							attack(character.StrongF);
+							attack(character.StrongFa);
 					if(inputs.keyCheck(Controls[FIERCE]))
-						if(distance < character.FierceC.range)
-							attack(character.FierceC);
+						if(distance < character.FierceCl.range)
+							attack(character.FierceCl);
 						else
-							attack(character.FierceF);
+							attack(character.FierceFa);
 					if(inputs.keyCheck(Controls[SHORT]))
-						if(distance < character.ShortC.range)
-							attack(character.ShortC);
+						if(distance < character.ShortCl.range)
+							attack(character.ShortCl);
 						else
-							attack(character.ShortF);
+							attack(character.ShortFa);
 					if(inputs.keyCheck(Controls[FORWARD]))
-						if(distance < character.ForwardC.range)
-							attack(character.ForwardC);
+						if(distance < character.ForwardCl.range)
+							attack(character.ForwardCl);
 						else
-							attack(character.ForwardF);
+							attack(character.ForwardFa);
 					if(inputs.keyCheck(Controls[ROUNDHOUSE]))
-						if(distance < character.RoundhouseC.range)
-							attack(character.RoundhouseC);
+						if(distance < character.RoundhouseCl.range)
+							attack(character.RoundhouseCl);
 						else
-							attack(character.RoundhouseF);
+							attack(character.RoundhouseFa);
 				}
 				else
 				{
 					if(inputs.keyCheck(Controls[JAB]))
-						attack(character.P7C);
+						attack(character.JabC);
 					if(inputs.keyCheck(Controls[STRONG]))
-						attack(character.P8C);
+						attack(character.StrongC);
 					if(inputs.keyCheck(Controls[FIERCE]))
-						attack(character.P9C);
+						attack(character.FierceC);
 					if(inputs.keyCheck(Controls[SHORT]))
-						attack(character.K4C);
+						attack(character.ShortC);
 					if(inputs.keyCheck(Controls[FORWARD]))
-						attack(character.K5C);
+						attack(character.ForwardC);
 					if(inputs.keyCheck(Controls[ROUNDHOUSE]))
-						attack(character.K6C);
+						attack(character.RoundhouseC);
 				}
 			}
 			else
 			{
 				if(inputs.keyCheck(Controls[JAB]))
-					attack(character.P7A);
+					attack(character.JabA);
 				if(inputs.keyCheck(Controls[STRONG]))
-					attack(character.P8A);
+					attack(character.StrongA);
 				if(inputs.keyCheck(Controls[FIERCE]))
-					attack(character.P9A);
+					attack(character.FierceA);
 				if(inputs.keyCheck(Controls[SHORT]))
-					attack(character.K4A);
+					attack(character.ShortA);
 				if(inputs.keyCheck(Controls[FORWARD]))
-					attack(character.K5A);
+					attack(character.ForwardA);
 				if(inputs.keyCheck(Controls[ROUNDHOUSE]))
-					attack(character.K6A);
+					attack(character.RoundhouseA);
 			}
 		}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
 	}
