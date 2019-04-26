@@ -1,20 +1,10 @@
 package sf;
 
-public class Command extends Attack
+public abstract class Command
 {
 	//first is direction, second is frames of leniency
 	int[][] directions;
-
 	int button;
 	int meterCost;
-	Attack attack;
-	
-	Command(String name, Animation animation, int[][] directions, int button, int meterCost, Attack attack)
-	{
-		super(name, animation);
-		this.directions = directions;
-		this.button = button;
-		this.meterCost = meterCost;
-		this.attack = attack;
-	}
+	Animation anim;
 }

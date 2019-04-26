@@ -7,11 +7,14 @@ import java.util.Scanner;
 
 public class animFrame implements Serializable
 {
-	private static final long serialVersionUID = 4060222835319512008L;
+	private static final long serialVersionUID = 2800579864081696969L;
 	public transient BufferedImage sprite;
 	public Box[] boxes;
 	public boolean actionable;
 	public int frameCount;
+	boolean chCancel;
+	boolean spCancel;
+	boolean suCancel;
 
 	public animFrame(boolean actionable, int frameCount, BufferedImage sprite, Box[] boxes)
 	{

@@ -7,17 +7,17 @@ import java.awt.Rectangle;
 public class Hitbox extends Box
 {
 	//TODO projectiles in S
-	enum AttackType {L, M, H, JL, JM, JH, S}
+	public enum AttackType {L, M, H, JL, JM, JH, S}
 
 	boolean knockdown;
 	int dmg;
 	int blockDmg;
 	boolean low = false;
 	AttackType strength;
-	int customStunStand = -1;
-	int customStunCrouch = -1;
+	int stun;
+	int stunTimer;
 
-	public Hitbox(Rectangle r, AttackType strength, int dmg, boolean knockdown, boolean low)
+	public Hitbox(Rectangle r, AttackType strength, int dmg, int stun, int stunTimer, boolean low, boolean knockdown)
 	{
 		super(BoxType.HIT, r);
 		this.knockdown = knockdown;
@@ -26,44 +26,10 @@ public class Hitbox extends Box
 		this.strength = strength;
 		this.low = low;
 		this.type = BoxType.HIT;
-	}
-
-	public Hitbox(Rectangle r, AttackType strength, int dmg, boolean knockdown, boolean low, int customStunStand, int customStunCrouch)
-	{
-		super(BoxType.HIT, r);
-		this.knockdown = knockdown;
-		this.dmg = dmg;
-		this.blockDmg = 0;
-		this.strength = strength;
-		this.low = low;
-		this.type = BoxType.HIT;
-		this.customStunStand = customStunStand;
-		this.customStunCrouch = customStunCrouch;
-	}
-	
-	public Hitbox(Rectangle r, int dmg, boolean knockdown, boolean low, boolean projectile)
-	{
-		super(BoxType.HIT, r);
-		this.knockdown = knockdown;
-		this.dmg = dmg;
-		this.blockDmg = 0;
-		this.strength = AttackType.S;
-		this.low = low;
-		if(projectile)
-			this.type = BoxType.PROJ;
 	}
 
 	public int stunCalc(Player opponent)
 	{
-		if(customStunStand != -1)
-		{
-			if(opponent.isCrouching())
-				return customStunCrouch;
-			else
-				return customStunStand;
-		}
-		else
-		{
 			switch(strength)
 			{
 			case L:
@@ -91,7 +57,6 @@ public class Hitbox extends Box
 			default:
 				return 0;
 			}
-		}
 
 	}
 

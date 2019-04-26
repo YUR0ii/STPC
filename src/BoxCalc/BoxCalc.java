@@ -5,6 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import javax.swing.filechooser.FileFilter;
 import sf.*;
 import sf.Box;
 import sf.Box.BoxType;
+import sf.Hitbox.AttackType;
 
 //TODO whole animation using multiple instances of singleViz
 public class BoxCalc extends JFrame
@@ -42,6 +45,18 @@ public class BoxCalc extends JFrame
 	JSlider ySlider;
 	JCheckBox actionableB;
 	JSpinner frames;
+	JComboBox<AttackType> type;
+	JLabel damageL;
+	JSpinner damage;
+	JLabel stunL;
+	JSpinner stun;
+	JLabel stunTimerL;
+	JSpinner stunTimer;
+	JCheckBox chCancel;
+	JCheckBox spCancel;
+	JCheckBox suCancel;
+	JCheckBox low;
+	JCheckBox knockdown;
 	JButton save = new JButton("Save");
 	JButton newFrame = new JButton("New Frame");
 
@@ -60,7 +75,7 @@ public class BoxCalc extends JFrame
 		add(save);
 		add(newFrame);
 
-		setSize(400,400);
+		setSize(800,700);
 		setLayout(new FlowLayout());
 
 
@@ -129,21 +144,57 @@ public class BoxCalc extends JFrame
 
 		if(vizs.size() > 1)
 		{
-			this.remove(xSlider);
-			this.remove(ySlider);
-			this.remove(actionableB);
-			this.remove(frames);
+			remove(xSlider);
+			remove(ySlider);
+			remove(actionableB);
+			remove(frames);
+			remove(type);
+			remove(damageL);
+			remove(damage);
+			remove(stunL);
+			remove(stun);
+			remove(stunTimerL);
+			remove(stunTimer);
+			remove(chCancel);
+			remove(spCancel);
+			remove(suCancel);
+			remove(low);
+			remove(knockdown);
 		}
 
 		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()), current.hitboxViz.getWidth()-current.sprite.getWidth(), 0);
 		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()), current.hitboxViz.getHeight()-current.sprite.getHeight(), 0);
 		actionableB = new JCheckBox("Actionable", current.actionable);
 		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
+		type = new JComboBox<AttackType>(AttackType.values());
+		damageL = new JLabel("Damage: ");
+		stunL = new JLabel("Stun: ");
+		stunTimerL = new JLabel("Stun Timer: ");
+		damage = new JSpinner(new SpinnerNumberModel(current.damage, 0, 255, 1));
+		stun = new JSpinner(new SpinnerNumberModel(current.stun, 0, 255, 1));
+		stunTimer = new JSpinner(new SpinnerNumberModel(current.stunTimer, 0, 255, 1));
+		chCancel = new JCheckBox("Chain Cancel", current.chCancel);
+		spCancel = new JCheckBox("Special Cancel", current.spCancel);
+		suCancel = new JCheckBox("Super Cancel", current.suCancel);
+		low = new JCheckBox("Low", current.low);
+		knockdown = new JCheckBox("Knockdown", current.knockdown);
 
 		add(ySlider);
 		add(xSlider);
 		add(actionableB);
 		add(frames);
+		add(type);
+		add(damageL);
+		add(damage);
+		add(stunL);
+		add(stun);
+		add(stunTimerL);
+		add(stunTimer);
+		add(chCancel);
+		add(spCancel);
+		add(suCancel);
+		add(low);
+		add(knockdown);
 
 
 
@@ -184,8 +235,90 @@ public class BoxCalc extends JFrame
 				current.frames = (int) frames.getValue();
 			}
 		});
+		
+		type.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent arg0)
+			{
+				current.strength = (AttackType) type.getSelectedItem();
+			}
+		});
+		
+		damage.addChangeListener(new ChangeListener()
+		{
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				current.damage = (int) damage.getValue();
+			}
+		});
+		
+		stun.addChangeListener(new ChangeListener()
+		{
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				current.stun = (int) stun.getValue();
+			}
+		});
+		
+		stunTimer.addChangeListener(new ChangeListener()
+		{
+			@Override
+			public void stateChanged(ChangeEvent e)
+			{
+				current.stunTimer = (int) stunTimer.getValue();
+			}
+		});
+		
+		chCancel.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				current.chCancel = chCancel.isSelected();
+			}
+		});
+		
+		spCancel.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				current.spCancel = spCancel.isSelected();
+			}
+		});
+		
+		suCancel.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				current.suCancel = suCancel.isSelected();
+			}
+		});
+		
+		low.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				current.low = low.isSelected();
+			}
+		});
+		
+		knockdown.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				current.knockdown = knockdown.isSelected();
+			}
+		});
 
 		validate();
+		pack();
 		repaint();
 	}
 
@@ -340,19 +473,28 @@ public class BoxCalc extends JFrame
 
 		boolean actionable = false;
 		int frames = 1;
+		AttackType strength = AttackType.S;
+		int damage = 0;
+		int stun = 0;
+		int stunTimer = 0;
+		boolean chCancel = false;
+		boolean spCancel = false;
+		boolean suCancel = false;
+		boolean low = false;
+		boolean knockdown = false;
 
 		singleViz()
 		{
 			try
 			{
-				sprite = ImageIO.read(chooseFile("Sprite", new FileNameExtensionFilter("Image", "png")));
-				hitboxViz = ImageIO.read(chooseFile("Hitboxes", new FileNameExtensionFilter("Image", "png")));
+				sprite = ImageIO.read(chooseFile("Sprite", new FileNameExtensionFilter("Sprite", "png")));
+				hitboxViz = ImageIO.read(chooseFile("Hitboxes", new FileNameExtensionFilter("Hitboxes", "png")));
 			}
 			catch(Exception boxE)
 			{
 				System.out.println("File Inavlid");
+				boxE.printStackTrace();
 			}
-			//			calculateBoxes();
 			repaint();
 		}
 
@@ -405,19 +547,15 @@ public class BoxCalc extends JFrame
 					}
 				}
 			}
-		}
-
-		void calculateHitboxes()
-		{
 			for(int i = 0; i < hitboxes.size(); i++)
 			{
-				//				boxes.add(new Hitbox(hitboxes.get(i), )
+				boxes.add(new Hitbox(hitboxes.get(i), strength, damage, stun, stunTimer, low, knockdown));
 			}
 		}
 
 		void prepareForSave()
 		{
-			calculateHitboxes();
+			calculateBoxes();
 			for(Rectangle r : boxes)
 			{
 				r.x += offset.x;

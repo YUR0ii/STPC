@@ -127,21 +127,6 @@ public class Player
 		return currentFrame.actionable;
 	}
 
-	private void attack(Attack a)
-	{
-		setAnim(a.animation);
-
-		if(grounded)
-		{
-			moving = 0;
-		}
-
-		if(a.proj)
-		{
-			projectiles.add(a.projectile);
-		}
-	}
-
 	public boolean checkCommands()
 	{
 		for(int i = 0; i < character.Commands.length; i++)
@@ -149,7 +134,7 @@ public class Player
 			Command c = character.Commands[i];
 			if(inputs.keyCheck(c.button) && inputs.getCommandProgress(i) == c.directions.length-1)
 			{
-				attack(c);
+				//TODO set anim to command
 				return true;
 			}
 			else
@@ -172,32 +157,32 @@ public class Player
 				if(!crouching)
 				{
 					if(inputs.keyCheck(Controls[JAB]))
-						if(distance < character.JabCl.range)
+						if(distance < character.jabRange)
 							attack(character.JabCl);
 						else
 							attack(character.JabFa);
 					if(inputs.keyCheck(Controls[STRONG]))
-						if(distance < character.StrongCl.range)
+						if(distance < character.strongRange)
 							attack(character.StrongCl);
 						else
 							attack(character.StrongFa);
 					if(inputs.keyCheck(Controls[FIERCE]))
-						if(distance < character.FierceCl.range)
+						if(distance < character.fierceRange)
 							attack(character.FierceCl);
 						else
 							attack(character.FierceFa);
 					if(inputs.keyCheck(Controls[SHORT]))
-						if(distance < character.ShortCl.range)
+						if(distance < character.shortRange)
 							attack(character.ShortCl);
 						else
 							attack(character.ShortFa);
 					if(inputs.keyCheck(Controls[FORWARD]))
-						if(distance < character.ForwardCl.range)
+						if(distance < character.forwardRange)
 							attack(character.ForwardCl);
 						else
 							attack(character.ForwardFa);
 					if(inputs.keyCheck(Controls[ROUNDHOUSE]))
-						if(distance < character.RoundhouseCl.range)
+						if(distance < character.roundhouseRange)
 							attack(character.RoundhouseCl);
 						else
 							attack(character.RoundhouseFa);
@@ -240,6 +225,11 @@ public class Player
 	private void Jump()
 	{
 		setAnim(character.Jump);
+	}
+	
+	private void attack(Animation a)
+	{
+		//TODO do something
 	}
 
 	private int dirConvert(int direction)
