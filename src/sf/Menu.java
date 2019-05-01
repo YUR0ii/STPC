@@ -1,78 +1,113 @@
 package sf;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Menu extends JFrame
 {
-	static charSelect css;
-	Menu()
+	public final int scale = 3;
+
+	private enum State {TITLE, CHAR_SELECT, STAGE_SELECT, IN_GAME};
+	private State gs;
+
+
+
+	public Menu()
 	{
-//		this.add(new charSelect(new charBox[] {new charBox(new Ryu()),new charBox(new ChunLi())}));
-		
-		this.setSize(400,300);
+		gs = State.TITLE;
+
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel panel = new STPCPanel();
+		this.add(panel);
+		this.addKeyListener(new STPCKeyListener());
+
+		this.setSize(12 * 32 * scale, 7 * 32 * scale);
 		this.setResizable(false);
+		this.setTitle("STPC");
 		this.setVisible(true);
-		
-//		Timer t = new Timer();
-		
-	}
-	
-	class selectBox extends Rectangle
-	{
-		int selected = 0;
-		selectBox()
-		{
-		}
-	}
-	
-	class charBox extends Rectangle
-	{
-		BufferedImage icon;
-
-		charBox(Character c) {
-			this.setSize(100, 100);
-			this.icon = c.selectIcon;
-		}
 	}
 
-	class charSelect extends JPanel
+	private class STPCPanel extends JPanel
 	{
-		charBox[] characters;
-		
-		charSelect(charBox[] characters)
-		{
-			this.characters = characters;
-		}
-		
-		public void paintComponent(Graphics g)
+		@Override
+		protected void paintComponent(Graphics g)
 		{
 			super.paintComponent(g);
-			Graphics2D g2 = (Graphics2D) g;
-			
-			
-			charBox current;
-			for(int i = 0; i < characters.length; i++)
-			{
-				current = characters[i];
-				current.setLocation(i*100, 200);
-				g2.setColor(new Color(255/(i+1), 0, 0));
-				g2.fill(characters[i]);
-				g2.drawImage(current.icon, current.x, current.y, 100, 100, rootPane);
+			this.setBackground(new Color(0, 0, 80));
+
+			try {
+
+				if (gs == State.TITLE)
+				{
+
+					BufferedImage img = ImageIO.read(new File("img/titlescreen.png"));
+
+					Image scaled_img = img.getScaledInstance(
+						img.getWidth() * scale,
+						img.getHeight() * scale,
+						0
+					);
+
+					g.drawImage(
+						scaled_img,
+						(this.getWidth() - img.getWidth() * scale) / 2,
+						(this.getHeight() - img.getHeight() * scale) / 2,
+						null
+					);
+				}
+				else if (gs == State.CHAR_SELECT)
+				{
+					BufferedImage img = ImageIO.read(new File("img/charselect.png"));
+
+					Image scaled_img = img.getScaledInstance(
+						img.getWidth() * scale,
+						img.getHeight() * scale,
+						0
+					);
+
+					g.drawImage(
+						scaled_img,
+						(this.getWidth() - img.getWidth() * scale) / 2,
+						(this.getHeight() - img.getHeight() * scale) / 10,
+						null
+					);
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-	
-	static void Update()
+
+	private class STPCKeyListener implements KeyListener
 	{
-		css.repaint();
+		@Override
+		public void keyPressed(KeyEvent arg0)
+		{
+			if (gs == State.TITLE)
+			{
+				gs = State.CHAR_SELECT;
+				Menu.this.repaint();
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent arg0) { }
+
+		@Override
+		public void keyTyped(KeyEvent arg0) { }
 	}
-	
+
 	public static void main(String[] args)
 	{
-//		new Menu();
+		new Menu();
 	}
 }
