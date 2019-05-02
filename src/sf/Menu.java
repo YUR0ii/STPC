@@ -10,6 +10,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Menu extends JFrame
 {
@@ -18,7 +19,9 @@ public class Menu extends JFrame
 	private enum State {TITLE, CHAR_SELECT, STAGE_SELECT, IN_GAME};
 	private State gs;
 
-
+	// row + 6 * col
+	private int p1sel;
+	private int p2sel;
 
 	public Menu()
 	{
@@ -47,7 +50,6 @@ public class Menu extends JFrame
 
 				if (gs == State.TITLE)
 				{
-
 					BufferedImage img = ImageIO.read(new File("img/titlescreen.png"));
 
 					Image scaled_img = img.getScaledInstance(
@@ -65,20 +67,31 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.CHAR_SELECT)
 				{
-					BufferedImage img = ImageIO.read(new File("img/charselect.png"));
+					BufferedImage[] images = new BufferedImage[2];
+					images[0] = ImageIO.read(new File("img/charselect.png"));
+					images[1] = ImageIO.read(new File("img/selection_boxes/p1.png"));
 
-					Image scaled_img = img.getScaledInstance(
-						img.getWidth() * scale,
-						img.getHeight() * scale,
-						0
-					);
+					Image[] scaled_images = Arrays.stream(images).map(img ->
+						img.getScaledInstance(
+							img.getWidth() * scale,
+							img.getHeight() * scale,
+							0
+						)
+					).toArray(Image[]::new);
 
 					g.drawImage(
-						scaled_img,
-						(this.getWidth() - img.getWidth() * scale) / 2,
-						(this.getHeight() - img.getHeight() * scale) / 10,
+						scaled_images[0],
+						(this.getWidth() - images[0].getWidth() * scale) / 2,
+						(this.getHeight() - images[0].getHeight() * scale) / 10,
 						null
 					);
+
+					int originx = 0;
+					int originy = 0;
+					int incx = 20 * scale;
+					int incy = 30 * scale;
+
+					g.drawImage(scaled_images[1], originx + incy * (p1sel % 6), originy + incy * (p1sel / 6), null);
 				}
 			}
 			catch (IOException e) {
@@ -90,12 +103,46 @@ public class Menu extends JFrame
 	private class STPCKeyListener implements KeyListener
 	{
 		@Override
-		public void keyPressed(KeyEvent arg0)
+		public void keyPressed(KeyEvent e)
 		{
 			if (gs == State.TITLE)
 			{
 				gs = State.CHAR_SELECT;
 				Menu.this.repaint();
+				p1sel = 1;
+				p2sel = 4;
+			}
+			else if (gs == State.CHAR_SELECT)
+			{
+				Menu.this.repaint();
+				switch (e.getKeyCode())
+				{
+				// TODO: verify that the new selection is valid
+				case KeyEvent.VK_W:
+					p1sel -= 6;
+					break;
+				case KeyEvent.VK_S:
+					p1sel += 6;
+					break;
+				case KeyEvent.VK_A:
+					p1sel -= 1;
+					break;
+				case KeyEvent.VK_D:
+					p1sel += 1;
+					break;
+				case KeyEvent.VK_UP:
+					p2sel -= 6;
+					break;
+				case KeyEvent.VK_DOWN:
+					p2sel += 6;
+					break;
+				case KeyEvent.VK_LEFT:
+					p2sel -= 1;
+					break;
+				case KeyEvent.VK_RIGHT:
+					p2sel += 1;
+					break;
+				}
 			}
 		}
 
