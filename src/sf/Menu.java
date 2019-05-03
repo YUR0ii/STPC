@@ -3,6 +3,8 @@ package sf;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
@@ -19,9 +21,12 @@ public class Menu extends JFrame
 	private enum State {TITLE, CHAR_SELECT, STAGE_SELECT, IN_GAME};
 	private State gs;
 
-	// row + 6 * col
+	private final int p1confirmkey = KeyEvent.VK_E;
+	private final int p2confirmkey = KeyEvent.VK_NUMPAD0;
 	private int p1sel;
 	private int p2sel;
+	private boolean p1confirmed;
+	private boolean p2confirmed;
 
 	public Menu()
 	{
@@ -67,9 +72,17 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.CHAR_SELECT)
 				{
-					BufferedImage[] images = new BufferedImage[2];
+					// TODO: animate the selection boxes
+					// TODO: large display of character
+					
+					BufferedImage[] images = new BufferedImage[3];
 					images[0] = ImageIO.read(new File("img/charselect.png"));
-					images[1] = ImageIO.read(new File("img/selection_boxes/p1.png"));
+					
+					images[1] = ImageIO.read(new File("img/selection_boxes/" +
+						(p1confirmed ? "p1f1.png" : "p1.png")));
+					
+					images[2] = ImageIO.read(new File("img/selection_boxes/" +
+						(p2confirmed ? "p2f1.png" : "p2.png")));
 
 					Image[] scaled_images = Arrays.stream(images).map(img ->
 						img.getScaledInstance(
@@ -86,12 +99,14 @@ public class Menu extends JFrame
 						null
 					);
 
-					int originx = 0;
-					int originy = 0;
-					int incx = 20 * scale;
-					int incy = 30 * scale;
+					int startx = (this.getWidth() - images[0].getWidth() * scale) / 2;
+					int p1starty = (this.getWidth() - images[0].getWidth() * scale) / 32;
+					int p2starty = p1starty + 4 * scale;
+					int incx = 21 * scale;
+					int incy = 32 * scale;
 
-					g.drawImage(scaled_images[1], originx + incy * (p1sel % 6), originy + incy * (p1sel / 6), null);
+					g.drawImage(scaled_images[2], startx + incx * (p2sel % 7), p2starty + incy * (p2sel / 7), null);
+					g.drawImage(scaled_images[1], startx + incx * (p1sel % 7), p1starty + incy * (p1sel / 7), null);
 				}
 			}
 			catch (IOException e) {
@@ -108,41 +123,51 @@ public class Menu extends JFrame
 			if (gs == State.TITLE)
 			{
 				gs = State.CHAR_SELECT;
-				Menu.this.repaint();
 				p1sel = 1;
 				p2sel = 4;
+				p1confirmed = false;
+				p2confirmed = false;
+				Menu.this.repaint();
 			}
 			else if (gs == State.CHAR_SELECT)
 			{
-				Menu.this.repaint();
+				int p1inc = 0;
+				int p2inc = 0;
+				
 				switch (e.getKeyCode())
 				{
-				// TODO: verify that the new selection is valid
-				case KeyEvent.VK_W:
-					p1sel -= 6;
+				case KeyEvent.VK_W:		p1inc = -7;	break;
+				case KeyEvent.VK_S:		p1inc = 7;	break;
+				case KeyEvent.VK_A:		p1inc = -1;	break;
+				case KeyEvent.VK_D:		p1inc = 1;	break;
+				case KeyEvent.VK_UP:	p2inc = -7;	break;
+				case KeyEvent.VK_DOWN:	p2inc = 7;	break;
+				case KeyEvent.VK_LEFT:	p2inc = -1;	break;
+				case KeyEvent.VK_RIGHT:	p2inc = 1;	break;
+				
+				case p1confirmkey:
+					p1confirmed = !p1confirmed;
 					break;
-				case KeyEvent.VK_S:
-					p1sel += 6;
-					break;
-				case KeyEvent.VK_A:
-					p1sel -= 1;
-					break;
-				case KeyEvent.VK_D:
-					p1sel += 1;
-					break;
-				case KeyEvent.VK_UP:
-					p2sel -= 6;
-					break;
-				case KeyEvent.VK_DOWN:
-					p2sel += 6;
-					break;
-				case KeyEvent.VK_LEFT:
-					p2sel -= 1;
-					break;
-				case KeyEvent.VK_RIGHT:
-					p2sel += 1;
+					
+				case p2confirmkey:
+					p2confirmed = !p2confirmed;
 					break;
 				}
+				
+				int p1selbak = p1sel;
+				int p2selbak = p2sel;
+				if (!p1confirmed) p1sel += p1inc;
+				if (!p2confirmed) p2sel += p2inc;
+				
+				if (p1sel % 7 == 6 || p1sel > 20 || p1sel < 1 || p1sel == 5) {
+					p1sel = p1selbak;
+				}
+				
+				if (p2sel % 7 == 6 || p2sel > 20 || p2sel < 1 || p2sel == 5) {
+					p2sel = p2selbak;
+				}
+				
+				Menu.this.repaint();
 			}
 		}
 
@@ -158,3 +183,4 @@ public class Menu extends JFrame
 		new Menu();
 	}
 }
+
