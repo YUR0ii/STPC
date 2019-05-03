@@ -16,10 +16,13 @@ import java.util.Arrays;
 
 public class Menu extends JFrame
 {
-	public final int scale = 3;
+	public final static int scale = 3;
+	public final static int fps = 20;
 
 	private enum State {TITLE, CHAR_SELECT, STAGE_SELECT, IN_GAME};
 	private State gs;
+	
+	private long start;
 
 	private final int p1confirmkey = KeyEvent.VK_E;
 	private final int p2confirmkey = KeyEvent.VK_NUMPAD0;
@@ -41,6 +44,8 @@ public class Menu extends JFrame
 		this.setResizable(false);
 		this.setTitle("STPC");
 		this.setVisible(true);
+		
+		start = System.nanoTime();
 	}
 
 	private class STPCPanel extends JPanel
@@ -49,6 +54,7 @@ public class Menu extends JFrame
 		protected void paintComponent(Graphics g)
 		{
 			super.paintComponent(g);
+			int frame = (int) (fps * (System.nanoTime() - start) / 1_000_000_000);
 			this.setBackground(new Color(0, 0, 80));
 
 			try {
@@ -72,17 +78,16 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.CHAR_SELECT)
 				{
-					// TODO: animate the selection boxes
 					// TODO: large display of character
 					
 					BufferedImage[] images = new BufferedImage[3];
 					images[0] = ImageIO.read(new File("img/charselect.png"));
 					
 					images[1] = ImageIO.read(new File("img/selection_boxes/" +
-						(p1confirmed ? "p1f1.png" : "p1.png")));
+						(p1confirmed ? (frame / 2 % 2 == 0 ? "p1f1.png" : "p1f2.png") : "p1.png")));
 					
 					images[2] = ImageIO.read(new File("img/selection_boxes/" +
-						(p2confirmed ? "p2f1.png" : "p2.png")));
+						(p2confirmed ? (frame / 2 % 2 == 0 ? "p2f1.png" : "p2f2.png") : "p2.png")));
 
 					Image[] scaled_images = Arrays.stream(images).map(img ->
 						img.getScaledInstance(
@@ -180,7 +185,13 @@ public class Menu extends JFrame
 
 	public static void main(String[] args)
 	{
-		new Menu();
+		Menu m = new Menu();
+		while (true)
+		{
+			long st = System.nanoTime();
+			while (System.nanoTime() - st < 1_000_000_000 / fps);
+			m.repaint();
+		}
 	}
 }
 
