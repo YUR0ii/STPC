@@ -1,78 +1,197 @@
 package sf;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class Menu extends JFrame
 {
-	static charSelect css;
-	Menu()
+	public final static int scale = 3;
+	public final static int fps = 20;
+
+	private enum State {TITLE, CHAR_SELECT, STAGE_SELECT, IN_GAME};
+	private State gs;
+	
+	private long start;
+
+	private final int p1confirmkey = KeyEvent.VK_E;
+	private final int p2confirmkey = KeyEvent.VK_NUMPAD0;
+	private int p1sel;
+	private int p2sel;
+	private boolean p1confirmed;
+	private boolean p2confirmed;
+
+	public Menu()
 	{
-//		this.add(new charSelect(new charBox[] {new charBox(new Ryu()),new charBox(new ChunLi())}));
-		
-		this.setSize(400,300);
+		gs = State.TITLE;
+
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel panel = new STPCPanel();
+		this.add(panel);
+		this.addKeyListener(new STPCKeyListener());
+
+		this.setSize(12 * 32 * scale, 7 * 32 * scale);
 		this.setResizable(false);
+		this.setTitle("STPC");
 		this.setVisible(true);
 		
-//		Timer t = new Timer();
-		
-	}
-	
-	class selectBox extends Rectangle
-	{
-		int selected = 0;
-		selectBox()
-		{
-		}
-	}
-	
-	class charBox extends Rectangle
-	{
-		BufferedImage icon;
-
-		charBox(Character c) {
-			this.setSize(100, 100);
-			this.icon = c.selectIcon;
-		}
+		start = System.nanoTime();
 	}
 
-	class charSelect extends JPanel
+	private class STPCPanel extends JPanel
 	{
-		charBox[] characters;
-		
-		charSelect(charBox[] characters)
-		{
-			this.characters = characters;
-		}
-		
-		public void paintComponent(Graphics g)
+		@Override
+		protected void paintComponent(Graphics g)
 		{
 			super.paintComponent(g);
-			Graphics2D g2 = (Graphics2D) g;
-			
-			
-			charBox current;
-			for(int i = 0; i < characters.length; i++)
-			{
-				current = characters[i];
-				current.setLocation(i*100, 200);
-				g2.setColor(new Color(255/(i+1), 0, 0));
-				g2.fill(characters[i]);
-				g2.drawImage(current.icon, current.x, current.y, 100, 100, rootPane);
+			int frame = (int) (fps * (System.nanoTime() - start) / 1_000_000_000);
+			this.setBackground(new Color(0, 0, 80));
+
+			try {
+
+				if (gs == State.TITLE)
+				{
+					BufferedImage img = ImageIO.read(new File("img/titlescreen.png"));
+
+					Image scaled_img = img.getScaledInstance(
+						img.getWidth() * scale,
+						img.getHeight() * scale,
+						0
+					);
+
+					g.drawImage(
+						scaled_img,
+						(this.getWidth() - img.getWidth() * scale) / 2,
+						(this.getHeight() - img.getHeight() * scale) / 2,
+						null
+					);
+				}
+				else if (gs == State.CHAR_SELECT)
+				{
+					// TODO: large display of character
+					
+					BufferedImage[] images = new BufferedImage[3];
+					images[0] = ImageIO.read(new File("img/charselect.png"));
+					
+					images[1] = ImageIO.read(new File("img/selection_boxes/" +
+						(p1confirmed ? (frame / 2 % 2 == 0 ? "p1f1.png" : "p1f2.png") : "p1.png")));
+					
+					images[2] = ImageIO.read(new File("img/selection_boxes/" +
+						(p2confirmed ? (frame / 2 % 2 == 0 ? "p2f1.png" : "p2f2.png") : "p2.png")));
+
+					Image[] scaled_images = Arrays.stream(images).map(img ->
+						img.getScaledInstance(
+							img.getWidth() * scale,
+							img.getHeight() * scale,
+							0
+						)
+					).toArray(Image[]::new);
+
+					g.drawImage(
+						scaled_images[0],
+						(this.getWidth() - images[0].getWidth() * scale) / 2,
+						(this.getHeight() - images[0].getHeight() * scale) / 10,
+						null
+					);
+
+					int startx = (this.getWidth() - images[0].getWidth() * scale) / 2;
+					int p1starty = (this.getWidth() - images[0].getWidth() * scale) / 32;
+					int p2starty = p1starty + 4 * scale;
+					int incx = 21 * scale;
+					int incy = 32 * scale;
+
+					g.drawImage(scaled_images[2], startx + incx * (p2sel % 7), p2starty + incy * (p2sel / 7), null);
+					g.drawImage(scaled_images[1], startx + incx * (p1sel % 7), p1starty + incy * (p1sel / 7), null);
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-	
-	static void Update()
+
+	private class STPCKeyListener implements KeyListener
 	{
-		css.repaint();
+		@Override
+		public void keyPressed(KeyEvent e)
+		{
+			if (gs == State.TITLE)
+			{
+				gs = State.CHAR_SELECT;
+				p1sel = 1;
+				p2sel = 4;
+				p1confirmed = false;
+				p2confirmed = false;
+				Menu.this.repaint();
+			}
+			else if (gs == State.CHAR_SELECT)
+			{
+				int p1inc = 0;
+				int p2inc = 0;
+				
+				switch (e.getKeyCode())
+				{
+				case KeyEvent.VK_W:		p1inc = -7;	break;
+				case KeyEvent.VK_S:		p1inc = 7;	break;
+				case KeyEvent.VK_A:		p1inc = -1;	break;
+				case KeyEvent.VK_D:		p1inc = 1;	break;
+				case KeyEvent.VK_UP:	p2inc = -7;	break;
+				case KeyEvent.VK_DOWN:	p2inc = 7;	break;
+				case KeyEvent.VK_LEFT:	p2inc = -1;	break;
+				case KeyEvent.VK_RIGHT:	p2inc = 1;	break;
+				
+				case p1confirmkey:
+					p1confirmed = !p1confirmed;
+					break;
+					
+				case p2confirmkey:
+					p2confirmed = !p2confirmed;
+					break;
+				}
+				
+				int p1selbak = p1sel;
+				int p2selbak = p2sel;
+				if (!p1confirmed) p1sel += p1inc;
+				if (!p2confirmed) p2sel += p2inc;
+				
+				if (p1sel % 7 == 6 || p1sel > 20 || p1sel < 1 || p1sel == 5) {
+					p1sel = p1selbak;
+				}
+				
+				if (p2sel % 7 == 6 || p2sel > 20 || p2sel < 1 || p2sel == 5) {
+					p2sel = p2selbak;
+				}
+				
+				Menu.this.repaint();
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent arg0) { }
+
+		@Override
+		public void keyTyped(KeyEvent arg0) { }
 	}
-	
+
 	public static void main(String[] args)
 	{
-//		new Menu();
+		Menu m = new Menu();
+		while (true)
+		{
+			long st = System.nanoTime();
+			while (System.nanoTime() - st < 1_000_000_000 / fps);
+			m.repaint();
+		}
 	}
 }
+
