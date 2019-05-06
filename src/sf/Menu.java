@@ -3,12 +3,8 @@ package sf;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -21,11 +17,11 @@ public class Menu extends JFrame
 
 	private enum State {TITLE, CHAR_SELECT, STAGE_SELECT, IN_GAME};
 	private State gs;
-	
+
 	private long start;
 
-	private final int p1confirmkey = KeyEvent.VK_E;
-	private final int p2confirmkey = KeyEvent.VK_NUMPAD0;
+	private final int p1confirmkey = KeyEvent.VK_R;
+	private final int p2confirmkey = KeyEvent.VK_NUMPAD7;
 	private int p1sel;
 	private int p2sel;
 	private boolean p1confirmed;
@@ -44,7 +40,7 @@ public class Menu extends JFrame
 		this.setResizable(false);
 		this.setTitle("STPC");
 		this.setVisible(true);
-		
+
 		start = System.nanoTime();
 	}
 
@@ -79,16 +75,37 @@ public class Menu extends JFrame
 				else if (gs == State.CHAR_SELECT)
 				{
 					// TODO: large display of character
-					
-					BufferedImage[] images = new BufferedImage[3];
+					// TODO: don't reload images every frame
+
+					BufferedImage[] images = new BufferedImage[5];
 					images[0] = ImageIO.read(new File("img/charselect.png"));
-					
+
 					images[1] = ImageIO.read(new File("img/selection_boxes/" +
 						(p1confirmed ? (frame / 2 % 2 == 0 ? "p1f1.png" : "p1f2.png") : "p1.png")));
-					
+
 					images[2] = ImageIO.read(new File("img/selection_boxes/" +
 						(p2confirmed ? (frame / 2 % 2 == 0 ? "p2f1.png" : "p2f2.png") : "p2.png")));
 
+					images[3] = ImageIO.read(new File("img/sprites/c" + p1sel + ".png"));
+					images[4] = ImageIO.read(new File("img/sprites/c" + p2sel + ".png"));
+
+					double[] factor = new double[5];
+					factor[0] = 0;
+					factor[1] = 0;
+					factor[2] = 0;
+					factor[0] = 0;
+
+					Image[] scaled_images = new Image[5];
+					for (int i = 0; i < 5; i++)
+					{
+						scaled_images[i] = images[i].getScaledInstance(
+							images[i].getWidth() * scale * factor[i],
+							images[i].getHeight() * scale * factor[i],
+							0
+						);
+					}
+
+					/*
 					Image[] scaled_images = Arrays.stream(images).map(img ->
 						img.getScaledInstance(
 							img.getWidth() * scale,
@@ -96,6 +113,7 @@ public class Menu extends JFrame
 							0
 						)
 					).toArray(Image[]::new);
+					*/
 
 					g.drawImage(
 						scaled_images[0],
@@ -112,6 +130,9 @@ public class Menu extends JFrame
 
 					g.drawImage(scaled_images[2], startx + incx * (p2sel % 7), p2starty + incy * (p2sel / 7), null);
 					g.drawImage(scaled_images[1], startx + incx * (p1sel % 7), p1starty + incy * (p1sel / 7), null);
+
+					g.drawImage(scaled_images[3], scale * (0 + 20), scale * 5, null);
+					g.drawImage(scaled_images[4], scale * (326 - 20), scale * 5, null);
 				}
 			}
 			catch (IOException e) {
@@ -138,7 +159,7 @@ public class Menu extends JFrame
 			{
 				int p1inc = 0;
 				int p2inc = 0;
-				
+
 				switch (e.getKeyCode())
 				{
 				case KeyEvent.VK_W:		p1inc = -7;	break;
@@ -149,29 +170,29 @@ public class Menu extends JFrame
 				case KeyEvent.VK_DOWN:	p2inc = 7;	break;
 				case KeyEvent.VK_LEFT:	p2inc = -1;	break;
 				case KeyEvent.VK_RIGHT:	p2inc = 1;	break;
-				
+
 				case p1confirmkey:
 					p1confirmed = !p1confirmed;
 					break;
-					
+
 				case p2confirmkey:
 					p2confirmed = !p2confirmed;
 					break;
 				}
-				
+
 				int p1selbak = p1sel;
 				int p2selbak = p2sel;
 				if (!p1confirmed) p1sel += p1inc;
 				if (!p2confirmed) p2sel += p2inc;
-				
+
 				if (p1sel % 7 == 6 || p1sel > 20 || p1sel < 1 || p1sel == 5) {
 					p1sel = p1selbak;
 				}
-				
+
 				if (p2sel % 7 == 6 || p2sel > 20 || p2sel < 1 || p2sel == 5) {
 					p2sel = p2selbak;
 				}
-				
+
 				Menu.this.repaint();
 			}
 		}
