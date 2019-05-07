@@ -91,7 +91,10 @@ public class Menu extends JFrame
 					double[] scaling_factor = {1, 1, 1, 1.5, 1.5};
 					Image[] scaled_images = new Image[5];
 					
+<<<<<<< HEAD
 					// upscale all of the  images
+=======
+>>>>>>> branch 'menu' of https://github.com/YUR0ii/STPC
 					for (int i = 0; i < 5; i++)
 					{
 						scaled_images[i] = images[i].getScaledInstance(
