@@ -8,7 +8,6 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Menu extends JFrame
 {
@@ -26,6 +25,7 @@ public class Menu extends JFrame
 	private int p2sel;
 	private boolean p1confirmed;
 	private boolean p2confirmed;
+	private BufferedImage[] images = new BufferedImage[5];
 
 	public Menu()
 	{
@@ -74,10 +74,9 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.CHAR_SELECT)
 				{
-					// TODO: large display of character
-					// TODO: don't reload images every frame
+					// TODO: character names
+					// TODO: don't reload images every frame (not much practical difference but its bad practice)
 
-					BufferedImage[] images = new BufferedImage[5];
 					images[0] = ImageIO.read(new File("img/charselect.png"));
 
 					images[1] = ImageIO.read(new File("img/selection_boxes/" +
@@ -89,36 +88,25 @@ public class Menu extends JFrame
 					images[3] = ImageIO.read(new File("img/sprites/c" + p1sel + ".png"));
 					images[4] = ImageIO.read(new File("img/sprites/c" + p2sel + ".png"));
 
-					double[] factor = new double[5];
-					factor[0] = 0;
-					factor[1] = 0;
-					factor[2] = 0;
-					factor[0] = 0;
-
+					double[] scaling_factor = {1, 1, 1, 1.5, 1.5};
 					Image[] scaled_images = new Image[5];
+					
 					for (int i = 0; i < 5; i++)
 					{
 						scaled_images[i] = images[i].getScaledInstance(
-							images[i].getWidth() * scale * factor[i],
-							images[i].getHeight() * scale * factor[i],
+							(int) (images[i].getWidth() * scale * scaling_factor[i]),
+							(int) (images[i].getHeight() * scale * scaling_factor[i]),
 							0
 						);
 					}
-
-					/*
-					Image[] scaled_images = Arrays.stream(images).map(img ->
-						img.getScaledInstance(
-							img.getWidth() * scale,
-							img.getHeight() * scale,
-							0
-						)
-					).toArray(Image[]::new);
-					*/
-
+					
+					int halign = (this.getHeight() - images[0].getHeight() * scale) / 10;
+					
+					// character list
 					g.drawImage(
 						scaled_images[0],
 						(this.getWidth() - images[0].getWidth() * scale) / 2,
-						(this.getHeight() - images[0].getHeight() * scale) / 10,
+						halign,
 						null
 					);
 
@@ -128,11 +116,13 @@ public class Menu extends JFrame
 					int incx = 21 * scale;
 					int incy = 32 * scale;
 
+					// selection boxes
 					g.drawImage(scaled_images[2], startx + incx * (p2sel % 7), p2starty + incy * (p2sel / 7), null);
 					g.drawImage(scaled_images[1], startx + incx * (p1sel % 7), p1starty + incy * (p1sel / 7), null);
 
-					g.drawImage(scaled_images[3], scale * (0 + 20), scale * 5, null);
-					g.drawImage(scaled_images[4], scale * (326 - 20), scale * 5, null);
+					// large display
+					g.drawImage(scaled_images[3], scale * (0 + 20), halign, null);
+					g.drawImage(scaled_images[4], scale * (300 - 20), halign, null);
 				}
 			}
 			catch (IOException e) {
