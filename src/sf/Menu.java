@@ -25,6 +25,7 @@ public class Menu extends JFrame
 
 	private int p1sel;
 	private int p2sel;
+  
 	private boolean p1confirmed;
 	private boolean p2confirmed;
 	private boolean stageconfirmed;
@@ -60,7 +61,6 @@ public class Menu extends JFrame
 			g.drawString(Integer.toString(frame % menu_fps), 7, 15);
 
 			try {
-
 				if (gs == State.TITLE)
 				{
 					BufferedImage img = ImageIO.read(new File("img/titlescreen.png"));
@@ -81,7 +81,7 @@ public class Menu extends JFrame
 				else if (gs == State.CHAR_SELECT)
 				{
 					// TODO: character names
-					// TODO: don't reload images every frame (not much practical difference but its bad practice)
+					// TODO: don't reload images every frame (not much practical difference but it's bad practice)
 
 					images = new BufferedImage[5];
 					images[0] = ImageIO.read(new File("img/charselect.png"));
