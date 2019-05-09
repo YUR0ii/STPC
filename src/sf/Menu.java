@@ -12,7 +12,7 @@ import java.io.IOException;
 public class Menu extends JFrame
 {
 	public final static int scale = 3;
-	public final static int fps = 20;
+	public final static int menu_fps = 20;
 	public final static int width = 12 * 32 * scale;
 	public final static int height = 7 * 32 * scale;
 
@@ -55,9 +55,9 @@ public class Menu extends JFrame
 		protected void paintComponent(Graphics g)
 		{
 			super.paintComponent(g);
-			int frame = (int) (fps * (System.nanoTime() - start) / 1_000_000_000);
+			int frame = (int) (menu_fps * (System.nanoTime() - start) / 1_000_000_000);
 			this.setBackground(new Color(0, 0, 80));
-			g.drawString(Integer.toString(frame % fps), 7, 15);
+			g.drawString(Integer.toString(frame % menu_fps), 7, 15);
 
 			try {
 
@@ -167,12 +167,30 @@ public class Menu extends JFrame
 				else if (gs == State.IN_GAME)
 				{
 					// "working on it" -ian
+
+					// after the game is done, this routine should be called
+					newgame();
 				}
 			}
 			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	// brings the player to the character selection screen
+	private void newgame()
+	{
+		gs = State.CHAR_SELECT;
+
+		p1sel = 1;
+		p2sel = 4;
+
+		p1confirmed = false;
+		p2confirmed = false;
+		stageconfirmed = false;
+
+		Menu.this.repaint();
 	}
 
 	private class STPCKeyListener implements KeyListener
@@ -182,12 +200,7 @@ public class Menu extends JFrame
 		{
 			if (gs == State.TITLE)
 			{
-				gs = State.CHAR_SELECT;
-				p1sel = 1;
-				p2sel = 4;
-				p1confirmed = false;
-				p2confirmed = false;
-				Menu.this.repaint();
+				newgame();
 			}
 			else if (gs == State.CHAR_SELECT)
 			{
@@ -270,7 +283,7 @@ public class Menu extends JFrame
 		while (true)
 		{
 			long st = System.nanoTime();
-			while (System.nanoTime() - st < 1_000_000_000 / fps);
+			while (System.nanoTime() - st < 1_000_000_000 / menu_fps);
 			m.repaint();
 		}
 	}
