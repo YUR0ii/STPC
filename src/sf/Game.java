@@ -86,8 +86,6 @@ public class Game extends JFrame
 					System.exit(0);
 			}
 		});
-
-
 	}
 
 	class HealthBar extends Rectangle
@@ -317,7 +315,6 @@ public class Game extends JFrame
 		int p1dy = p1.dy();
 		int p2dx = p2.moving/10;
 		int p2dy = p2.dy();
-		//
 
 		Rectangle newP1 = new Rectangle(p1.pushbox.x+p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
 		Rectangle newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
@@ -362,7 +359,7 @@ public class Game extends JFrame
 
 	void gameEnd()
 	{
-
+		
 	}
 
 	private int scale(double num)

@@ -167,7 +167,7 @@ public class Menu extends JFrame
 				else if (gs == State.IN_GAME)
 				{
 					// "working on it" -ian
-
+					new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage())
 					// after the game is done, this routine should be called
 					newgame();
 				}

@@ -577,13 +577,13 @@ public class Player
 		}
 		else
 			hitlag--;
-
-//		if(anim.equals(character.JumpB) || anim.equals(character.JumpN) || anim.equals(character.JumpF))
-//		{
-//			if(currentFrame.actionable)
-//				grounded = false;
-//			else
-//				grounded = true;
-//		}
+//
+////		if(anim.equals(character.JumpB) || anim.equals(character.JumpN) || anim.equals(character.JumpF))
+////		{
+////			if(currentFrame.actionable)
+////				grounded = false;
+////			else
+////				grounded = true;
+////		}
 	}
 }
