@@ -301,7 +301,7 @@ public class Game extends JFrame
 		p1b.Update();
 		p2b.Update();
 
-		System.out.println(p1.getX() + " " + p2.getX());
+//		System.out.println(p1.getX() + " " + p2.getX());
 
 		//TODO game end
 

@@ -88,7 +88,7 @@ public class BoxCalc extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				saveToFile(chooseFile("Animation.anim", new FileNameExtensionFilter("Animation", "anim")));
+				saveToFile(chooseFile("Animation.anim", new FileNameExtensionFilter("Animation", "anim"), true));
 				System.out.println("Saved Succesfully");
 			}
 		});
@@ -108,7 +108,7 @@ public class BoxCalc extends JFrame
 	{
 		singleViz s = new singleViz();
 		vizs.add(s);
-		JButton newButton = new JButton(new ImageIcon(s.sprite));
+		final JButton newButton = new JButton(new ImageIcon(s.sprite));
 		vizChoose.add(newButton);
 		add(newButton);
 		newButton.addActionListener(new ActionListener() {
@@ -466,11 +466,16 @@ public class BoxCalc extends JFrame
 		bottomRight = new Point(right, y);
 		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x-topLeft.x, bottomRight.y-topLeft.y);
 	}
+	
+	static String lastLocation = "Z:\\";
 
-	static public File chooseFile(String name, FileFilter extension)
+	static public File chooseFile(String name, FileFilter extension, boolean save)
 	{
+		String path = "Z:\\Git\\STPC\\characters\\";
+		if(!save)
+			path = lastLocation;
 		JFrame chooser = new JFrame();
-		JFileChooser fileChooser = new JFileChooser("Z:\\");
+		JFileChooser fileChooser = new JFileChooser(path);
 		fileChooser.setSelectedFile(new File(name));
 		fileChooser.setApproveButtonText("Select");
 		fileChooser.setFileFilter(extension);
@@ -479,6 +484,8 @@ public class BoxCalc extends JFrame
 
 		if (returnVal == JFileChooser.APPROVE_OPTION)
 		{
+			if(!save)
+				lastLocation = fileChooser.getSelectedFile().getPath();
 			return fileChooser.getSelectedFile();
 		}
 		return null;
@@ -526,8 +533,8 @@ public class BoxCalc extends JFrame
 		{
 			try
 			{
-				sprite = ImageIO.read(chooseFile("Sprite", new FileNameExtensionFilter("Sprite", "png")));
-				hitboxViz = ImageIO.read(chooseFile("Hitboxes", new FileNameExtensionFilter("Hitboxes", "png")));
+				sprite = ImageIO.read(chooseFile("Sprite", new FileNameExtensionFilter("Sprite", "png"), false));
+				hitboxViz = ImageIO.read(chooseFile("Hitboxes", new FileNameExtensionFilter("Hitboxes", "png"), false));
 			}
 			catch(Exception boxE)
 			{

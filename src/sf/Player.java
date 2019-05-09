@@ -284,10 +284,11 @@ public class Player
 	//TODO airborne calculation
 	public int dy()
 	{
-		if(grounded)
-			return 0;
-		else
-			return 1;
+		return 0;
+//		if(grounded)
+//			return 0;
+//		else
+//			return 1;
 	}
 
 	private void attack(Animation a)
