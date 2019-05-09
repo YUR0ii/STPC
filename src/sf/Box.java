@@ -9,17 +9,20 @@ public class Box extends Rectangle
 {
 	public enum BoxType {HIT, HURT, PUSH, PROJ, THROW, THROWABLEG, THROWABLEA}
 	public BoxType type;
+	final Point offset;
 
 	public Box(BoxType t, Rectangle r)
 	{
 		super(r);
 		type = t;
+		offset = r.getLocation();
 	}
 	
 	public Box(Box b)
 	{
 		super(b);
 		type = b.type;
+		offset = b.offset;
 	}
 	
 	public boolean testCollision(Player opponent, BoxType testType)

@@ -42,6 +42,7 @@ public class Animation implements Serializable
 	public boolean equals(Animation a)
 	{
 		return this.id == a.id;
+//		return false;
 	}
 
 	void customEvents(Player parent, int frame) {};

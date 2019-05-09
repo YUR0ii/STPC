@@ -1,6 +1,7 @@
 package sf;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +18,7 @@ public class Player
 	private static final int JAB = 4, STRONG = 5, FIERCE = 6;
 	private static final int SHORT = 7, FORWARD = 8, ROUNDHOUSE = 9;
 
-	private Character character;
+	public Character character;
 	private int[] Controls;
 	private InputManager inputs;
 
@@ -25,6 +26,10 @@ public class Player
 	public int getX()
 	{
 		return (int) x;
+	}
+	public void moveX(int x)
+	{
+		this.x += x;
 	}
 	private double y;
 	public int getY()
@@ -39,6 +44,7 @@ public class Player
 	{
 		return currentFrame.boxes;
 	}
+	public Rectangle pushbox;
 	public BufferedImage sprite()
 	{
 		return currentFrame.sprite;
@@ -48,7 +54,7 @@ public class Player
 	private int hitstun = 0;
 	private int hitlag = 0;
 	public Point hitlagShake = new Point(0,0);
-	private int moving = 0;
+	public int moving = 0;
 
 	//SF2-like
 	private int health = 30;
@@ -80,16 +86,33 @@ public class Player
 	{
 		return grounded;
 	}
+	private boolean hit = false;
+	public boolean hitThisFrame()
+	{
+		return hit;
+	}
 	private boolean p1;
 	public boolean isP1()
 	{
 		return p1;
 	}
 
+	public Point getSpriteOffset()
+	{
+		return currentFrame.spriteOffset;
+	}
+
+	public int rMult()
+	{
+		if(right)
+			return 1;
+		else
+			return -1;
+	}
+
 	Player(Character c, Point Location, int[] controls, boolean p1, Game origin)
 	{
-		x = Location.x;
-		y = Location.y;
+
 		Controls = controls;
 		character = c;
 		inputs = new InputManager(controls, character.Commands);
@@ -98,9 +121,8 @@ public class Player
 		this.p1 = p1;
 		setAnim(c.Stand, true);
 		Animate();
-
-		if(!p1)
-			Flip();
+		x = Location.x;
+		y = Location.y;
 	}
 
 	@Override
@@ -122,9 +144,19 @@ public class Player
 		return y >= ground;
 	}
 
-	public boolean actionable()
+	public boolean movementActionable()
 	{
-		return currentFrame.actionable;
+		return currentFrame.actionable && grounded;
+	}
+
+	public boolean commandActionable()
+	{
+		return currentFrame.actionable || currentFrame.spCancel;
+	}
+
+	public boolean normalActionable()
+	{
+		return currentFrame.actionable || currentFrame.chCancel;
 	}
 
 	public boolean checkCommands()
@@ -134,8 +166,17 @@ public class Player
 			Command c = character.Commands[i];
 			if(inputs.keyCheck(c.button) && inputs.getCommandProgress(i) == c.directions.length-1)
 			{
-				//TODO set anim to command
-				return true;
+				if(c.Super && !currentFrame.suCancel)
+				{
+					meter = 0;
+					return false;
+				}
+				else
+				{
+					attack(c.anim);
+					return true;
+				}
+
 			}
 			else
 			{
@@ -150,11 +191,12 @@ public class Player
 
 	public void checkNormals(int distance)
 	{
+		distance -= Math.abs(currentFrame.spriteOffset.x);
 		try
 		{
 			if(grounded)
 			{
-				if(!crouching)
+				if(!(dirConvert(inputs.getDir()) == 1 || dirConvert(inputs.getDir()) == 2 || dirConvert(inputs.getDir()) == 3))
 				{
 					if(inputs.keyCheck(Controls[JAB]))
 						if(distance < character.jabRange)
@@ -222,14 +264,37 @@ public class Player
 	}
 
 	//TODO jump
-	private void Jump()
+	private void Jump(int dir)
 	{
-		setAnim(character.Jump);
+		switch(dir)
+		{
+		case -1:
+			setAnim(character.JumpB);
+			break;
+		case 0:
+			setAnim(character.JumpN);
+			break;
+		case 1:
+			setAnim(character.JumpF);
+			break;
+		}
+
 	}
-	
+
+	//TODO airborne calculation
+	public int dy()
+	{
+		if(grounded)
+			return 0;
+		else
+			return 1;
+	}
+
 	private void attack(Animation a)
 	{
-		//TODO do something
+		setAnim(a, true);
+		if(grounded)
+			moving = 0;
 	}
 
 	private int dirConvert(int direction)
@@ -265,19 +330,19 @@ public class Player
 		case 1:
 			blocking = true;
 			crouching = true;
-			setAnim(character.Crouch);
+			setAnim(character.Crouching);
 			moving = 0;
 			break;
 		case 2:
 			blocking = false;
 			crouching = true;
-			setAnim(character.Crouch);
+			setAnim(character.Crouching);
 			moving = 0;
 			break;
 		case 3:
 			blocking = false;
 			crouching = true;
-			setAnim(character.Crouch);
+			setAnim(character.Crouching);
 			moving = 0;
 			break;
 		case 4:
@@ -299,16 +364,16 @@ public class Player
 			crouching = false;
 			break;
 		case 7:
-			moving = character.fASpeed;
+			moving = character.bASpeed;
 			if(right)
 				moving = -moving;
 
 			crouching = false;
-			Jump();
+			Jump(-1);
 			break;
 		case 8:
 			moving = 0;
-			Jump();
+			Jump(0);
 			crouching = false;
 			break;
 		case 9:
@@ -317,7 +382,7 @@ public class Player
 				moving = -moving;
 
 			crouching = false;
-			Jump();
+			Jump(1);
 			break;
 		default:
 			setAnim(character.Stand);
@@ -328,16 +393,20 @@ public class Player
 		}
 	}
 
-	public void posUpdate()
+	public void posUpdate(int otherX)
 	{
+		if(otherX > x)
+			right = true;
+		else
+			right = false;
 		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
 			Box b = currentFrame.boxes[i];
-			b.y = getY() - b.y - b.height;
+			b.y = (int) (getY() - b.offset.getY() - b.height);
 			if (right)
-				b.x = getX() + b.x;
+				b.x = (int) (getX() + b.offset.getX());
 			else
-				b.x = getX() - b.x - b.width;
+				b.x = (int) (getX() - b.offset.getX() - b.width);
 		}
 		for(Iterator<Projectile> i = projectiles.iterator(); i.hasNext();)
 		{
@@ -357,12 +426,6 @@ public class Player
 		}
 	}
 
-	//TODO movement
-	public void doMovement()
-	{
-		x += moving;
-	}
-
 	public void hitboxCalc(Player other)
 	{
 		for(Box b : currentFrame.boxes)
@@ -374,10 +437,13 @@ public class Player
 				if (h.testCollision(other, BoxType.HURT))
 				{
 					other.Hit(h);
+					this.hit = true;
 					if(grounded)
 						hitlag = 12;
 				}
 			}
+			if(b.type == Box.BoxType.PUSH)
+				pushbox = b;
 		}
 		for(Projectile p : projectiles)
 		{
@@ -399,8 +465,13 @@ public class Player
 
 	public void Hit(Hitbox h)
 	{
+		moving = 0;
 		if(!blocking || (!crouching && h.low) || (crouching && !grounded))
 		{
+			if(crouching)
+				setAnim(character.DamageC);
+			else
+				setAnim(character.Damage);
 			health -= h.dmg;
 
 			if(h.knockdown || (!grounded))
@@ -426,7 +497,6 @@ public class Player
 				setAnim(character.BlockDmgC);
 			else
 				setAnim(character.BlockDmg);
-
 			if(health - h.blockDmg > 0)
 				health -= h.blockDmg;
 			else
@@ -436,12 +506,13 @@ public class Player
 
 			//TODO Attack pushback on block
 		}
+		currentFrame = anim.getFrame(0);
 	}
 
 	//TODO knockdown
 	public void Knockdown()
 	{
-		setAnim(character.Knockdown);
+		setAnim(character.Sweep);
 	}
 
 	//TODO wakeup
@@ -457,18 +528,8 @@ public class Player
 
 	public void doHitstun()
 	{
-		Random rand = new Random();
-		if(hitstun != 0)
-		{
-			if (crouching)
-				setAnim(character.DamageC);
-			else
-				setAnim(character.Damage);
-
-			hitlagShake = new Point((int) (-.5 + rand.nextDouble() * hitlag), (int) (-.5 + rand.nextDouble() * hitlag));
+		if(hitlag > 0)
 			hitlag--;
-			hitstun--;
-		}
 	}
 
 	private void setAnim(Animation a)
@@ -488,19 +549,41 @@ public class Player
 
 	public void Animate()
 	{
-		if(hitlag == 0)
+		Random rand = new Random();
+		if(hitstun != 0)
 		{
-			frame++;
+			hitlagShake = new Point((int) (-.5 + rand.nextDouble() * hitlag), (int) (-.5 + rand.nextDouble() * hitlag));
+			hitstun--;
 		}
-		animFrame newFrame = anim.getFrame(frame);
-		if(newFrame == null)
+
+		if(hitlag <= 0)
 		{
-			setAnim(character.Stand, true);
+			hitlagShake = new Point(0,0);
+			frame++;
+			animFrame newFrame = anim.getFrame(frame);
+			if(newFrame == null)
+			{
+				setAnim(character.Stand, true);
+			}
+			else
+			{
+				if(!newFrame.equals(currentFrame))
+				{
+					currentFrame = newFrame;
+					hit = false;
+				}
+				anim.customEvents(this, frame);
+			}
 		}
 		else
-		{
-			currentFrame = anim.getFrame(frame);
-			anim.customEvents(this, frame);
-		}
+			hitlag--;
+
+//		if(anim.equals(character.JumpB) || anim.equals(character.JumpN) || anim.equals(character.JumpF))
+//		{
+//			if(currentFrame.actionable)
+//				grounded = false;
+//			else
+//				grounded = true;
+//		}
 	}
 }

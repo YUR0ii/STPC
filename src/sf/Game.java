@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import BoxCalc.BoxCalc;
 import sf.Box.BoxType;
 
 //http://zachd.com/nki/ST/data.html
@@ -81,6 +82,8 @@ public class Game extends JFrame
 			{
 				if(keyEvent.getKeyCode() == KeyEvent.VK_F9)
 					debug = !debug;
+				if(keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE)
+					System.exit(0);
 			}
 		});
 
@@ -99,13 +102,15 @@ public class Game extends JFrame
 			this.p1 = p1;
 
 			if(!p1)
-				this.x = scale(228);
+				this.x = scale(384);
 		}
 
 		public void Update()
 		{
-			this.width = (int) (scale(150) * ((double) p.getHealth() / 30));
+			this.width = (int) (scale(150 * ((double) p.getHealth() / 30)));
+
 			if(!p1)
+				//				this.x = 1600-this.width;
 				this.x = scale(384)-this.width;
 		}
 	}
@@ -146,32 +151,31 @@ public class Game extends JFrame
 						switch(h.type)
 						{
 						case HIT:
-							g2.setColor(Color.RED);
+							g2.setColor(BoxCalc.HIT);
 							break;
 						case HURT:
-//							if(p.hitstun != 0)
-								g2.setColor(Color.BLUE);
-//							else if(p.blocking)
-//								g2.setColor(Color.CYAN);
-//							else if(p.crouching)
-//								g2.setColor(Color.MAGENTA);
+							g2.setColor(BoxCalc.HURT);
 							break;
 						case PUSH:
-							g2.setColor(Color.GREEN);
+							g2.setColor(BoxCalc.PUSH);
 							break;
 						case PROJ:
+							g2.setColor(BoxCalc.PROJ);
 							break;
 						case THROW:
+							g2.setColor(BoxCalc.THROW);
 							break;
 						case THROWABLEG:
+							g2.setColor(BoxCalc.GTHROW);
 							break;
 						case THROWABLEA:
+							g2.setColor(BoxCalc.ATHROW);
 							break;
 
 						}
-
-
-						g2.draw(h);
+						//						g2.fill(new Rectangle(new Point(scale(h.x), scale(h.y)), new Dimension(scale(h.width), scale(h.height))));
+						g2.fill(new Rectangle(new Point(scale(h.x),scale(-h.y - h.height) + (getHeight() - stage.floorHeight)), new Dimension(scale(h.width),scale(h.height))));
+						//						System.out.println(h.x + "," + h.y + " " + h.width + "," + h.height);
 					}
 					for(Box h : p.projectiles)
 					{
@@ -181,13 +185,18 @@ public class Game extends JFrame
 				}
 				//</editor-fold>
 
-				if(!p.facingR())
+				if(p.facingR())
+					at.setToScale(screenScale, screenScale);
+				else
 					at.setToScale(-screenScale, screenScale);
 
 				for(Projectile h : p.projectiles)
-					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(h.x), scale(h.y));
-				g2.drawImage(p.sprite(), new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.getX() + p.hitlagShake.x), scale(p.getX()  + p.hitlagShake.y - (p.sprite().getHeight() * 5)));
+					g2.drawImage(h.sprite, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(h.x), scale(h.y)); scale(p.getY()- (p.sprite().getHeight() * screenScale));
+					g2.drawImage(p.sprite(), new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), scale(p.getX() + p.hitlagShake.x - (p.getSpriteOffset().x*p.rMult())), scale(p.getY() - p.getSpriteOffset().y  + p.hitlagShake.y) + (getHeight() - stage.floorHeight));
+					//				g2.drawImage(p.sprite(), p.getX(), 0, this);
+					//				System.out.println(scale(p.getX() + p.hitlagShake.x) + "," + scale(p.getY()) + (getHeight() - stage.floorHeight));
 			}
+			//			System.out.println(p1.getX() + "," + p1.getY() + " " + p2.getX() + "," + p2.getY());
 
 			g2.setColor(Color.red);
 			g2.fill(p1b);
@@ -236,25 +245,28 @@ public class Game extends JFrame
 						KeyEvent.VK_ENTER
 				};
 
-		p1 = new Player(p1Char, new Point(scale(50),0), p1Controls, true, this);
-		p2 = new Player(p2Char, new Point(scale(300),0), p2Controls, false, this);
+		p1 = new Player(p1Char, new Point(80,0), p1Controls, true, this);
+		p2 = new Player(p2Char, new Point(300,0), p2Controls, false, this);
 
 		Players = new Player[] {p1, p2};
 	}
 
 	private void initPanel()
 	{
-		DrawPanel d = new DrawPanel();
-		this.add(d);
-		p1b = new HealthBar(p1, true);
-		p2b = new HealthBar(p2, false);
-
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		//		this.setSize(1600,900);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.setUndecorated(true);
 		this.setVisible(true);
-		screenScale = defaultRes.getHeight() / getSize().getHeight();
+
+		screenScale = ((double) getWidth()) / ((double) defaultRes.getWidth());
+		//		screenScale = 4;
+		//		System.out.println(screenScale);
+
+		DrawPanel d = new DrawPanel();
+		this.add(d);
+		p1b = new HealthBar(p1, true);
+		p2b = new HealthBar(p2, false);
 	}
 
 	private void Update()
@@ -269,33 +281,29 @@ public class Game extends JFrame
 			else
 				other = p1;
 
-			if(p.actionable())
-			{
-				if(!p.checkCommands())
-					p.checkNormals(Math.abs(p1.getX() - p2.getX()));
-				if(p.isGrounded())
-				{
-					if(p.getX() > other.getX())
-					{
-						if(p.facingR())
-							p.Flip();
-					}
-					else
-						if(!p.facingR())
-							p.Flip();
-					
-					p.checkMovement();
-				}
-			}
-			p.doMovement();
-			p.posUpdate();
-			p.hitboxCalc(other);
-			p.doHitstun();
+
+			if(p.commandActionable())
+				p.checkCommands();
+
+			if(p.movementActionable())
+				p.checkMovement();
+
+			if(p.normalActionable())
+				p.checkNormals(Math.abs(p1.getX() - p2.getX()));
+
+			if(!p.hitThisFrame())
+				p.hitboxCalc(other);
+
 			p.Animate();
+			p.posUpdate(other.getX());
 		}
+
+		doMovement();
 
 		p1b.Update();
 		p2b.Update();
+
+		System.out.println(p1.getX() + " " + p2.getX());
 
 		//TODO game end
 
@@ -303,9 +311,57 @@ public class Game extends JFrame
 		//		System.out.println(System.currentTimeMillis() - time);
 	}
 
+	void doMovement()
+	{
+		int p1dx = p1.moving/10;
+		int p1dy = p1.dy();
+		int p2dx = p2.moving/10;
+		int p2dy = p2.dy();
+
+		Rectangle newP1 = new Rectangle(p1.pushbox.x+p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
+		Rectangle newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
+
+		if(newP1.getMinX() <= 0 || newP1.getMaxX() >= 384)
+			p1dx = 0;
+		if(newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
+			p2dx = 0;
+
+		if(!(p1dx == 0 && p2dx == 0))
+		{
+			if(newP1.intersects(newP2))
+			{
+				if(Math.abs(p1dx) < Math.abs(p2dx))
+				{
+					p2dx = (int) Math.copySign(p1.character.bSpeed/10, p2dx);
+					p1dx = p2dx;
+				}
+				else if(Math.abs(p2dx) < Math.abs(p1dx))
+				{
+					p1dx = (int) Math.copySign(p2.character.bSpeed/10, p1dx);
+					p2dx = p1dx;
+				}
+				else
+				{
+					p1dx = p1dx + p2dx;
+					p2dx = p1dx;
+				}
+				
+				newP1 = new Rectangle(p1.pushbox.x+p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
+				newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
+				
+				if(newP1.getMinX() <= 0 || newP1.getMaxX() >= 384 || newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
+				{
+					p1dx = 0; p2dx = 0;
+				}
+			}
+		}
+		p1.moveX(p1dx);
+		p2.moveX(p2dx);
+	}
+
 	void gameEnd()
 	{
-		
+
 	}
 
 	private int scale(double num)

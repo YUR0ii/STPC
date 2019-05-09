@@ -1,6 +1,10 @@
 package sf;
 
 import javax.swing.*;
+
+import sf.chars.Ryu;
+import sf.stages.RyuStage;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -74,5 +78,6 @@ public class Menu extends JFrame
 	public static void main(String[] args)
 	{
 //		new Menu();
+		new Game(new Ryu(), new Ryu(), new RyuStage());
 	}
 }

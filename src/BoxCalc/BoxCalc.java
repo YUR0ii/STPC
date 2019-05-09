@@ -24,14 +24,15 @@ import sf.Hitbox.AttackType;
 //TODO whole animation using multiple instances of singleViz
 public class BoxCalc extends JFrame
 {
-	static final Color HIT = new Color(255,0,0);
-	static final Color HURT = new Color(0,0,255);
-	static final Color PUSH = new Color(0,255,0);
-	static final Color PROJ = new Color(255,102,0);
-	static final Color PROJVULN = new Color(0,255,255);
-	static final Color THROW = new Color(255,255,0);
-	static final Color GTHROW = new Color(254,254,254);
-	static final Color ATHROW = new Color(1,1,1);
+	public static final Color HIT = new Color(255,0,0);
+	public static final Color HURT = new Color(0,0,255);
+	public static final Color PUSH = new Color(0,255,0);
+	public static final Color PROJ = new Color(255,102,0);
+	public static final Color PROJVULN = new Color(0,255,255);
+	public static final Color THROW = new Color(255,255,0);
+	public static final Color GTHROW = new Color(254,254,254);
+	public static final Color ATHROW = new Color(1,1,1);
+	public static final Color AXIS = new Color(127,127,127);
 
 	static final Color[] COLORS = new Color[] {HIT, HURT, PUSH, PROJ, PROJVULN, THROW, GTHROW, ATHROW};
 	static final String[] COLORNAMES = new String[] {"Hitbox", "Hurtbox", "Pushbox", "Projectile", "Projectile Vulnerable", "Throwbox", "Grounded Throwable", "Aerial Throwable"};
@@ -60,7 +61,6 @@ public class BoxCalc extends JFrame
 	JButton save = new JButton("Save");
 	JButton newFrame = new JButton("New Frame");
 
-	//TODO global setup method for each viz
 	BoxCalc()
 	{
 		d = new display();
@@ -162,8 +162,8 @@ public class BoxCalc extends JFrame
 			remove(knockdown);
 		}
 
-		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()), current.hitboxViz.getWidth()-current.sprite.getWidth(), 0);
-		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()), current.hitboxViz.getHeight()-current.sprite.getHeight(), 0);
+		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()) - 10, current.hitboxViz.getWidth()-current.sprite.getWidth() + 10, 0);
+		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()) - 10, current.hitboxViz.getHeight()-current.sprite.getHeight() + 10, 0);
 		actionableB = new JCheckBox("Actionable", current.actionable);
 		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
 		type = new JComboBox<AttackType>(AttackType.values());
@@ -235,7 +235,7 @@ public class BoxCalc extends JFrame
 				current.frames = (int) frames.getValue();
 			}
 		});
-		
+
 		type.addItemListener(new ItemListener()
 		{
 			@Override
@@ -244,7 +244,7 @@ public class BoxCalc extends JFrame
 				current.strength = (AttackType) type.getSelectedItem();
 			}
 		});
-		
+
 		damage.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -253,7 +253,7 @@ public class BoxCalc extends JFrame
 				current.damage = (int) damage.getValue();
 			}
 		});
-		
+
 		stun.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -262,7 +262,7 @@ public class BoxCalc extends JFrame
 				current.stun = (int) stun.getValue();
 			}
 		});
-		
+
 		stunTimer.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -271,7 +271,7 @@ public class BoxCalc extends JFrame
 				current.stunTimer = (int) stunTimer.getValue();
 			}
 		});
-		
+
 		chCancel.addActionListener(new ActionListener()
 		{
 			@Override
@@ -280,7 +280,7 @@ public class BoxCalc extends JFrame
 				current.chCancel = chCancel.isSelected();
 			}
 		});
-		
+
 		spCancel.addActionListener(new ActionListener()
 		{
 			@Override
@@ -289,7 +289,7 @@ public class BoxCalc extends JFrame
 				current.spCancel = spCancel.isSelected();
 			}
 		});
-		
+
 		suCancel.addActionListener(new ActionListener()
 		{
 			@Override
@@ -298,7 +298,7 @@ public class BoxCalc extends JFrame
 				current.suCancel = suCancel.isSelected();
 			}
 		});
-		
+
 		low.addActionListener(new ActionListener()
 		{
 			@Override
@@ -307,7 +307,7 @@ public class BoxCalc extends JFrame
 				current.low = low.isSelected();
 			}
 		});
-		
+
 		knockdown.addActionListener(new ActionListener()
 		{
 			@Override
@@ -318,7 +318,7 @@ public class BoxCalc extends JFrame
 		});
 
 		validate();
-		pack();
+		//		pack();
 		repaint();
 	}
 
@@ -329,6 +329,7 @@ public class BoxCalc extends JFrame
 		{
 			vizs.get(i).prepareForSave();
 			afs[i] = vizs.get(i).frame;
+			System.out.println(i);
 		}
 		Animation a = new Animation(afs);
 		try
@@ -339,8 +340,45 @@ public class BoxCalc extends JFrame
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
 
+	static Point findOrigin(BufferedImage viz)
+	{
+		int x = 0;
+		int y = 0;
+		boolean foundX = false;
+		boolean foundY = false;
 
+		gamer:
+		for(int j = 0; j < viz.getHeight(); j++)
+		{
+			for(int i = 0; i < viz.getWidth(); i++)
+			{
+				if(new Color(viz.getRGB(i, j)).equals(AXIS))
+				{
+					if(!foundX)
+					{
+						if(new Color(viz.getRGB(i, j+1)).equals(AXIS))
+						{
+						x = i;
+						foundX = true;
+						}
+					}
+					else if(!foundY)
+					{
+						if(new Color(viz.getRGB(i+1, j)).equals(AXIS))
+						{
+							y = j;
+							foundY = true;
+						}
+					}
+					else
+						break gamer;
+				}
+			}
+		}
+
+		return new Point(x,y);
 	}
 
 	static Rectangle findBox(BufferedImage viz, Color c, Rectangle[] ignore)
@@ -456,8 +494,8 @@ public class BoxCalc extends JFrame
 
 			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, .5f));
 			g.scale(5,5);
-			g.drawImage(current.sprite, 0, 0, this);
-			g.drawImage(current.hitboxViz, current.offset.x, current.offset.y, this);
+			g.drawImage(current.hitboxViz, 0, 0, this);
+			g.drawImage(current.sprite, current.offset.x, current.offset.y, this);
 			setPreferredSize(new Dimension(current.hitboxViz.getWidth() * 5, current.hitboxViz.getHeight() * 5));
 		}
 	}
@@ -467,6 +505,7 @@ public class BoxCalc extends JFrame
 		BufferedImage sprite;
 		BufferedImage hitboxViz;
 		Point offset = new Point(0,0);
+		Point origin;
 		animFrame frame;
 		ArrayList<Box> boxes = new ArrayList<Box>();
 		ArrayList<Box> hitboxes = new ArrayList<Box>();
@@ -495,17 +534,25 @@ public class BoxCalc extends JFrame
 				System.out.println("File Inavlid");
 				boxE.printStackTrace();
 			}
+			origin = findOrigin(hitboxViz);
+			System.out.println(origin);
 			repaint();
 		}
 
 		void calculateBoxes()
 		{
+			ArrayList<Rectangle> ignore = new ArrayList<Rectangle>();
 			for(int i = 0; i < 8; i++)
 			{
 				boolean done = false;
 				while(!done)
 				{
-					Rectangle r = findBox(hitboxViz, COLORS[i], boxes.toArray(new Rectangle[0]));
+					Rectangle r;
+					try
+					{
+					r = findBox(hitboxViz, COLORS[i], ignore.toArray(new Rectangle[0]));
+					}
+					catch(Exception e) {r = null;}
 					if(r == null)
 						done = true;
 					else
@@ -539,7 +586,10 @@ public class BoxCalc extends JFrame
 							b = BoxType.THROWABLEA;
 							break;
 						}
-						Box bx = new Box(b, r);
+						System.out.println(b);
+						ignore.add(r);
+						//TODO Y COORDS
+						Box bx = new Box(b, new Rectangle(new Point(r.x - origin.x, r.y - origin.y), new Dimension(r.width, r.height)));
 						if(b == BoxType.HIT || b == BoxType.PROJ)
 							hitboxes.add(bx);
 						else
@@ -556,13 +606,8 @@ public class BoxCalc extends JFrame
 		void prepareForSave()
 		{
 			calculateBoxes();
-			for(Rectangle r : boxes)
-			{
-				r.x += offset.x;
-				r.y += offset.y;
-			}
 
-			frame = new animFrame(actionable, frames, sprite, boxes.toArray(new Box[0]));
+			frame = new animFrame(actionable, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x + offset.x, origin.y - offset.y));
 		}
 	}
 

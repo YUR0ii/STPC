@@ -4,8 +4,8 @@ import java.awt.image.BufferedImage;
 
 public class Stage
 {
-	int length;
-	int floorHeight;
-	BufferedImage sprite;
-	String name;
+	protected int length;
+	protected int floorHeight;
+	protected BufferedImage sprite;
+	protected String name;
 }
