@@ -8,6 +8,8 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Menu extends JFrame
 {
@@ -32,6 +34,13 @@ public class Menu extends JFrame
 
 	private long start;
 	private BufferedImage[] images;
+
+	private static Map<Integer, Class<sf.Character>> characters = new HashMap<>();
+
+	static
+	{
+		characters.put(1, (Class<sf.Character>) sf.chars.Ryu.class);
+	}
 
 	public Menu()
 	{
@@ -166,7 +175,21 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.IN_GAME)
 				{
-					new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage());
+
+					sf.Character p1;
+					sf.Character p2;
+
+					if (p1sel == 1)
+					{
+						p1 = new sf.chars.Ryu();
+					}
+
+					if (p2sel == 1)
+					{
+						p2 = new sf.chars.Ryu();
+					}
+
+					new Game(p1, p2, new sf.stages.RyuStage());
 					newgame();
 				}
 			}
