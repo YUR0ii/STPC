@@ -20,8 +20,7 @@ import sf.*;
 import sf.Box;
 import sf.Box.BoxType;
 import sf.Hitbox.AttackType;
-
-//TODO whole animation using multiple instances of singleViz
+//TODO fix images before processing
 public class BoxCalc extends JFrame
 {
 	public static final Color HIT = new Color(255,0,0);
@@ -33,6 +32,8 @@ public class BoxCalc extends JFrame
 	public static final Color GTHROW = new Color(254,254,254);
 	public static final Color ATHROW = new Color(1,1,1);
 	public static final Color AXIS = new Color(127,127,127);
+	public static final Color AXIS2 = new Color(126,126,126);
+	public static final Color AXIS3 = new Color(128,128,128);
 
 	static final Color[] COLORS = new Color[] {HIT, HURT, PUSH, PROJ, PROJVULN, THROW, GTHROW, ATHROW};
 	static final String[] COLORNAMES = new String[] {"Hitbox", "Hurtbox", "Pushbox", "Projectile", "Projectile Vulnerable", "Throwbox", "Grounded Throwable", "Aerial Throwable"};
@@ -348,17 +349,20 @@ public class BoxCalc extends JFrame
 		int y = 0;
 		boolean foundX = false;
 		boolean foundY = false;
+		Color c;
 
 		gamer:
 		for(int j = 0; j < viz.getHeight(); j++)
 		{
 			for(int i = 0; i < viz.getWidth(); i++)
 			{
-				if(new Color(viz.getRGB(i, j)).equals(AXIS))
+				c = new Color(viz.getRGB(i, j));
+				if(c.equals(AXIS) || c.equals(AXIS2) || c.equals(AXIS3))
 				{
 					if(!foundX)
 					{
-						if(new Color(viz.getRGB(i, j+1)).equals(AXIS))
+						c = new Color(viz.getRGB(i, j+1));
+						if(c.equals(AXIS) || c.equals(AXIS2) || c.equals(AXIS3))
 						{
 						x = i;
 						foundX = true;
@@ -366,7 +370,8 @@ public class BoxCalc extends JFrame
 					}
 					else if(!foundY)
 					{
-						if(new Color(viz.getRGB(i+1, j)).equals(AXIS))
+						c = new Color(viz.getRGB(i+1, j));
+						if(c.equals(AXIS) || c.equals(AXIS2) || c.equals(AXIS3))
 						{
 							y = j;
 							foundY = true;
