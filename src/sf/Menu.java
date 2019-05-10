@@ -25,7 +25,7 @@ public class Menu extends JFrame
 
 	private int p1sel;
 	private int p2sel;
-  
+
 	private boolean p1confirmed;
 	private boolean p2confirmed;
 	private boolean stageconfirmed;
@@ -166,9 +166,7 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.IN_GAME)
 				{
-					// "working on it" -ian
 					new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage());
-					// after the game is done, this routine should be called
 					newgame();
 				}
 			}
