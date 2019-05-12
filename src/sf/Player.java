@@ -156,7 +156,7 @@ public class Player
 
 	public boolean normalActionable()
 	{
-		return currentFrame.actionable || currentFrame.chCancel;
+		return currentFrame.actionable || (currentFrame.chCancel && hitThisFrame());
 	}
 
 	public boolean checkCommands()
