@@ -3,9 +3,11 @@ package sf;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
-public class Hitbox extends Box
+public class Hitbox extends Box implements Serializable
 {
+	public static final long serialVersionUID = 1L;
 	//TODO projectiles in S
 	public enum AttackType {L, M, H, JL, JM, JH, S}
 

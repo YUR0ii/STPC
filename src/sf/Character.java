@@ -104,9 +104,11 @@ public abstract class Character
 	{
 		try
 		{
+			System.out.println("loading " + filename);
 			return (Animation) new ObjectInputStream(new FileInputStream(new File(filename))).readObject();
 		} catch (Exception e)
 		{
+			System.out.println("failed");
 			return Stand;
 		}
 	}

@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class animFrame implements Serializable
 {
-	private static final long serialVersionUID = 2800579864081696969L;
+	public static final long serialVersionUID = 1L;
 	public transient BufferedImage sprite;
 	Point spriteOffset;
 	public Box[] boxes;

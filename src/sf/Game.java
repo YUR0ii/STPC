@@ -172,13 +172,13 @@ public class Game extends JFrame
 
 						}
 						//						g2.fill(new Rectangle(new Point(scale(h.x), scale(h.y)), new Dimension(scale(h.width), scale(h.height))));
-						g2.fill(new Rectangle(new Point(scale(h.x),scale(-h.y - h.height) + (getHeight() - stage.floorHeight)), new Dimension(scale(h.width),scale(h.height))));
+						g2.draw(new Rectangle(new Point(scale(h.x),scale(-h.y - h.height) + (getHeight() - stage.floorHeight)), new Dimension(scale(h.width),scale(h.height))));
 						//						System.out.println(h.x + "," + h.y + " " + h.width + "," + h.height);
 					}
 					for(Box h : p.projectiles)
 					{
 						g2.setColor(Color.YELLOW);
-						g2.fill(h);
+						g2.draw(h);
 					}
 				}
 				//</editor-fold>
@@ -365,5 +365,10 @@ public class Game extends JFrame
 	private int scale(double num)
 	{
 		return (int) (num * screenScale);
+	}
+
+	public static void main(String[] args)
+	{
+		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage());
 	}
 }

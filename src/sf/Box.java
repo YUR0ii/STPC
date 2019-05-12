@@ -5,8 +5,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.Serializable;
 
-public class Box extends Rectangle
+public class Box extends Rectangle implements Serializable
 {
+	public static final long serialVersionUID = 1L;
 	public enum BoxType {HIT, HURT, PUSH, PROJ, THROW, THROWABLEG, THROWABLEA}
 	public BoxType type;
 	final Point offset;

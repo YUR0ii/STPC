@@ -4,6 +4,7 @@ import java.io.*;
 
 public class Animation implements Serializable
 {
+	public static final long serialVersionUID = 1L;
 	animFrame[] frames;
 	transient int id;
 	static int maxID = 0;
