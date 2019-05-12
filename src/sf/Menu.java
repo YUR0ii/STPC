@@ -35,11 +35,11 @@ public class Menu extends JFrame
 	private long start;
 	private BufferedImage[] images;
 
-	private static Map<Integer, Class<sf.Character>> characters = new HashMap<>();
+	private static Map<Integer, Class> character_map = new HashMap<>();
 
 	static
 	{
-		characters.put(1, (Class<sf.Character>) sf.chars.Ryu.class);
+		character_map.put(1, sf.chars.Ryu.class);
 	}
 
 	public Menu()
@@ -176,24 +176,17 @@ public class Menu extends JFrame
 				else if (gs == State.IN_GAME)
 				{
 
-					sf.Character p1;
-					sf.Character p2;
-
-					if (p1sel == 1)
-					{
-						p1 = new sf.chars.Ryu();
-					}
-
-					if (p2sel == 1)
-					{
-						p2 = new sf.chars.Ryu();
-					}
-
-					new Game(p1, p2, new sf.stages.RyuStage());
+					Class<Character> p1 = character_map.get(p1sel);
+					Class<Character> p2 = character_map.get(p2sel);
+					new Game(p1.newInstance(), p2.newInstance(), new sf.stages.RyuStage());
 					newgame();
 				}
 			}
 			catch (IOException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
 		}
