@@ -119,7 +119,7 @@ public class Player
 		origin.addKeyListener(inputs);
 
 		this.p1 = p1;
-		setAnim(c.Stand, true);
+		anim = character.Stand;
 		Animate();
 		x = Location.x;
 		y = Location.y;
@@ -293,7 +293,8 @@ public class Player
 
 	private void attack(Animation a)
 	{
-		setAnim(a, true);
+		anim = a;
+		frame = -1;
 		if(grounded)
 			moving = 0;
 	}
@@ -466,6 +467,10 @@ public class Player
 
 	public void Hit(Hitbox h)
 	{
+		if(hitstun != 0)
+			hitlag = 12;
+		else
+			hitlag = 13;
 		moving = 0;
 		if(!blocking || (!crouching && h.low) || (crouching && !grounded))
 		{
@@ -479,10 +484,7 @@ public class Player
 				Knockdown();
 			else
 			{
-				if(hitstun != 0)
-					hitlag = 12;
-				else
-					hitlag = 13;
+
 
 				hitstun = h.stunCalc(this);
 
@@ -527,12 +529,6 @@ public class Player
 		right = !right;
 	}
 
-	public void doHitstun()
-	{
-		if(hitlag > 0)
-			hitlag--;
-	}
-
 	private void setAnim(Animation a)
 	{
 		if(!anim.equals(a))
@@ -542,29 +538,24 @@ public class Player
 		}
 	}
 
-	private void setAnim(Animation a, boolean noCheck)
-	{
-		frame = 0;
-		anim = a;
-	}
-
 	public void Animate()
 	{
 		Random rand = new Random();
-		if(hitstun != 0)
+		if(hitlag != 0)
 		{
-			hitlagShake = new Point((int) (-.5 + rand.nextDouble() * hitlag), (int) (-.5 + rand.nextDouble() * hitlag));
-			hitstun--;
+			if(!hitThisFrame())
+				hitlagShake = new Point((int) (-.5 + rand.nextDouble() * hitlag), (int) (-.5 + rand.nextDouble() * hitlag));
+			hitlag--;
 		}
-
-		if(hitlag <= 0)
+		else if(hitstun <= 0)
 		{
 			hitlagShake = new Point(0,0);
 			frame++;
 			animFrame newFrame = anim.getFrame(frame);
 			if(newFrame == null)
 			{
-				setAnim(character.Stand, true);
+				frame = 0;
+				anim = character.Stand;
 			}
 			else
 			{
@@ -577,14 +568,6 @@ public class Player
 			}
 		}
 		else
-			hitlag--;
-//
-////		if(anim.equals(character.JumpB) || anim.equals(character.JumpN) || anim.equals(character.JumpF))
-////		{
-////			if(currentFrame.actionable)
-////				grounded = false;
-////			else
-////				grounded = true;
-////		}
+			hitstun--;
 	}
 }

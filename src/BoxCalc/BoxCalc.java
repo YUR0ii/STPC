@@ -16,6 +16,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 
+import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import sf.*;
 import sf.Box;
 import sf.Box.BoxType;
@@ -32,8 +33,6 @@ public class BoxCalc extends JFrame
 	public static final Color GTHROW = new Color(254,254,254);
 	public static final Color ATHROW = new Color(1,1,1);
 	public static final Color AXIS = new Color(127,127,127);
-	public static final Color AXIS2 = new Color(126,126,126);
-	public static final Color AXIS3 = new Color(128,128,128);
 
 	static final Color[] COLORS = new Color[] {HIT, HURT, PUSH, PROJ, PROJVULN, THROW, GTHROW, ATHROW};
 	static final String[] COLORNAMES = new String[] {"Hitbox", "Hurtbox", "Pushbox", "Projectile", "Projectile Vulnerable", "Throwbox", "Grounded Throwable", "Aerial Throwable"};
@@ -46,13 +45,14 @@ public class BoxCalc extends JFrame
 	JSlider xSlider;
 	JSlider ySlider;
 	JCheckBox actionableB;
+	JLabel frameLabel = new JLabel("Frame Count:");
 	JSpinner frames;
 	JComboBox<AttackType> type;
-	JLabel damageL;
+	JLabel damageL = new JLabel("Damage: ");
 	JSpinner damage;
-	JLabel stunL;
+	JLabel stunL = new JLabel("Stun: ");
 	JSpinner stun;
-	JLabel stunTimerL;
+	JLabel stunTimerL = new JLabel("Stun Timer: ");
 	JSpinner stunTimer;
 	JCheckBox chCancel;
 	JCheckBox spCancel;
@@ -148,6 +148,7 @@ public class BoxCalc extends JFrame
 			remove(xSlider);
 			remove(ySlider);
 			remove(actionableB);
+			remove(frameLabel);
 			remove(frames);
 			remove(type);
 			remove(damageL);
@@ -168,9 +169,6 @@ public class BoxCalc extends JFrame
 		actionableB = new JCheckBox("Actionable", current.actionable);
 		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
 		type = new JComboBox<AttackType>(AttackType.values());
-		damageL = new JLabel("Damage: ");
-		stunL = new JLabel("Stun: ");
-		stunTimerL = new JLabel("Stun Timer: ");
 		damage = new JSpinner(new SpinnerNumberModel(current.damage, 0, 255, 1));
 		stun = new JSpinner(new SpinnerNumberModel(current.stun, 0, 255, 1));
 		stunTimer = new JSpinner(new SpinnerNumberModel(current.stunTimer, 0, 255, 1));
@@ -183,6 +181,7 @@ public class BoxCalc extends JFrame
 		add(ySlider);
 		add(xSlider);
 		add(actionableB);
+		add(frameLabel);
 		add(frames);
 		add(type);
 		add(damageL);
@@ -357,12 +356,12 @@ public class BoxCalc extends JFrame
 			for(int i = 0; i < viz.getWidth(); i++)
 			{
 				c = new Color(viz.getRGB(i, j));
-				if(c.equals(AXIS) || c.equals(AXIS2) || c.equals(AXIS3))
+				if(c.equals(AXIS))
 				{
 					if(!foundX)
 					{
 						c = new Color(viz.getRGB(i, j+1));
-						if(c.equals(AXIS) || c.equals(AXIS2) || c.equals(AXIS3))
+						if(c.equals(AXIS))
 						{
 						x = i;
 						foundX = true;
@@ -371,7 +370,7 @@ public class BoxCalc extends JFrame
 					else if(!foundY)
 					{
 						c = new Color(viz.getRGB(i+1, j));
-						if(c.equals(AXIS) || c.equals(AXIS2) || c.equals(AXIS3))
+						if(c.equals(AXIS))
 						{
 							y = j;
 							foundY = true;
@@ -546,9 +545,39 @@ public class BoxCalc extends JFrame
 				System.out.println("File Inavlid");
 				boxE.printStackTrace();
 			}
+			fixColor();
 			origin = findOrigin(hitboxViz);
 			System.out.println(origin);
 			repaint();
+		}
+
+		boolean close(int a, int b)
+		{
+			return Math.abs(a-b) <= 1;
+		}
+
+		void fixColor()
+		{
+			for(int i = 0; i < hitboxViz.getWidth(); i++)
+			{
+				for(int j = 0; j < hitboxViz.getHeight(); j++)
+				{
+					Color hc = new Color(hitboxViz.getRGB(i,j));
+					for(int k = 0; k <= COLORS.length; k++)
+					{
+						Color c;
+						if(k == COLORS.length)
+							c = AXIS;
+						else
+							c = COLORS[k];
+
+						if(!hc.equals(Color.WHITE) && close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen()))
+						{
+							hitboxViz.setRGB(i, j, c.getRGB());
+						}
+					}
+				}
+			}
 		}
 
 		void calculateBoxes()
