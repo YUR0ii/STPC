@@ -1,11 +1,11 @@
 package sf;
 
-import java.awt.image.BufferedImage;
+import java.awt.Image;
 
 public class Stage
 {
 	protected int length;
 	protected int floorHeight;
-	protected BufferedImage sprite;
+	protected Image sprite;
 	protected String name;
 }

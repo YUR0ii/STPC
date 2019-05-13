@@ -105,7 +105,7 @@ public class Game extends JFrame
 
 		public void Update()
 		{
-			this.width = (int) (scale(150 * ((double) p.getHealth() / 30)));
+			this.width = (scale(150 * ((double) p.getHealth() / 30)));
 
 			if(!p1)
 				//				this.x = 1600-this.width;
@@ -115,10 +115,12 @@ public class Game extends JFrame
 
 	class DrawPanel extends JPanel
 	{
-		private BufferedImage background;
+		private Image background;
+
 		DrawPanel()
 		{
-			try{background = ImageIO.read(new File("ryuStage.jpg"));}catch(Exception e) {};
+			background = stage.sprite;
+
 			this.add(roundTimer);
 			roundTimer.setBounds(scale(180), 0, scale(12), scale(12));
 			roundTimer.setFont(new Font("Monospace", 1, scale(12)));
@@ -134,10 +136,12 @@ public class Game extends JFrame
 		{
 			super.paintComponent(g);
 			g2 = (Graphics2D) g;
+
 			AffineTransform at = new AffineTransform();
 			at.setToScale(screenScale, screenScale);
+			//g2.drawImage(background, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), 0, 0);
 
-			g2.drawImage(background, new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR), 0, 0);
+			g2.drawImage(background.getScaledInstance((int) (background.getWidth(null) * screenScale), (int) (background.getHeight(null) * screenScale), Image.SCALE_DEFAULT), 0, 0, null);
 
 			for(Player p : Players)
 			{
@@ -202,7 +206,7 @@ public class Game extends JFrame
 			winText.setFont(new Font("Monospace", 1, scale(36)));
 			winText.setLocation(scale(192)-(winText.getWidth()/2), scale(108)-(winText.getHeight()/2));
 			roundTimer.setLocation(scale(192)-(roundTimer.getWidth()/2), 0);
-		}  
+		}
 	}
 
 	private void initCharacters(Character p1Char, Character p2Char)
@@ -257,7 +261,7 @@ public class Game extends JFrame
 		this.setUndecorated(true);
 		this.setVisible(true);
 
-		screenScale = ((double) getWidth()) / ((double) defaultRes.getWidth());
+		screenScale = (getWidth()) / (defaultRes.getWidth());
 		//		screenScale = 4;
 		//		System.out.println(screenScale);
 
@@ -343,10 +347,10 @@ public class Game extends JFrame
 					p1dx = p1dx + p2dx;
 					p2dx = p1dx;
 				}
-				
+
 				newP1 = new Rectangle(p1.pushbox.x+p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
 				newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
-				
+
 				if(newP1.getMinX() <= 0 || newP1.getMaxX() >= 384 || newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
 				{
 					p1dx = 0; p2dx = 0;
@@ -359,7 +363,7 @@ public class Game extends JFrame
 
 	void gameEnd()
 	{
-		
+
 	}
 
 	private int scale(double num)

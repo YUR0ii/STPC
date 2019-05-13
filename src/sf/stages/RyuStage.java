@@ -1,9 +1,7 @@
 package sf.stages;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 import sf.Stage;
@@ -15,12 +13,10 @@ public class RyuStage extends Stage
 		length = 621;
 		floorHeight = 50;
 		try {
-			sprite = ImageIO.read(new File("ryuStage.jpg"));
+			sprite = ImageIO.read(new File("stages/ryu.jpg"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		name = "Ryu Stage";
 	}
-
 }

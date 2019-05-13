@@ -43,7 +43,9 @@ public class Menu extends JFrame
 
 	public Menu()
 	{
-		gs = State.TITLE;
+		gs = State.IN_GAME;
+		p1sel = 1;
+		p2sel = 1;
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panel = new STPCPanel();
@@ -99,8 +101,8 @@ public class Menu extends JFrame
 					images[2] = ImageIO.read(new File("img/selection_boxes/" +
 						(p2confirmed ? (frame / 2 % 2 == 0 ? "p2f1.png" : "p2f2.png") : "p2.png")));
 
-					images[3] = ImageIO.read(new File("img/sprites/c" + p1sel + ".png"));
-					images[4] = ImageIO.read(new File("img/sprites/c" + p2sel + ".png"));
+					images[3] = ImageIO.read(new File("img/char_sprites/c" + p1sel + ".png"));
+					images[4] = ImageIO.read(new File("img/char_sprites/c" + p2sel + ".png"));
 
 					double[] scaling_factor = {1, 1, 1, 1.5, 1.5};
 					Image[] scaled_images = new Image[5];
@@ -146,7 +148,7 @@ public class Menu extends JFrame
 
 					// TODO: more to do to get more stages
 
-					images[1] = ImageIO.read(new File("img/stages/s0" + (true ? "f" : "") + ".png"));
+					images[1] = ImageIO.read(new File("img/stage_sprites/s0" + (true ? "f" : "") + ".png"));
 
 					double[] scaling_factor = {1, 1};
 					Image[] scaled_images = new Image[2];
@@ -177,7 +179,7 @@ public class Menu extends JFrame
 					try {
 						Class<Character> p1 = character_map.get(p1sel);
 						Class<Character> p2 = character_map.get(p2sel);
-						new Game(p1.newInstance(), p2.newInstance(), new sf.stages.RyuStage());
+						new Game(p1.newInstance(), p2.newInstance(), new sf.stages.FeiLongStage());
 					} catch (NullPointerException e) {
 						System.out.println("Invalid character selected");
 					}

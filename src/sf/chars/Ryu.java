@@ -3,7 +3,7 @@ package sf.chars;
 import sf.*;
 
 public class Ryu extends sf.Character {
-	
+
 	public Ryu()
 	{
 		super("characters/Ryu");
@@ -13,7 +13,7 @@ public class Ryu extends sf.Character {
 		fASpeed = 32;
 		bASpeed = 48;
 		//selectIcon
-		
+
 		jabRange = 25;
 		strongRange = 31;
 		fierceRange = 41;
@@ -30,8 +30,6 @@ public class Ryu extends sf.Character {
 
 	@Override
 	protected void setupWinAnims() {
-		// TODO Auto-generated method stub
 
 	}
-
 }
