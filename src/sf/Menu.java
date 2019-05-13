@@ -30,7 +30,6 @@ public class Menu extends JFrame
 
 	private boolean p1confirmed;
 	private boolean p2confirmed;
-	private boolean stageconfirmed;
 
 	private long start;
 	private BufferedImage[] images;
@@ -145,9 +144,9 @@ public class Menu extends JFrame
 					images = new BufferedImage[2];
 					images[0] = ImageIO.read(new File("img/stageselect.png"));
 
-					// TODO: lots more to do to get more stages
+					// TODO: more to do to get more stages
 
-					images[1] = ImageIO.read(new File("img/stages/s0" + (stageconfirmed ? "f" : "") + ".png"));
+					images[1] = ImageIO.read(new File("img/stages/s0" + (true ? "f" : "") + ".png"));
 
 					double[] scaling_factor = {1, 1};
 					Image[] scaled_images = new Image[2];
@@ -175,10 +174,14 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.IN_GAME)
 				{
+					try {
+						Class<Character> p1 = character_map.get(p1sel);
+						Class<Character> p2 = character_map.get(p2sel);
+						new Game(p1.newInstance(), p2.newInstance(), new sf.stages.RyuStage());
+					} catch (NullPointerException e) {
+						System.out.println("Invalid character selected");
+					}
 
-					Class<Character> p1 = character_map.get(p1sel);
-					Class<Character> p2 = character_map.get(p2sel);
-					new Game(p1.newInstance(), p2.newInstance(), new sf.stages.RyuStage());
 					newgame();
 				}
 			}
@@ -202,7 +205,6 @@ public class Menu extends JFrame
 
 		p1confirmed = false;
 		p2confirmed = false;
-		stageconfirmed = false;
 
 		Menu.this.repaint();
 	}
@@ -267,17 +269,9 @@ public class Menu extends JFrame
 			{
 				switch (e.getKeyCode())
 				{
-					case p1confirmkey:
-					case p2confirmkey:
-						stageconfirmed = !stageconfirmed;
-						break;
-
-					case startkey:
-						if (stageconfirmed) {
-							gs = State.IN_GAME;
-						}
-
-						break;
+				case startkey:
+					gs = State.IN_GAME;
+					break;
 				}
 
 				Menu.this.repaint();
