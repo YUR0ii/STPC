@@ -8,19 +8,19 @@ import javax.swing.ImageIcon;
 
 import sf.Stage;
 
-public class FeiLongStage extends Stage
+public class VegaStage extends Stage
 {
-	public FeiLongStage()
+	public VegaStage()
 	{
-		length = 695;
+		length = 590;
 		floorHeight = 50;
 		
 		try {
-			sprite = ImageIO.read(new File("stages/fei_long.gif"));
+			sprite = ImageIO.read(new File("stages/vega.gif"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		name = "Fei Long Stage";
+		name = "Vega Stage";
 	}
 }

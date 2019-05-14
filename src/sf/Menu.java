@@ -179,7 +179,7 @@ public class Menu extends JFrame
 					try {
 						Class<Character> p1 = character_map.get(p1sel);
 						Class<Character> p2 = character_map.get(p2sel);
-						new Game(p1.newInstance(), p2.newInstance(), new sf.stages.FeiLongStage());
+						new Game(p1.newInstance(), p2.newInstance(), new sf.stages.RyuStage());
 					} catch (NullPointerException e) {
 						System.out.println("Invalid character selected");
 					}

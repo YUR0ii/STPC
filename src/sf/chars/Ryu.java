@@ -6,7 +6,7 @@ public class Ryu extends sf.Character {
 
 	public Ryu()
 	{
-		super("characters/Ryu");
+		super("characters/ryu");
 		name = "Ryu";
 		fSpeed = 48;
 		bSpeed = 32;

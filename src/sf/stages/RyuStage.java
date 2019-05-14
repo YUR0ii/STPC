@@ -10,13 +10,15 @@ public class RyuStage extends Stage
 {
 	public RyuStage()
 	{
-		length = 621;
+		length = 620;
 		floorHeight = 50;
+		
 		try {
-			sprite = ImageIO.read(new File("stages/ryu.jpg"));
+			sprite = ImageIO.read(new File("stages/ryu.gif"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		name = "Ryu Stage";
 	}
 }
