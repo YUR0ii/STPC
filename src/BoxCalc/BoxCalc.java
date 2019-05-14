@@ -46,6 +46,7 @@ public class BoxCalc extends JFrame
 	JSlider xSlider;
 	JSlider ySlider;
 	JCheckBox actionableB;
+	JCheckBox airborneB;
 	JLabel frameLabel = new JLabel("Frame Count:");
 	JSpinner frames;
 	JComboBox<AttackType> type;
@@ -69,11 +70,11 @@ public class BoxCalc extends JFrame
 		addFrame();
 		switchTo(0);
 
-		add(ySlider);
 		add(d);
-		add(xSlider);
-		add(actionableB);
-		add(frames);
+//		add(ySlider);
+//		add(xSlider);
+//		add(actionableB);
+//		add(frames);
 		add(save);
 		add(newFrame);
 
@@ -149,6 +150,7 @@ public class BoxCalc extends JFrame
 			remove(xSlider);
 			remove(ySlider);
 			remove(actionableB);
+			remove(airborneB);
 			remove(frameLabel);
 			remove(frames);
 			remove(type);
@@ -168,6 +170,7 @@ public class BoxCalc extends JFrame
 		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()) - 10, current.hitboxViz.getWidth()-current.sprite.getWidth() + 10, 0);
 		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()) - 10, current.hitboxViz.getHeight()-current.sprite.getHeight() + 10, 0);
 		actionableB = new JCheckBox("Actionable", current.actionable);
+		airborneB = new JCheckBox("Airborne", current.airborne);
 		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
 		type = new JComboBox<AttackType>(AttackType.values());
 		damage = new JSpinner(new SpinnerNumberModel(current.damage, 0, 255, 1));
@@ -182,6 +185,7 @@ public class BoxCalc extends JFrame
 		add(ySlider);
 		add(xSlider);
 		add(actionableB);
+		add(airborneB);
 		add(frameLabel);
 		add(frames);
 		add(type);
@@ -225,6 +229,13 @@ public class BoxCalc extends JFrame
 			public void actionPerformed(ActionEvent arg0)
 			{
 				current.actionable = actionableB.isSelected();
+			}
+		});
+
+		airborneB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				current.airborne = airborneB.isSelected();
 			}
 		});
 
@@ -533,6 +544,7 @@ public class BoxCalc extends JFrame
 		ArrayList<Box> hitboxes = new ArrayList<Box>();
 
 		boolean actionable = false;
+		boolean airborne = false;
 		int frames = 1;
 		AttackType strength = AttackType.S;
 		int damage = 0;
@@ -656,7 +668,7 @@ public class BoxCalc extends JFrame
 		{
 			calculateBoxes();
 
-			frame = new animFrame(actionable, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x + offset.x, origin.y - offset.y));
+			frame = new animFrame(actionable, airborne, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x + offset.x, origin.y - offset.y));
 		}
 	}
 

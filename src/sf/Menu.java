@@ -43,7 +43,7 @@ public class Menu extends JFrame
 
 	public Menu()
 	{
-		gs = State.IN_GAME;
+		gs = State.TITLE;
 		p1sel = 1;
 		p2sel = 1;
 

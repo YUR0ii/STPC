@@ -84,7 +84,7 @@ public class Player
 	private boolean grounded = true;
 	public boolean isGrounded()
 	{
-		return grounded;
+		return !currentFrame.airborne;
 	}
 	private boolean hit = false;
 	public boolean hitThisFrame()
@@ -146,7 +146,7 @@ public class Player
 
 	public boolean movementActionable()
 	{
-		return currentFrame.actionable && grounded;
+		return currentFrame.actionable && isGrounded();
 	}
 
 	public boolean commandActionable()
@@ -194,7 +194,7 @@ public class Player
 		distance -= Math.abs(currentFrame.spriteOffset.x);
 		try
 		{
-			if(grounded)
+			if(isGrounded())
 			{
 				if(!(dirConvert(inputs.getDir()) == 1 || dirConvert(inputs.getDir()) == 2 || dirConvert(inputs.getDir()) == 3))
 				{
@@ -295,7 +295,7 @@ public class Player
 	{
 		anim = a;
 		frame = -1;
-		if(grounded)
+		if(isGrounded())
 			moving = 0;
 	}
 
@@ -440,7 +440,7 @@ public class Player
 				{
 					other.Hit(h);
 					this.hit = true;
-					if(grounded)
+					if(isGrounded())
 						hitlag = 12;
 				}
 			}
@@ -472,7 +472,7 @@ public class Player
 		else
 			hitlag = 13;
 		moving = 0;
-		if(!blocking || (!crouching && h.low) || (crouching && !grounded))
+		if(!blocking || (!crouching && h.low) || (crouching && !isGrounded()))
 		{
 			if(crouching)
 				setAnim(character.DamageC);
@@ -480,7 +480,7 @@ public class Player
 				setAnim(character.Damage);
 			health -= h.dmg;
 
-			if(h.knockdown || (!grounded))
+			if(h.knockdown || (!isGrounded()))
 				Knockdown();
 			else
 			{
