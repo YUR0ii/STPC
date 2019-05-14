@@ -118,7 +118,8 @@ public class Game extends JFrame
 		private BufferedImage background;
 		DrawPanel()
 		{
-			try{background = ImageIO.read(new File("ryuStage.jpg"));}catch(Exception e) {};
+			background = stage.sprite;
+			
 			this.add(roundTimer);
 			roundTimer.setBounds(scale(180), 0, scale(12), scale(12));
 			roundTimer.setFont(new Font("Monospace", 1, scale(12)));

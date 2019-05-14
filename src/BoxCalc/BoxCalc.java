@@ -16,11 +16,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 
-import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import sf.*;
 import sf.Box;
 import sf.Box.BoxType;
 import sf.Hitbox.AttackType;
+
 //TODO fix images before processing
 public class BoxCalc extends JFrame
 {

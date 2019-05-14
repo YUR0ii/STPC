@@ -2,23 +2,25 @@ package sf.stages;
 
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import sf.Stage;
 
-public class RyuStage extends Stage
+public class BalrogStage extends Stage
 {
-	public RyuStage()
+	public BalrogStage()
 	{
-		length = 620;
+		length = 557;
 		floorHeight = 50;
 		
 		try {
-			sprite = ImageIO.read(new File("stages/ryu.gif"));
+			sprite = ImageIO.read(new File("stages/balrog.gif"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		name = "Ryu Stage";
+		name = "Balrog Stage";
 	}
 }
