@@ -36,6 +36,7 @@ public class Player
 	{
 		return (int) y;
 	}
+	public void moveY(int y) {this.y -= y;}
 
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private Animation anim;

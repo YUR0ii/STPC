@@ -356,6 +356,8 @@ public class Game extends JFrame
 		}
 		p1.moveX(p1dx);
 		p2.moveX(p2dx);
+		p1.moveY(p1dy);
+		p2.moveY(p2dy);
 	}
 
 	void gameEnd()

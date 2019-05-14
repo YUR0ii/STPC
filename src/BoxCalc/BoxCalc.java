@@ -525,7 +525,7 @@ public class BoxCalc extends JFrame
 	
 	static boolean close(Color c, Color hc)
 	{
-		return close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen());
+		return !hc.equals(Color.WHITE) && close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen());
 	}
 	
 	static boolean close(int a, int b)
@@ -572,32 +572,6 @@ public class BoxCalc extends JFrame
 			origin = findOrigin(hitboxViz);
 			System.out.println(origin);
 			repaint();
-		}
-
-		
-
-		void fixColor()
-		{
-			for(int k = 0; k <= COLORS.length; k++)
-			{
-				Color c;
-				if(k == COLORS.length)
-					c = AXIS;
-				else
-					c = COLORS[k];
-				
-				for(int i = 0; i < hitboxViz.getWidth(); i++)
-				{
-					for(int j = 0; j < hitboxViz.getHeight(); j++)
-					{
-						Color hc = new Color(hitboxViz.getRGB(i,j));
-						if(!hc.equals(Color.WHITE) && close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen()))
-						{
-							hitboxViz.setRGB(i, j, c.getRGB());
-						}
-					}
-				}
-			}
 		}
 
 		void calculateBoxes()
