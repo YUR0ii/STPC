@@ -27,6 +27,7 @@ public class Menu extends JFrame
 
 	private int p1sel;
 	private int p2sel;
+	private int ssel;
 
 	private boolean p1confirmed;
 	private boolean p2confirmed;
@@ -35,17 +36,32 @@ public class Menu extends JFrame
 	private BufferedImage[] images;
 
 	private static Map<Integer, Class> character_map = new HashMap<>();
+	private static Map<Integer, Class> stage_map = new HashMap<>();
 
 	static
 	{
 		character_map.put(1, sf.chars.Ryu.class);
+		
+		stage_map.put(0, sf.stages.RyuStage.class);
+		stage_map.put(1, sf.stages.BlankaStage.class);
+		stage_map.put(2, sf.stages.KenStage.class);
+		stage_map.put(3, sf.stages.GuileStage.class);
+		stage_map.put(4, sf.stages.BalrogStage.class);
+		stage_map.put(5, sf.stages.ChunLiStage.class);
+		stage_map.put(6, sf.stages.ZangiefStage.class);
+		stage_map.put(7, sf.stages.DhalsimStage.class);
+		stage_map.put(8, sf.stages.MBisonStage.class);
+		stage_map.put(9, sf.stages.SagatStage.class);
+		stage_map.put(10, sf.stages.VegaStage.class);
+		stage_map.put(11, sf.stages.THawkStage.class);
+		stage_map.put(12, sf.stages.FeiLongStage.class);
+		stage_map.put(13, sf.stages.DeeJayStage.class);
+		stage_map.put(14, sf.stages.CammyStage.class);
 	}
 
 	public Menu()
 	{
 		gs = State.TITLE;
-		p1sel = 1;
-		p2sel = 1;
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panel = new STPCPanel();
@@ -70,6 +86,8 @@ public class Menu extends JFrame
 			this.setBackground(new Color(0, 0, 80));
 			g.drawString(Integer.toString(frame % menu_fps), 7, 15);
 
+			// TODO: don't reload images every frame (not much practical difference but it's bad practice)
+			
 			try {
 				if (gs == State.TITLE)
 				{
@@ -90,8 +108,8 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.CHAR_SELECT)
 				{
-					// TODO: character names
-					// TODO: don't reload images every frame (not much practical difference but it's bad practice)
+					// TODO: character names (and possibly country flags)
+					// TODO: large display on the right side should be flipped
 
 					images = new BufferedImage[5];
 					images[0] = ImageIO.read(new File("img/charselect.png"));
@@ -143,22 +161,25 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.STAGE_SELECT)
 				{
-					images = new BufferedImage[2];
+					// TODO: England sprite has a very small inaccuracy
+					// TODO: fix Japan and Brazil sprites
+					
+					images = new BufferedImage[16];
 					images[0] = ImageIO.read(new File("img/stageselect.png"));
-
-					// TODO: more to do to get more stages
-
-					images[1] = ImageIO.read(new File("img/stage_sprites/s0" + (true ? "f" : "") + ".png"));
-
-					double[] scaling_factor = {1, 1};
-					Image[] scaled_images = new Image[2];
+          
+					for (int i = 0; i < 15; i++)
+					{
+						images[i+1] = ImageIO.read(new File("img/stage_sprites/s" + i + (ssel == i ? "f" : "") + ".png"));
+					}
+					
+					Image[] scaled_images = new Image[16];
 
 					// upscale all of the images
-					for (int i = 0; i < 2; i++)
+					for (int i = 0; i < 16; i++)
 					{
 						scaled_images[i] = images[i].getScaledInstance(
-							(int) (images[i].getWidth() * scale * scaling_factor[i]),
-							(int) (images[i].getHeight() * scale * scaling_factor[i]),
+							images[i].getWidth() * scale,
+							images[i].getHeight() * scale,
 							0
 						);
 					}
@@ -170,18 +191,34 @@ public class Menu extends JFrame
 						(this.getWidth() - images[0].getWidth() * scale) / 4,
 						null
 					);
-
+					
 					// stages
-					g.drawImage(scaled_images[1], width / 2 - 12 * scale, height / 2 - scale * 5, null);
+					
+					int wpos = 50 * scale;
+					for (int i = 1; i < 9; i++)
+					{
+						g.drawImage(scaled_images[i], wpos, height / 2 - scale * 5, null);
+						wpos += 15 * scale + scaled_images[i].getWidth(null);
+					}
+					
+					// the rest of the bottom row
+					wpos = 50 * scale;
+					for (int i = 9; i < 16; i++)
+					{
+						g.drawImage(scaled_images[i], wpos, height / 2 + scale * 30, null);
+						wpos += 15 * scale + scaled_images[i].getWidth(null);
+					}
 				}
 				else if (gs == State.IN_GAME)
 				{
 					try {
 						Class<Character> p1 = character_map.get(p1sel);
 						Class<Character> p2 = character_map.get(p2sel);
-						new Game(p1.newInstance(), p2.newInstance(), new sf.stages.GuileStage());
+						Class<Stage> stage = stage_map.get(ssel);
+						new Game(p1.newInstance(), p2.newInstance(), stage.newInstance());
+            
 					} catch (NullPointerException e) {
-						System.out.println("Invalid character selected");
+						System.err.println("Invalid selection");
 					}
 
 					newgame();
@@ -203,7 +240,8 @@ public class Menu extends JFrame
 		gs = State.CHAR_SELECT;
 
 		p1sel = 1;
-		p2sel = 4;
+		p2sel = 1;
+		ssel = 0;
 
 		p1confirmed = false;
 		p2confirmed = false;
@@ -252,28 +290,34 @@ public class Menu extends JFrame
 					break;
 				}
 
-				int p1selbak = p1sel;
-				int p2selbak = p2sel;
-				if (!p1confirmed) p1sel += p1inc;
-				if (!p2confirmed) p2sel += p2inc;
-
-				if (p1sel % 7 == 6 || p1sel > 20 || p1sel < 1 || p1sel == 5) {
-					p1sel = p1selbak;
+				if (character_map.containsKey(p1sel + p1inc)) {
+					p1sel += p1inc;
 				}
 
-				if (p2sel % 7 == 6 || p2sel > 20 || p2sel < 1 || p2sel == 5) {
-					p2sel = p2selbak;
+				if (character_map.containsKey(p2sel + p2inc)) {
+					p2sel += p2inc;
 				}
 
 				Menu.this.repaint();
 			}
 			else if (gs == State.STAGE_SELECT)
 			{
+				int sinc = 0;
+				
 				switch (e.getKeyCode())
 				{
+				case KeyEvent.VK_A:		sinc = -1;	break;
+				case KeyEvent.VK_D:		sinc = 1;	break;
+				case KeyEvent.VK_LEFT:	sinc = -1;	break;
+				case KeyEvent.VK_RIGHT:	sinc = 1;	break;
+					
 				case startkey:
 					gs = State.IN_GAME;
 					break;
+				}
+				
+				if (stage_map.containsKey(ssel + sinc)) {
+					ssel += sinc;
 				}
 
 				Menu.this.repaint();
@@ -298,4 +342,3 @@ public class Menu extends JFrame
 		}
 	}
 }
-
