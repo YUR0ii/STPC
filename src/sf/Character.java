@@ -87,6 +87,9 @@ public abstract class Character
 	protected Animation RoundhouseA;
 	protected Animation RoundhouseAD;
 
+	protected Animation Win;
+	protected Animation Lose;
+
 	protected abstract void setupCommands();
 	protected Command[] Commands;
 	protected abstract void setupWinAnims();
@@ -143,6 +146,8 @@ public abstract class Character
 		BlockDmg = animFromFile(animDir + "blockDmg.anim");
 		BlockDmgC = animFromFile(animDir + "blockDmgC.anim");
 		Dizzy = animFromFile(animDir + "dizzy.anim");
+		Win = animFromFile(animDir + "win.anim");
+		Lose = animFromFile(animDir + "lose.anim");
 	}
 
 	void setupNormals()

@@ -16,8 +16,32 @@ public class HumanInputManager extends InputManager implements KeyListener
     //first is progress, second is frames since last input
     private int[][] commandValid;
 
-    private int dir;
-
+    @Override
+    public int getDir(boolean right)
+    {
+        if(!right)
+        {
+            switch(dir)
+            {
+                case 1:
+                    return 3;
+                case 4:
+                    return 6;
+                case 7:
+                    return 9;
+                case 3:
+                    return 1;
+                case 6:
+                    return 4;
+                case 9:
+                    return 7;
+                default:
+                    return dir;
+            }
+        }
+        else
+            return dir;
+    }
 
     public HumanInputManager(int[] keys, Command[] commands)
     {
@@ -53,11 +77,6 @@ public class HumanInputManager extends InputManager implements KeyListener
     }
 
     public void keyTyped(KeyEvent e){}
-
-    public int getDir()
-    {
-        return dir;
-    }
 
     public void checkCommandValid(Command c, int i)
     {

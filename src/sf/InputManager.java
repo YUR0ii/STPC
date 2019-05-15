@@ -8,6 +8,7 @@ public abstract class InputManager
 {
 	//first is progress, second is frames since last input
 	private int[][] commandValid;
+	protected int dir;
 
 	public InputManager(Command[] commands)
 	{
@@ -20,7 +21,7 @@ public abstract class InputManager
 		return commandValid[command][0];
 	}
 	
-	abstract int getDir();
+	public int getDir(boolean right){return dir;}
 
 	public void checkCommandValid(Command c, int i)
 	{

@@ -1,23 +1,17 @@
 package sf;
 
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import BoxCalc.BoxCalc;
-import sf.Box.BoxType;
 
 //http://zachd.com/nki/ST/data.html
 //https://classicreload.com/super-street-fighter-2-turbo.html
@@ -32,10 +26,11 @@ public class Game extends JFrame
 	InputManager p2C;
 	Player[] Players;
 	Timer updateTimer;
+	Timer roundTimerT;
 	int roundTimerInt = 3;
 	JLabel roundTimer = new JLabel("3");
 	JLabel winText = new JLabel("");
-	boolean start = false;
+	boolean running = false;
 	boolean debug = false;
 	double screenScale;
 	final Dimension defaultRes = new Dimension(384,224);
@@ -49,20 +44,23 @@ public class Game extends JFrame
 		initCharacters(p1, p2);
 		initPanel();
 		updateTimer = new Timer();
+		roundTimerT = new Timer();
 		updateTimer.scheduleAtFixedRate(new TimerTask(){@Override public void run(){Update();}}, 0, 17);
-		updateTimer.scheduleAtFixedRate(new TimerTask(){@Override public void run()
+		roundTimerT.scheduleAtFixedRate(new TimerTask(){@Override public void run()
 		{
 			roundTimerInt--;
-			roundTimer.setText(Integer.toString(roundTimerInt));
-
-			if(!start)
+			if(!running)
 			{
+			    if(roundTimerInt > 0)
+                    roundTimer.setText(Integer.toString(roundTimerInt));
 				if(roundTimerInt == 0)
 				{
 					roundTimerInt = 99;
-					start = true;
+					running = true;
+                    roundTimer.setText(Integer.toString(roundTimerInt));
 				}
 			}
+			else
 			roundTimer.setText(Integer.toString(roundTimerInt));
 		}
 		}, 1000, 1000);
@@ -87,7 +85,7 @@ public class Game extends JFrame
 				if(keyEvent.getKeyCode() == KeyEvent.VK_F9)
 					debug = !debug;
 				if(keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE)
-					System.exit(0);
+					dispose();
 			}
 		});
 	}
@@ -258,7 +256,7 @@ public class Game extends JFrame
 			addKeyListener(p2CH);
 		}
 		else
-			p2C = null;
+			p2C = new BogoBoxer(p2Char.Commands);
 
 		p1 = new Player(p1Char, new Point(80,0), p1C, true);
 		p2 = new Player(p2Char, new Point(300,0), p2C, false);
@@ -289,21 +287,24 @@ public class Game extends JFrame
 		//		long time = System.currentTimeMillis();
 		for(Player p : Players)
 		{
-			p.readInput();
+
 			Player other;
 			if(p.isP1())
 				other = p2;
 			else
 				other = p1;
+            if(running)
+            {
+                p.readInput();
+                if (p.commandActionable())
+                    p.checkCommands();
 
-			if(p.commandActionable())
-				p.checkCommands();
+                if (p.movementActionable())
+                    p.checkMovement();
 
-			if(p.movementActionable())
-				p.checkMovement();
-
-			if(p.normalActionable())
-				p.checkNormals(Math.abs(p1.getX() - p2.getX()));
+                if (p.normalActionable())
+                    p.checkNormals(Math.abs(p1.getX() - p2.getX()));
+            }
 
 			if(!p.hitThisFrame())
 				p.hitboxCalc(other);
@@ -320,8 +321,11 @@ public class Game extends JFrame
 //		System.out.println(p1.getX() + " " + p2.getX());
 
 		//TODO game end
-		if(roundTimerInt == 0 || p1.getHealth() <= 0 || p2.getHealth() <= 0)
+		if(running && (roundTimerInt == 0 || p1.getHealth() <= 0 || p2.getHealth() <= 0))
 			gameEnd();
+
+		if(roundTimerInt < -5)
+		    dispose();
 
 		this.repaint();
 		//		System.out.println(System.currentTimeMillis() - time);
@@ -411,7 +415,32 @@ public class Game extends JFrame
 
 	void gameEnd()
 	{
-		
+//	    System.out.println(roundTimerInt);
+	    running = false;
+	    if(roundTimerInt <= 0)
+	        roundTimer.setText("TIME UP");
+	    roundTimerInt = -1;
+
+	    if(p1.getHealth() > p2.getHealth())
+        {
+            winText.setText("PLAYER 1 WINS");
+            p1.win();
+            p2.lose();
+        }
+	    else if(p1.getHealth() < p2.getHealth())
+        {
+            winText.setText("PLAYER 2 WINS");
+            p1.lose();
+            p2.win();
+        }
+	    else
+        {
+            winText.setText("DRAW");
+            p1.lose();
+            p2.lose();
+        }
+
+		winText.setVisible(true);
 	}
 
 	private int scale(double num)
@@ -421,6 +450,6 @@ public class Game extends JFrame
 
 	public static void main(String[] args)
 	{
-		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage(), true);
+		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage(), false);
 	}
 }

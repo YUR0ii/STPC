@@ -176,7 +176,7 @@ public class Player
 			}
 			else
 			{
-				if(dirConvert(inputs.getDir()) == c.directions[inputs.getCommandProgress(i)][0])
+				if(inputs.getDir(right) == c.directions[inputs.getCommandProgress(i)][0])
 				{
 					inputs.checkCommandValid(c,i);
 				}
@@ -192,7 +192,7 @@ public class Player
 		{
 			if(isGrounded())
 			{
-				if(!(dirConvert(inputs.getDir()) == 1 || dirConvert(inputs.getDir()) == 2 || dirConvert(inputs.getDir()) == 3))
+				if(!(inputs.getDir(right) == 1 || inputs.getDir(right) == 2 || inputs.getDir(right) == 3))
 				{
 					if(inputs.buttonCheck(FIERCE))
 						if(distance < character.fierceRange)
@@ -259,7 +259,6 @@ public class Player
 		}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
 	}
 
-	//TODO jump
 	private void Jump(int dir)
 	{
 		switch(dir)
@@ -277,7 +276,6 @@ public class Player
 
 	}
 
-	//TODO airborne calculation
 	int airborneFrames = 0;
 	public int dy()
 	{
@@ -303,35 +301,9 @@ public class Player
 			moving = 0;
 	}
 
-	private int dirConvert(int direction)
-	{
-		if(!right)
-		{
-			switch(direction)
-			{
-			case 1:
-				return 3;
-			case 4:
-				return 6;
-			case 7:
-				return 9;
-			case 3:
-				return 1;
-			case 6:
-				return 4;
-			case 9:
-				return 7;
-			default:
-				return direction;
-			}
-		}
-		else
-			return direction;
-	}
-
 	public void checkMovement()
 	{
-		switch(dirConvert(inputs.getDir()))
+		switch(inputs.getDir(right))
 		{
 		case 1:
 			blocking = true;
@@ -573,5 +545,15 @@ public class Player
 		}
 		else
 			hitstun--;
+	}
+
+	void win()
+	{
+		setAnim(character.Win);
+	}
+
+	void lose()
+	{
+		setAnim(character.Lose);
 	}
 }

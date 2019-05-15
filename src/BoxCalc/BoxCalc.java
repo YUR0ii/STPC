@@ -21,7 +21,6 @@ import sf.Box;
 import sf.Box.BoxType;
 import sf.Hitbox.AttackType;
 
-//TODO fix images before processing
 public class BoxCalc extends JFrame
 {
 	
@@ -167,15 +166,15 @@ public class BoxCalc extends JFrame
 			remove(knockdown);
 		}
 
-		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()) - 10, current.hitboxViz.getWidth()-current.sprite.getWidth() + 10, 0);
-		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()) - 10, current.hitboxViz.getHeight()-current.sprite.getHeight() + 10, 0);
+		xSlider = new JSlider(JSlider.HORIZONTAL, -Math.abs(current.hitboxViz.getWidth()-current.sprite.getWidth()) - 10, Math.abs(current.hitboxViz.getWidth()-current.sprite.getWidth()) + 10, 0);
+		ySlider = new JSlider(JSlider.VERTICAL, -Math.abs(current.hitboxViz.getHeight()-current.sprite.getHeight()) - 10, Math.abs(current.hitboxViz.getHeight()-current.sprite.getHeight()) + 10, 0);
 		actionableB = new JCheckBox("Actionable", current.actionable);
 		airborneB = new JCheckBox("Airborne", current.airborne);
-		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
+		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, Integer.MAX_VALUE, 1));
 		type = new JComboBox<AttackType>(AttackType.values());
-		damage = new JSpinner(new SpinnerNumberModel(current.damage, 0, 255, 1));
-		stun = new JSpinner(new SpinnerNumberModel(current.stun, 0, 255, 1));
-		stunTimer = new JSpinner(new SpinnerNumberModel(current.stunTimer, 0, 255, 1));
+		damage = new JSpinner(new SpinnerNumberModel(current.damage, 0, Integer.MAX_VALUE, 1));
+		stun = new JSpinner(new SpinnerNumberModel(current.stun, 0, Integer.MAX_VALUE, 1));
+		stunTimer = new JSpinner(new SpinnerNumberModel(current.stunTimer, 0, Integer.MAX_VALUE, 1));
 		chCancel = new JCheckBox("Chain Cancel", current.chCancel);
 		spCancel = new JCheckBox("Special Cancel", current.spCancel);
 		suCancel = new JCheckBox("Super Cancel", current.suCancel);
@@ -623,7 +622,6 @@ public class BoxCalc extends JFrame
 						}
 						System.out.println(b);
 						ignore.add(r);
-						//TODO Y COORDS
 						Box bx = new Box(b, new Rectangle(new Point(r.x - origin.x, r.y - origin.y), new Dimension(r.width, r.height)));
 						if(b == BoxType.HIT || b == BoxType.PROJ)
 							hitboxes.add(bx);
