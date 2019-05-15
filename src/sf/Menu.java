@@ -108,7 +108,7 @@ public class Menu extends JFrame
 				}
 				else if (gs == State.CHAR_SELECT)
 				{
-					// TODO: character names
+					// TODO: character names (and possibly country flags)
 					// TODO: large display on the right side should be flipped
 
 					images = new BufferedImage[5];
