@@ -36,6 +36,7 @@ public class Player
 	{
 		return (int) y;
 	}
+	public void moveY(int y) {this.y -= y;}
 
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private Animation anim;
@@ -81,10 +82,9 @@ public class Player
 	{
 		return crouching;
 	}
-	private boolean grounded = true;
 	public boolean isGrounded()
 	{
-		return grounded;
+		return !currentFrame.airborne;
 	}
 	private boolean hit = false;
 	public boolean hitThisFrame()
@@ -146,7 +146,7 @@ public class Player
 
 	public boolean movementActionable()
 	{
-		return currentFrame.actionable && grounded;
+		return currentFrame.actionable && isGrounded();
 	}
 
 	public boolean commandActionable()
@@ -194,7 +194,7 @@ public class Player
 		distance -= Math.abs(currentFrame.spriteOffset.x);
 		try
 		{
-			if(grounded)
+			if(isGrounded())
 			{
 				if(!(dirConvert(inputs.getDir()) == 1 || dirConvert(inputs.getDir()) == 2 || dirConvert(inputs.getDir()) == 3))
 				{
@@ -282,20 +282,28 @@ public class Player
 	}
 
 	//TODO airborne calculation
+	int airborneFrames = 0;
 	public int dy()
 	{
-		return 0;
-//		if(grounded)
-//			return 0;
-//		else
-//			return 1;
+		if(isGrounded())
+		{
+			airborneFrames = 0;
+			return 0;
+		}
+		else
+			{
+				airborneFrames++;
+				double dy = -((double) character.jumpHeight/484) * ((2*airborneFrames) - 44);
+//				System.out.println(dy);
+				return (int) dy;
+			}
 	}
 
 	private void attack(Animation a)
 	{
 		anim = a;
 		frame = -1;
-		if(grounded)
+		if(isGrounded())
 			moving = 0;
 	}
 
@@ -397,14 +405,19 @@ public class Player
 
 	public void posUpdate(int otherX)
 	{
-		if(otherX > x)
-			right = true;
-		else
-			right = false;
+		if(isGrounded())
+		{
+			y = 0;
+			if (otherX > x)
+				right = true;
+			else
+				right = false;
+		}
+
 		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
 			Box b = currentFrame.boxes[i];
-			b.y = (int) (getY() - b.offset.getY() - b.height);
+			b.y = (int) (-getY() - b.offset.getY() - b.height);
 			if (right)
 				b.x = (int) (getX() + b.offset.getX());
 			else
@@ -440,7 +453,7 @@ public class Player
 				{
 					other.Hit(h);
 					this.hit = true;
-					if(grounded)
+					if(isGrounded())
 						hitlag = 12;
 				}
 			}
@@ -472,7 +485,7 @@ public class Player
 		else
 			hitlag = 13;
 		moving = 0;
-		if(!blocking || (!crouching && h.low) || (crouching && !grounded))
+		if(!blocking || (!crouching && h.low) || (crouching && !isGrounded()))
 		{
 			if(crouching)
 				setAnim(character.DamageC);
@@ -480,7 +493,7 @@ public class Player
 				setAnim(character.Damage);
 			health -= h.dmg;
 
-			if(h.knockdown || (!grounded))
+			if(h.knockdown || (!isGrounded()))
 				Knockdown();
 			else
 			{
@@ -522,11 +535,6 @@ public class Player
 	public void Wakeup()
 	{
 		setAnim(character.Wakeup);
-	}
-
-	public void Flip()
-	{
-		right = !right;
 	}
 
 	private void setAnim(Animation a)

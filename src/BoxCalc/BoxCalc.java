@@ -24,6 +24,7 @@ import sf.Hitbox.AttackType;
 //TODO fix images before processing
 public class BoxCalc extends JFrame
 {
+	
 	public static final Color HIT = new Color(255,0,0);
 	public static final Color HURT = new Color(0,0,255);
 	public static final Color PUSH = new Color(0,255,0);
@@ -45,6 +46,7 @@ public class BoxCalc extends JFrame
 	JSlider xSlider;
 	JSlider ySlider;
 	JCheckBox actionableB;
+	JCheckBox airborneB;
 	JLabel frameLabel = new JLabel("Frame Count:");
 	JSpinner frames;
 	JComboBox<AttackType> type;
@@ -68,11 +70,11 @@ public class BoxCalc extends JFrame
 		addFrame();
 		switchTo(0);
 
-		add(ySlider);
 		add(d);
-		add(xSlider);
-		add(actionableB);
-		add(frames);
+//		add(ySlider);
+//		add(xSlider);
+//		add(actionableB);
+//		add(frames);
 		add(save);
 		add(newFrame);
 
@@ -148,6 +150,7 @@ public class BoxCalc extends JFrame
 			remove(xSlider);
 			remove(ySlider);
 			remove(actionableB);
+			remove(airborneB);
 			remove(frameLabel);
 			remove(frames);
 			remove(type);
@@ -167,6 +170,7 @@ public class BoxCalc extends JFrame
 		xSlider = new JSlider(JSlider.HORIZONTAL, -(current.hitboxViz.getWidth()-current.sprite.getWidth()) - 10, current.hitboxViz.getWidth()-current.sprite.getWidth() + 10, 0);
 		ySlider = new JSlider(JSlider.VERTICAL, -(current.hitboxViz.getHeight()-current.sprite.getHeight()) - 10, current.hitboxViz.getHeight()-current.sprite.getHeight() + 10, 0);
 		actionableB = new JCheckBox("Actionable", current.actionable);
+		airborneB = new JCheckBox("Airborne", current.airborne);
 		frames = new JSpinner(new SpinnerNumberModel(current.frames, 1, 255, 1));
 		type = new JComboBox<AttackType>(AttackType.values());
 		damage = new JSpinner(new SpinnerNumberModel(current.damage, 0, 255, 1));
@@ -181,6 +185,7 @@ public class BoxCalc extends JFrame
 		add(ySlider);
 		add(xSlider);
 		add(actionableB);
+		add(airborneB);
 		add(frameLabel);
 		add(frames);
 		add(type);
@@ -224,6 +229,13 @@ public class BoxCalc extends JFrame
 			public void actionPerformed(ActionEvent arg0)
 			{
 				current.actionable = actionableB.isSelected();
+			}
+		});
+
+		airborneB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				current.airborne = airborneB.isSelected();
 			}
 		});
 
@@ -351,36 +363,36 @@ public class BoxCalc extends JFrame
 		Color c;
 
 		gamer:
-		for(int j = 0; j < viz.getHeight(); j++)
-		{
-			for(int i = 0; i < viz.getWidth(); i++)
+			for(int j = 0; j < viz.getHeight(); j++)
 			{
-				c = new Color(viz.getRGB(i, j));
-				if(c.equals(AXIS))
+				for(int i = 0; i < viz.getWidth(); i++)
 				{
-					if(!foundX)
+					c = new Color(viz.getRGB(i, j));
+					if(close(c,AXIS))
 					{
-						c = new Color(viz.getRGB(i, j+1));
-						if(c.equals(AXIS))
+						if(!foundX)
 						{
-						x = i;
-						foundX = true;
+							c = new Color(viz.getRGB(i, j+1));
+							if(close(c,AXIS))
+							{
+								x = i;
+								foundX = true;
+							}
 						}
-					}
-					else if(!foundY)
-					{
-						c = new Color(viz.getRGB(i+1, j));
-						if(c.equals(AXIS))
+						else if(!foundY)
 						{
-							y = j;
-							foundY = true;
+							c = new Color(viz.getRGB(i+1, j));
+							if(close(c,AXIS))
+							{
+								y = j;
+								foundY = true;
+							}
 						}
+						else
+							break gamer;
 					}
-					else
-						break gamer;
 				}
 			}
-		}
 
 		return new Point(x,y);
 	}
@@ -397,7 +409,7 @@ public class BoxCalc extends JFrame
 		do
 		{
 			done = true;
-			while(!c.equals(new Color(viz.getRGB(x, y))))
+			while(!close(c,new Color(viz.getRGB(x, y))))
 			{
 				x++;
 
@@ -427,7 +439,7 @@ public class BoxCalc extends JFrame
 		} while(!done);
 
 
-		while(c.equals(new Color(viz.getRGB(x, y))))
+		while(close(c, new Color(viz.getRGB(x, y))))
 		{
 			x++;
 
@@ -441,11 +453,11 @@ public class BoxCalc extends JFrame
 		int right = x;
 		y++;
 
-		while(!(c.equals(new Color(viz.getRGB(topLeft.x, y))) && (topLeft.x >= viz.getWidth() || c.equals(new Color(viz.getRGB(topLeft.x+1, y)))) && (topLeft.x <= 0 || !c.equals(new Color(viz.getRGB(topLeft.x-1,y))))))
+		while(!(close(c, new Color(viz.getRGB(topLeft.x, y))) && (topLeft.x >= viz.getWidth() || close(c, new Color(viz.getRGB(topLeft.x+1, y)))) && (topLeft.x <= 0 || !close(c, new Color(viz.getRGB(topLeft.x-1,y))))))
 		{
 			x = topLeft.x+1;
 
-			while(!c.equals(new Color(viz.getRGB(x, y))))
+			while(!close(c, new Color(viz.getRGB(x, y))))
 			{
 				x++;
 				if(x >= viz.getWidth())
@@ -470,7 +482,7 @@ public class BoxCalc extends JFrame
 		bottomRight = new Point(right, y);
 		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x-topLeft.x, bottomRight.y-topLeft.y);
 	}
-	
+
 	static String lastLocation = "Z:\\";
 
 	static public File chooseFile(String name, FileFilter extension, boolean save)
@@ -510,6 +522,16 @@ public class BoxCalc extends JFrame
 			setPreferredSize(new Dimension(current.hitboxViz.getWidth() * 5, current.hitboxViz.getHeight() * 5));
 		}
 	}
+	
+	static boolean close(Color c, Color hc)
+	{
+		return !hc.equals(Color.WHITE) && close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen());
+	}
+	
+	static boolean close(int a, int b)
+	{
+		return Math.abs(a-b) <= 1;
+	}
 
 	class singleViz
 	{
@@ -522,6 +544,7 @@ public class BoxCalc extends JFrame
 		ArrayList<Box> hitboxes = new ArrayList<Box>();
 
 		boolean actionable = false;
+		boolean airborne = false;
 		int frames = 1;
 		AttackType strength = AttackType.S;
 		int damage = 0;
@@ -545,39 +568,10 @@ public class BoxCalc extends JFrame
 				System.out.println("File Inavlid");
 				boxE.printStackTrace();
 			}
-			fixColor();
+//			fixColor();
 			origin = findOrigin(hitboxViz);
 			System.out.println(origin);
 			repaint();
-		}
-
-		boolean close(int a, int b)
-		{
-			return Math.abs(a-b) <= 1;
-		}
-
-		void fixColor()
-		{
-			for(int i = 0; i < hitboxViz.getWidth(); i++)
-			{
-				for(int j = 0; j < hitboxViz.getHeight(); j++)
-				{
-					Color hc = new Color(hitboxViz.getRGB(i,j));
-					for(int k = 0; k <= COLORS.length; k++)
-					{
-						Color c;
-						if(k == COLORS.length)
-							c = AXIS;
-						else
-							c = COLORS[k];
-
-						if(!hc.equals(Color.WHITE) && close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen()))
-						{
-							hitboxViz.setRGB(i, j, c.getRGB());
-						}
-					}
-				}
-			}
 		}
 
 		void calculateBoxes()
@@ -591,7 +585,7 @@ public class BoxCalc extends JFrame
 					Rectangle r;
 					try
 					{
-					r = findBox(hitboxViz, COLORS[i], ignore.toArray(new Rectangle[0]));
+						r = findBox(hitboxViz, COLORS[i], ignore.toArray(new Rectangle[0]));
 					}
 					catch(Exception e) {r = null;}
 					if(r == null)
@@ -648,7 +642,7 @@ public class BoxCalc extends JFrame
 		{
 			calculateBoxes();
 
-			frame = new animFrame(actionable, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x + offset.x, origin.y - offset.y));
+			frame = new animFrame(actionable, airborne, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x + offset.x, origin.y - offset.y));
 		}
 	}
 

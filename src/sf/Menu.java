@@ -62,7 +62,7 @@ public class Menu extends JFrame
 	public Menu()
 	{
 		gs = State.TITLE;
-		
+
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panel = new STPCPanel();
 		this.add(panel);
@@ -166,7 +166,7 @@ public class Menu extends JFrame
 					
 					images = new BufferedImage[16];
 					images[0] = ImageIO.read(new File("img/stageselect.png"));
-					
+          
 					for (int i = 0; i < 15; i++)
 					{
 						images[i+1] = ImageIO.read(new File("img/stage_sprites/s" + i + (ssel == i ? "f" : "") + ".png"));
@@ -191,46 +191,8 @@ public class Menu extends JFrame
 						(this.getWidth() - images[0].getWidth() * scale) / 4,
 						null
 					);
-
-					// scaled_images[i].getWidth(null) * scale / 2;
 					
 					// stages
-					
-					/*
-					// first two flags
-					int wpos = 50 * scale;
-					for (int i = 1; i < 3; i++)
-					{
-						g.drawImage(scaled_images[i], wpos, height / 2 - scale * 5, null);
-						wpos += 15 * scale + scaled_images[i].getWidth(null);
-					}
-					
-					// U.S.A. three times
-					for (int i = 0; i < 3; i++)
-					{
-						g.drawImage(scaled_images[3], wpos, height / 2 - scale * 5, null);
-						wpos += 15 * scale + scaled_images[3].getWidth(null);
-					}
-					
-					// finish the top row
-					for (int i = 4; i < 7; i++)
-					{
-						g.drawImage(scaled_images[i], wpos, height / 2 - scale * 5, null);
-						wpos += 15 * scale + scaled_images[i].getWidth(null);
-					}
-					
-					// India again, starting the bottom row
-					wpos = 50 * scale;
-					g.drawImage(scaled_images[6], wpos, height / 2 + scale * 30, null);
-					wpos += 15 * scale + scaled_images[6].getWidth(null);
-					
-					// the rest of the bottom row
-					for (int i = 7; i < 13; i++)
-					{
-						g.drawImage(scaled_images[i], wpos, height / 2 + scale * 30, null);
-						wpos += 15 * scale + scaled_images[i].getWidth(null);
-					}
-					*/
 					
 					int wpos = 50 * scale;
 					for (int i = 1; i < 9; i++)
@@ -254,6 +216,7 @@ public class Menu extends JFrame
 						Class<Character> p2 = character_map.get(p2sel);
 						Class<Stage> stage = stage_map.get(ssel);
 						new Game(p1.newInstance(), p2.newInstance(), stage.newInstance());
+            
 					} catch (NullPointerException e) {
 						System.err.println("Invalid selection");
 					}

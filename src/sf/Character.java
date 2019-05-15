@@ -16,6 +16,7 @@ public abstract class Character
 	protected int bSpeed;
 	protected int fASpeed;
 	protected int bASpeed;
+	protected int jumpHeight;
 
 	public BufferedImage selectIcon;
 

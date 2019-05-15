@@ -14,14 +14,16 @@ public class animFrame implements Serializable
 	Point spriteOffset;
 	public Box[] boxes;
 	public boolean actionable;
+	public boolean airborne = false;
 	public int frameCount;
 	boolean chCancel;
 	boolean spCancel;
 	boolean suCancel;
 
-	public animFrame(boolean actionable, boolean chCancel, boolean spCancel, boolean suCancel, int frameCount, BufferedImage sprite, Box[] boxes, Point spriteOffset)
+	public animFrame(boolean actionable, boolean airborne, boolean chCancel, boolean spCancel, boolean suCancel, int frameCount, BufferedImage sprite, Box[] boxes, Point spriteOffset)
 	{
 		this.actionable = actionable;
+		this.airborne = airborne;
 		this.frameCount = frameCount;
 		this.sprite = sprite;
 		this.boxes = boxes;
