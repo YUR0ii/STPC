@@ -82,7 +82,6 @@ public class Player
 	{
 		return crouching;
 	}
-	private boolean grounded = true;
 	public boolean isGrounded()
 	{
 		return !currentFrame.airborne;
@@ -283,13 +282,21 @@ public class Player
 	}
 
 	//TODO airborne calculation
+	int airborneFrames = 0;
 	public int dy()
 	{
-		return 0;
-//		if(grounded)
-//			return 0;
-//		else
-//			return 1;
+		if(isGrounded())
+		{
+			airborneFrames = 0;
+			return 0;
+		}
+		else
+			{
+				airborneFrames++;
+				double dy = -((double) character.jumpHeight/484) * ((2*airborneFrames) - 44);
+//				System.out.println(dy);
+				return (int) dy;
+			}
 	}
 
 	private void attack(Animation a)
@@ -398,14 +405,19 @@ public class Player
 
 	public void posUpdate(int otherX)
 	{
-		if(otherX > x)
-			right = true;
-		else
-			right = false;
+		if(isGrounded())
+		{
+			y = 0;
+			if (otherX > x)
+				right = true;
+			else
+				right = false;
+		}
+
 		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
 			Box b = currentFrame.boxes[i];
-			b.y = (int) (getY() - b.offset.getY() - b.height);
+			b.y = (int) (-getY() - b.offset.getY() - b.height);
 			if (right)
 				b.x = (int) (getX() + b.offset.getX());
 			else
@@ -523,11 +535,6 @@ public class Player
 	public void Wakeup()
 	{
 		setAnim(character.Wakeup);
-	}
-
-	public void Flip()
-	{
-		right = !right;
 	}
 
 	private void setAnim(Animation a)

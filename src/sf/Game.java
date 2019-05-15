@@ -280,7 +280,6 @@ public class Game extends JFrame
 			else
 				other = p1;
 
-
 			if(p.commandActionable())
 				p.checkCommands();
 
@@ -305,6 +304,8 @@ public class Game extends JFrame
 //		System.out.println(p1.getX() + " " + p2.getX());
 
 		//TODO game end
+		if(roundTimerInt == 0 || p1.getHealth() <= 0 || p2.getHealth() <= 0)
+			gameEnd();
 
 		this.repaint();
 		//		System.out.println(System.currentTimeMillis() - time);
@@ -312,6 +313,40 @@ public class Game extends JFrame
 
 	void doMovement()
 	{
+		Player r;
+		Player l;
+		if(p1.getX() < p2.getX())
+		{
+			r = p1;
+			l = p2;
+		}
+		else
+		{
+			r = p2;
+			l = p1;
+		}
+
+		if(r.pushbox.getMinX() < 0)
+			r.moveX(-(int) r.pushbox.getMinX());
+
+		if(l.pushbox.getMaxX() > defaultRes.width)
+			l.moveX(-((int) l.pushbox.getMaxX() - defaultRes.width));
+
+		if(r.pushbox.intersects(l.pushbox))
+		{
+			int diff = (int) (l.pushbox.getMinX() - r.pushbox.getMaxX()) + 1;
+
+			if(r.pushbox.getMinX() - (diff/2) < 0)
+				l.moveX(diff);
+			else if(l.pushbox.getMaxX() + (diff/2) > defaultRes.width)
+				r. moveX(-diff);
+			else
+			{
+				l.moveX(-diff/2);
+				r.moveX(diff/2);
+			}
+		}
+
 		int p1dx = p1.moving/10;
 		int p1dy = p1.dy();
 		int p2dx = p2.moving/10;
@@ -325,35 +360,33 @@ public class Game extends JFrame
 		if(newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
 			p2dx = 0;
 
-		if(!(p1dx == 0 && p2dx == 0))
+		if(newP1.intersects(newP2))
 		{
-			if(newP1.intersects(newP2))
+			if(Math.abs(p1dx) < Math.abs(p2dx))
 			{
-				if(Math.abs(p1dx) < Math.abs(p2dx))
-				{
-					p2dx = (int) Math.copySign(p1.character.bSpeed/10, p2dx);
-					p1dx = p2dx;
-				}
-				else if(Math.abs(p2dx) < Math.abs(p1dx))
-				{
-					p1dx = (int) Math.copySign(p2.character.bSpeed/10, p1dx);
-					p2dx = p1dx;
-				}
-				else
+				p2dx = (int) Math.copySign(p1.character.bSpeed/15, p2dx);
+				p1dx = p2dx;
+			}
+			else if(Math.abs(p2dx) < Math.abs(p1dx))
+			{
+				p1dx = (int) Math.copySign(p2.character.bSpeed/15, p1dx);
+				p2dx = p1dx;
+			}
+			else
 				{
 					p1dx = p1dx + p2dx;
 					p2dx = p1dx;
 				}
-				
-				newP1 = new Rectangle(p1.pushbox.x+p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
-				newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
-				
-				if(newP1.getMinX() <= 0 || newP1.getMaxX() >= 384 || newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
-				{
-					p1dx = 0; p2dx = 0;
-				}
+
+			newP1 = new Rectangle(p1.pushbox.x+p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
+			newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
+
+			if(newP1.getMinX() <= 0 || newP1.getMaxX() >= 384 || newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
+			{
+				p1dx = 0; p2dx = 0;
 			}
 		}
+
 		p1.moveX(p1dx);
 		p2.moveX(p2dx);
 		p1.moveY(p1dy);

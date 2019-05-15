@@ -12,6 +12,7 @@ public class Ryu extends sf.Character {
 		bSpeed = 32;
 		fASpeed = 32;
 		bASpeed = 48;
+		jumpHeight = 90;
 		//selectIcon
 
 		jabRange = 25;
