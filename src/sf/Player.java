@@ -19,7 +19,6 @@ public class Player
 	private static final int SHORT = 7, FORWARD = 8, ROUNDHOUSE = 9;
 
 	public Character character;
-	private int[] Controls;
 	private InputManager inputs;
 
 	private double x;
@@ -110,13 +109,10 @@ public class Player
 			return -1;
 	}
 
-	Player(Character c, Point Location, int[] controls, boolean p1, Game origin)
+	Player(Character c, Point Location, InputManager manager, boolean p1)
 	{
-
-		Controls = controls;
 		character = c;
-		inputs = new InputManager(controls, character.Commands);
-		origin.addKeyListener(inputs);
+		inputs = manager;
 
 		this.p1 = p1;
 		anim = character.Stand;
@@ -164,7 +160,7 @@ public class Player
 		for(int i = 0; i < character.Commands.length; i++)
 		{
 			Command c = character.Commands[i];
-			if(inputs.keyCheck(c.button) && inputs.getCommandProgress(i) == c.directions.length-1)
+			if(inputs.buttonCheck(c.button, true) && inputs.getCommandProgress(i) == c.directions.length-1)
 			{
 				if(c.Super && !currentFrame.suCancel)
 				{
@@ -198,67 +194,67 @@ public class Player
 			{
 				if(!(dirConvert(inputs.getDir()) == 1 || dirConvert(inputs.getDir()) == 2 || dirConvert(inputs.getDir()) == 3))
 				{
-					if(inputs.keyCheck(Controls[JAB]))
-						if(distance < character.jabRange)
-							attack(character.JabCl);
-						else
-							attack(character.JabFa);
-					if(inputs.keyCheck(Controls[STRONG]))
-						if(distance < character.strongRange)
-							attack(character.StrongCl);
-						else
-							attack(character.StrongFa);
-					if(inputs.keyCheck(Controls[FIERCE]))
+					if(inputs.buttonCheck(FIERCE))
 						if(distance < character.fierceRange)
 							attack(character.FierceCl);
 						else
 							attack(character.FierceFa);
-					if(inputs.keyCheck(Controls[SHORT]))
-						if(distance < character.shortRange)
-							attack(character.ShortCl);
-						else
-							attack(character.ShortFa);
-					if(inputs.keyCheck(Controls[FORWARD]))
-						if(distance < character.forwardRange)
-							attack(character.ForwardCl);
-						else
-							attack(character.ForwardFa);
-					if(inputs.keyCheck(Controls[ROUNDHOUSE]))
+					if(inputs.buttonCheck(ROUNDHOUSE))
 						if(distance < character.roundhouseRange)
 							attack(character.RoundhouseCl);
 						else
 							attack(character.RoundhouseFa);
+					if(inputs.buttonCheck(STRONG))
+						if(distance < character.strongRange)
+							attack(character.StrongCl);
+						else
+							attack(character.StrongFa);
+					if(inputs.buttonCheck(FORWARD))
+						if(distance < character.forwardRange)
+							attack(character.ForwardCl);
+						else
+							attack(character.ForwardFa);
+					if(inputs.buttonCheck(JAB))
+						if(distance < character.jabRange)
+							attack(character.JabCl);
+						else
+							attack(character.JabFa);
+					if(inputs.buttonCheck(SHORT))
+						if(distance < character.shortRange)
+							attack(character.ShortCl);
+						else
+							attack(character.ShortFa);
 				}
 				else
 				{
-					if(inputs.keyCheck(Controls[JAB]))
-						attack(character.JabC);
-					if(inputs.keyCheck(Controls[STRONG]))
-						attack(character.StrongC);
-					if(inputs.keyCheck(Controls[FIERCE]))
+					if(inputs.buttonCheck(FIERCE))
 						attack(character.FierceC);
-					if(inputs.keyCheck(Controls[SHORT]))
-						attack(character.ShortC);
-					if(inputs.keyCheck(Controls[FORWARD]))
-						attack(character.ForwardC);
-					if(inputs.keyCheck(Controls[ROUNDHOUSE]))
+					if(inputs.buttonCheck(ROUNDHOUSE))
 						attack(character.RoundhouseC);
+					if(inputs.buttonCheck(STRONG))
+						attack(character.StrongC);
+					if(inputs.buttonCheck(FORWARD))
+						attack(character.ForwardC);
+					if(inputs.buttonCheck(JAB))
+						attack(character.JabC);
+					if(inputs.buttonCheck(SHORT))
+						attack(character.ShortC);
 				}
 			}
 			else
 			{
-				if(inputs.keyCheck(Controls[JAB]))
-					attack(character.JabA);
-				if(inputs.keyCheck(Controls[STRONG]))
-					attack(character.StrongA);
-				if(inputs.keyCheck(Controls[FIERCE]))
+				if(inputs.buttonCheck(FIERCE))
 					attack(character.FierceA);
-				if(inputs.keyCheck(Controls[SHORT]))
-					attack(character.ShortA);
-				if(inputs.keyCheck(Controls[FORWARD]))
-					attack(character.ForwardA);
-				if(inputs.keyCheck(Controls[ROUNDHOUSE]))
+				if(inputs.buttonCheck(ROUNDHOUSE))
 					attack(character.RoundhouseA);
+				if(inputs.buttonCheck(STRONG))
+					attack(character.StrongA);
+				if(inputs.buttonCheck(FORWARD))
+					attack(character.ForwardA);
+				if(inputs.buttonCheck(JAB))
+					attack(character.JabA);
+				if(inputs.buttonCheck(SHORT))
+					attack(character.ShortA);
 			}
 		}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
 	}

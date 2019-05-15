@@ -25,9 +25,11 @@ public class Game extends JFrame
 {
 	Graphics2D g2;
 	Player p1;
+	Player p2;
 	HealthBar p1b;
 	HealthBar p2b;
-	Player p2;
+	InputManager p1C;
+	InputManager p2C;
 	Player[] Players;
 	Timer updateTimer;
 	int roundTimerInt = 3;
@@ -38,9 +40,11 @@ public class Game extends JFrame
 	double screenScale;
 	final Dimension defaultRes = new Dimension(384,224);
 	Stage stage;
+	boolean versus;
 
-	Game(Character p1, Character p2, Stage stage)
+	Game(Character p1, Character p2, Stage stage, boolean versus)
 	{
+		this.versus = versus;
 		this.stage = stage;
 		initCharacters(p1, p2);
 		initPanel();
@@ -243,9 +247,21 @@ public class Game extends JFrame
 						KeyEvent.VK_NUMPAD3,
 						KeyEvent.VK_ENTER
 				};
+		HumanInputManager p1CH = new HumanInputManager(p1Controls, p1Char.Commands);
+		p1C = p1CH;
+		addKeyListener(p1CH);
 
-		p1 = new Player(p1Char, new Point(80,0), p1Controls, true, this);
-		p2 = new Player(p2Char, new Point(300,0), p2Controls, false, this);
+		if(versus)
+		{
+			HumanInputManager p2CH = new HumanInputManager(p2Controls, p2Char.Commands);
+			p2C = p2CH;
+			addKeyListener(p2CH);
+		}
+		else
+			p2C = null;
+
+		p1 = new Player(p1Char, new Point(80,0), p1C, true);
+		p2 = new Player(p2Char, new Point(300,0), p2C, false);
 
 		Players = new Player[] {p1, p2};
 	}
@@ -405,6 +421,6 @@ public class Game extends JFrame
 
 	public static void main(String[] args)
 	{
-		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage());
+		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage(), true);
 	}
 }

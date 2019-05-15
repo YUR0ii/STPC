@@ -215,7 +215,7 @@ public class Menu extends JFrame
 						Class<Character> p1 = character_map.get(p1sel);
 						Class<Character> p2 = character_map.get(p2sel);
 						Class<Stage> stage = stage_map.get(ssel);
-						new Game(p1.newInstance(), p2.newInstance(), stage.newInstance());
+						new Game(p1.newInstance(), p2.newInstance(), stage.newInstance(), true);
             
 					} catch (NullPointerException e) {
 						System.err.println("Invalid selection");
