@@ -482,11 +482,11 @@ public class BoxCalc extends JFrame
 		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x-topLeft.x, bottomRight.y-topLeft.y);
 	}
 
-	static String lastLocation = "Z:\\";
+	static String lastLocation = "D:\\Libraries\\Desktop\\!stpc links";
 
 	static public File chooseFile(String name, FileFilter extension, boolean save)
 	{
-		String path = "Z:\\Git\\STPC\\characters\\";
+		String path = "D:\\Libraries\\Desktop\\!stpc links";
 		if(!save)
 			path = lastLocation;
 		JFrame chooser = new JFrame();
@@ -575,16 +575,17 @@ public class BoxCalc extends JFrame
 
 		void calculateBoxes()
 		{
-			ArrayList<Rectangle> ignore = new ArrayList<Rectangle>();
+			ArrayList<Rectangle>[] ignore = new ArrayList[8];
 			for(int i = 0; i < 8; i++)
 			{
+				ignore[i] = new ArrayList<Rectangle>();
 				boolean done = false;
 				while(!done)
 				{
 					Rectangle r;
 					try
 					{
-						r = findBox(hitboxViz, COLORS[i], ignore.toArray(new Rectangle[0]));
+						r = findBox(hitboxViz, COLORS[i], ignore[i].toArray(new Rectangle[0]));
 					}
 					catch(Exception e) {r = null;}
 					if(r == null)
@@ -621,7 +622,7 @@ public class BoxCalc extends JFrame
 							break;
 						}
 						System.out.println(b);
-						ignore.add(r);
+						ignore[i].add(r);
 						Box bx = new Box(b, new Rectangle(new Point(r.x - origin.x, r.y - origin.y), new Dimension(r.width, r.height)));
 						if(b == BoxType.HIT || b == BoxType.PROJ)
 							hitboxes.add(bx);

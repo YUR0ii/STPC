@@ -53,13 +53,17 @@ public class Player
 
 	private int hitstun = 0;
 	private int hitlag = 0;
+	public int getHitlag()
+	{
+		return hitlag;
+	}
 	public Point hitlagShake = new Point(0,0);
 	public int moving = 0;
 
 	//SF2-like
 	private int health = 30;
 	//SFV-like
-	//	private int health = 144;
+//		private int health = 144;
 	public int getHealth()
 	{
 		return health;
@@ -446,6 +450,7 @@ public class Player
 		}
 	}
 
+	int hitpush = 0;
 	public void Hit(Hitbox h)
 	{
 		if(hitstun != 0)
@@ -471,7 +476,7 @@ public class Player
 
 				if(h.strength != Hitbox.AttackType.JL && h.strength != Hitbox.AttackType.JM && h.strength != Hitbox.AttackType.JH)
 				{
-					//TODO Attack pushback
+					hitpush = -rMult() * h.width;
 				}
 			}
 		}
@@ -488,7 +493,7 @@ public class Player
 
 			hitstun = h.stunCalc(this);
 
-			//TODO Attack pushback on block
+			hitpush = -rMult() * h.width/2 + 1;
 		}
 		currentFrame = anim.getFrame(0);
 	}
@@ -520,7 +525,9 @@ public class Player
 		if(hitlag != 0)
 		{
 			if(!hitThisFrame())
+			{
 				hitlagShake = new Point((int) (-.5 + rand.nextDouble() * hitlag), (int) (-.5 + rand.nextDouble() * hitlag));
+			}
 			hitlag--;
 		}
 		else if(hitstun <= 0)
@@ -549,11 +556,13 @@ public class Player
 
 	void win()
 	{
+		moving = 0;
 		setAnim(character.Win);
 	}
 
 	void lose()
 	{
+		moving = 0;
 		setAnim(character.Lose);
 	}
 }
