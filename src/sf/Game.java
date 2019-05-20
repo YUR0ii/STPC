@@ -296,11 +296,12 @@ public class Game extends JFrame
             if(running)
             {
                 p.readInput();
-                if (p.commandActionable())
-                    p.checkCommands();
 
                 if (p.movementActionable())
                     p.checkMovement();
+
+				if (p.commandActionable())
+					p.checkCommands();
 
                 if (p.normalActionable())
                     p.checkNormals(Math.abs(p1.getX() - p2.getX()));
@@ -331,6 +332,7 @@ public class Game extends JFrame
 		//		System.out.println(System.currentTimeMillis() - time);
 	}
 
+	//TODO p1 can jump over in the corner, p2 cannot
 	void doMovement()
 	{
 		Player r;
@@ -350,16 +352,16 @@ public class Game extends JFrame
 			r.moveX(-(int) r.pushbox.getMinX());
 
 		if(l.pushbox.getMaxX() > defaultRes.width)
-			l.moveX(-((int) l.pushbox.getMaxX() - defaultRes.width));
+			l.moveX(defaultRes.width - (int) l.pushbox.getMaxX());
 
 		if(r.pushbox.intersects(l.pushbox))
 		{
 			int diff = (int) (l.pushbox.getMinX() - r.pushbox.getMaxX()) + 1;
 
 			if(r.pushbox.getMinX() - (diff/2) < 0)
-				l.moveX(diff);
+				l.moveX(-diff);
 			else if(l.pushbox.getMaxX() + (diff/2) > defaultRes.width)
-				r. moveX(-diff);
+				r.moveX(diff);
 			else
 			{
 				l.moveX(-diff/2);
@@ -407,6 +409,27 @@ public class Game extends JFrame
 			}
 		}
 
+		if(p1.hitThisFrame() || p2.hitThisFrame())
+		{
+			p1dx += (int) ((double) p1.hitpush / 100 * p1.getHitlag());
+			p2dx += (int) ((double) p2.hitpush / 100 * p2.getHitlag());
+
+			newP1 = new Rectangle(p1.pushbox.x + p1dx, p1.pushbox.y + p1dy, (int) p1.pushbox.getWidth(), (int) p1.pushbox.getHeight());
+			newP2 = new Rectangle(p2.pushbox.x + p2dx, p2.pushbox.y + p2dy, (int) p2.pushbox.getWidth(), (int) p2.pushbox.getHeight());
+
+			if (newP1.getMinX() <= 0 || newP1.getMaxX() >= 384)
+			{
+				p2dx = -p1dx;
+				p1dx = 0;
+			}
+
+			if(newP2.getMinX() <= 0 || newP2.getMaxX() >= 384)
+			{
+				p1dx = -p2dx;
+				p2dx = 0;
+			}
+		}
+
 		p1.moveX(p1dx);
 		p2.moveX(p2dx);
 		p1.moveY(p1dy);
@@ -450,6 +473,6 @@ public class Game extends JFrame
 
 	public static void main(String[] args)
 	{
-		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage(), false);
+		new Game(new sf.chars.Ryu(), new sf.chars.Ryu(), new sf.stages.RyuStage(), true);
 	}
 }
