@@ -43,10 +43,8 @@ public class Player
 			dy1 = 0;
 			if(hitstun == -1)
 				Wakeup();
-//				System.out.println("wakeup");
-			else if(currentFrame.airborne)
-//				setAnim(character.Stand);
-			System.out.println("stand");
+			else if(!anim.equals(character.Wakeup))
+				setAnim(character.Stand);
 		}
 	}
 
@@ -542,7 +540,6 @@ public class Player
 	{
 		hitstun = -2;
 		setAnim(character.Wakeup);
-		System.out.println("wakeup");
 	}
 
 	private void setAnim(Animation a)
