@@ -43,8 +43,9 @@ public class Player
 			dy1 = 0;
 			if(hitstun == -1)
 				Wakeup();
-			else if(!anim.equals(character.Wakeup))
+			else if(!isGrounded() && !anim.equals(character.Wakeup))
 				setAnim(character.Stand);
+//				System.out.println("stand");
 		}
 	}
 
@@ -530,8 +531,9 @@ public class Player
 	//TODO knockdown
 	public void Knockdown()
 	{
-		dy1 += 20;
+		dy1 += 5;
 		hitstun = -1;
+		airborneFrames = 10;
 		setAnim(character.DamageA);
 	}
 

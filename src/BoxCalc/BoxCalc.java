@@ -17,6 +17,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 
+import javafx.geometry.Point2D;
+import javafx.scene.shape.Line;
 import sf.*;
 import sf.Box;
 import sf.Box.BoxType;
@@ -24,7 +26,7 @@ import sf.Hitbox.AttackType;
 
 public class BoxCalc extends JFrame
 {
-	
+
 	public static final Color HIT = new Color(255,0,0);
 	public static final Color HURT = new Color(0,0,255);
 	public static final Color PUSH = new Color(0,255,0);
@@ -71,10 +73,10 @@ public class BoxCalc extends JFrame
 		switchTo(0);
 
 		add(d);
-//		add(ySlider);
-//		add(xSlider);
-//		add(actionableB);
-//		add(frames);
+		//		add(ySlider);
+		//		add(xSlider);
+		//		add(actionableB);
+		//		add(frames);
 		add(save);
 		add(newFrame);
 
@@ -397,6 +399,21 @@ public class BoxCalc extends JFrame
 		return new Point(x,y);
 	}
 
+	static boolean isOnEdge(Point2D p, Rectangle r)
+	{
+		boolean top;
+		boolean left;
+		boolean bottom;
+		boolean right;
+		
+		top = new Line((int) r.getMinX(),(int) r.getMinY(),(int) r.getMaxX(),(int) r.getMinY()).contains(p);
+		left = new Line((int) r.getMinX(),(int) r.getMinY(),(int) r.getMinX(),(int) r.getMaxY()).contains(p);
+		bottom = new Line((int) r.getMinX(),(int) r.getMaxY(),(int) r.getMaxX(),(int) r.getMaxY()).contains(p);
+		right = new Line((int) r.getMaxX(),(int) r.getMinY(),(int) r.getMaxX(),(int) r.getMaxY()).contains(p);
+		
+		return top || left || bottom || right;
+	}
+	
 	static Rectangle findBox(BufferedImage viz, Color c, Rectangle[] ignore)
 	{
 		Point topLeft = null;
@@ -426,7 +443,7 @@ public class BoxCalc extends JFrame
 			topLeft = new Point(x,y);
 			for(Rectangle r : ignore)
 			{
-				if(((topLeft.x == r.getMinX() || topLeft.x == r.getMaxX()) || (topLeft.y == r.getMinY() || topLeft.y == r.getMaxY())))
+				if(isOnEdge(new Point2D(x, y), r))
 					done = false;
 			}
 			if(!done)
@@ -483,11 +500,11 @@ public class BoxCalc extends JFrame
 		return new Rectangle(topLeft.x, topLeft.y, bottomRight.x-topLeft.x, bottomRight.y-topLeft.y);
 	}
 
-	static String lastLocation = "D:\\Libraries\\Desktop\\!stpc links";
+	static String lastLocation = "Z:\\stpcchars";
 
 	static public File chooseFile(String name, FileFilter extension, boolean save)
 	{
-		String path = "D:\\Libraries\\Desktop\\!stpc links";
+		String path = "Z:\\Git\\STPC\\characters";
 		if(!save)
 			path = lastLocation;
 		JFrame chooser = new JFrame();
@@ -519,15 +536,45 @@ public class BoxCalc extends JFrame
 			g.scale(5,5);
 			g.drawImage(current.hitboxViz, 0, 0, this);
 			g.drawImage(current.sprite, current.offset.x, current.offset.y, this);
+			for (Box h : current.boxes)
+			{
+				switch(h.type)
+				{
+				case HIT:
+					g.setColor(BoxCalc.HIT);
+					break;
+				case HURT:
+					g.setColor(BoxCalc.HURT);
+					break;
+				case PUSH:
+					g.setColor(BoxCalc.PUSH);
+					break;
+				case PROJ:
+					g.setColor(BoxCalc.PROJ);
+					break;
+				case THROW:
+					g.setColor(BoxCalc.THROW);
+					break;
+				case THROWABLEG:
+					g.setColor(BoxCalc.GTHROW);
+					break;
+				case THROWABLEA:
+					g.setColor(BoxCalc.ATHROW);
+					break;
+
+				}
+				//						g2.fill(new Rectangle(new Point(scale(h.x), scale(h.y)), new Dimension(scale(h.width), scale(h.height))));
+				g.draw(new Rectangle(new Point(5*h.x,5*(-h.y - h.height + getHeight())), new Dimension(5*(h.width),5*(h.height))));
+			}
 			setPreferredSize(new Dimension(current.hitboxViz.getWidth() * 5, current.hitboxViz.getHeight() * 5));
 		}
 	}
-	
+
 	static boolean close(Color c, Color hc)
 	{
 		return !hc.equals(Color.WHITE) && close(hc.getRed(), c.getRed()) && close(hc.getBlue(), c.getBlue()) && close(hc.getGreen(), c.getGreen());
 	}
-	
+
 	static boolean close(int a, int b)
 	{
 		return Math.abs(a-b) <= 1;
@@ -568,7 +615,7 @@ public class BoxCalc extends JFrame
 				System.out.println("File Inavlid");
 				boxE.printStackTrace();
 			}
-//			fixColor();
+			//			fixColor();
 			origin = findOrigin(hitboxViz);
 			System.out.println(origin);
 			repaint();
