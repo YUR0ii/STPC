@@ -35,7 +35,20 @@ public class Player
 	{
 		return (int) y;
 	}
-	public void moveY(int y) {this.y -= y;}
+	public void moveY(int y)
+	{
+		this.y -= y;
+		if(pushbox.getMinY() <= 0)
+		{
+			dy1 = 0;
+			if(hitstun == -1)
+				Wakeup();
+//				System.out.println("wakeup");
+			else if(currentFrame.airborne)
+//				setAnim(character.Stand);
+			System.out.println("stand");
+		}
+	}
 
 	public ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	private Animation anim;
@@ -61,9 +74,9 @@ public class Player
 	public int moving = 0;
 
 	//SF2-like
-	private int health = 30;
+//	private int health = 30;
 	//SFV-like
-//		private int health = 144;
+		private int health = 144;
 	public int getHealth()
 	{
 		return health;
@@ -248,17 +261,35 @@ public class Player
 			else
 			{
 				if(inputs.buttonCheck(FIERCE))
-					attack(character.FierceA);
+				    if(moving == 0)
+					    attack(character.FierceA);
+				    else
+				        attack(character.FierceAD);
 				if(inputs.buttonCheck(ROUNDHOUSE))
-					attack(character.RoundhouseA);
+                    if(moving == 0)
+					    attack(character.RoundhouseA);
+                    else
+                        attack(character.RoundhouseAD);
 				if(inputs.buttonCheck(STRONG))
-					attack(character.StrongA);
+                    if(moving == 0)
+				        attack(character.StrongA);
+                    else
+                        attack(character.StrongAD);
 				if(inputs.buttonCheck(FORWARD))
-					attack(character.ForwardA);
+                    if(moving == 0)
+					    attack(character.ForwardA);
+                    else
+                        attack(character.ForwardAD);
 				if(inputs.buttonCheck(JAB))
-					attack(character.JabA);
+                    if(moving == 0)
+					    attack(character.JabA);
+                    else
+                        attack(character.JabAD);
 				if(inputs.buttonCheck(SHORT))
-					attack(character.ShortA);
+                    if(moving == 0)
+					    attack(character.ShortA);
+                    else
+                        attack(character.ShortAD);
 			}
 		}catch(Exception exc) {System.out.println("Unprogrammed Attack");}
 	}
@@ -281,6 +312,7 @@ public class Player
 	}
 
 	int airborneFrames = 0;
+	int dy1 = 0;
 	public int dy()
 	{
 		if(isGrounded())
@@ -291,7 +323,9 @@ public class Player
 		else
 			{
 				airborneFrames++;
-				double dy = -((double) character.jumpHeight/484) * ((2*airborneFrames) - 44);
+				double dy = dy1 - ((double) character.jumpHeight/484) * ((2*airborneFrames) - 44);
+				if(dy1 > 0)
+					dy1--;
 //				System.out.println(dy);
 				return (int) dy;
 			}
@@ -305,6 +339,7 @@ public class Player
 			moving = 0;
 	}
 
+	//TODO crouch transition animation
 	public void checkMovement()
 	{
 		switch(inputs.getDir(right))
@@ -316,11 +351,6 @@ public class Player
 			moving = 0;
 			break;
 		case 2:
-			blocking = false;
-			crouching = true;
-			setAnim(character.Crouching);
-			moving = 0;
-			break;
 		case 3:
 			blocking = false;
 			crouching = true;
@@ -375,17 +405,17 @@ public class Player
 		}
 	}
 
-	public void posUpdate(int otherX)
+	public void checkFlip(int otherX, boolean otherGrounded)
 	{
-		if(isGrounded())
+		if(isGrounded() && otherGrounded)
 		{
 			y = 0;
-			if (otherX > x)
-				right = true;
-			else
-				right = false;
+			right = otherX > x;
 		}
+	}
 
+	public void posUpdate()
+	{
 		for(int i = 0; i < currentFrame.boxes.length; i++)
 		{
 			Box b = currentFrame.boxes[i];
@@ -423,7 +453,7 @@ public class Player
 
 				if (h.testCollision(other, BoxType.HURT))
 				{
-					other.Hit(h);
+					other.Hit(h, this);
 					this.hit = true;
 					if(isGrounded())
 						hitlag = 12;
@@ -436,7 +466,8 @@ public class Player
 		{
 			if (p.testCollision(other, BoxType.HURT))
 			{
-				other.Hit(p);
+				//TODO projectiles might have wack behavior
+				other.Hit(p, this);
 				p.delete();
 			}
 			for(Projectile q : other.projectiles)
@@ -451,14 +482,14 @@ public class Player
 	}
 
 	int hitpush = 0;
-	public void Hit(Hitbox h)
+	public void Hit(Hitbox h, Player source)
 	{
 		if(hitstun != 0)
 			hitlag = 12;
 		else
 			hitlag = 13;
 		moving = 0;
-		if(!blocking || (!crouching && h.low) || (crouching && !isGrounded()))
+		if(!blocking || (!crouching && h.low) || (crouching && !source.isGrounded()))
 		{
 			if(crouching)
 				setAnim(character.DamageC);
@@ -474,7 +505,7 @@ public class Player
 
 				hitstun = h.stunCalc(this);
 
-				if(h.strength != Hitbox.AttackType.JL && h.strength != Hitbox.AttackType.JM && h.strength != Hitbox.AttackType.JH)
+				if(source.isGrounded() && isGrounded())
 				{
 					hitpush = -rMult() * h.width;
 				}
@@ -501,13 +532,17 @@ public class Player
 	//TODO knockdown
 	public void Knockdown()
 	{
-		setAnim(character.Sweep);
+		dy1 += 20;
+		hitstun = -1;
+		setAnim(character.DamageA);
 	}
 
 	//TODO wakeup
 	public void Wakeup()
 	{
+		hitstun = -2;
 		setAnim(character.Wakeup);
+		System.out.println("wakeup");
 	}
 
 	private void setAnim(Animation a)
@@ -530,7 +565,7 @@ public class Player
 			}
 			hitlag--;
 		}
-		else if(hitstun <= 0)
+		else if(hitstun == 0)
 		{
 			hitlagShake = new Point(0,0);
 			frame++;
@@ -550,7 +585,11 @@ public class Player
 				anim.customEvents(this, frame);
 			}
 		}
-		else
+		else if (hitstun <= -2)
+		{
+			hitstun = 0;
+		}
+		else if(hitstun > 0)
 			hitstun--;
 	}
 

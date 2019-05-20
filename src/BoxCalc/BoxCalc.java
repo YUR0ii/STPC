@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -425,7 +426,7 @@ public class BoxCalc extends JFrame
 			topLeft = new Point(x,y);
 			for(Rectangle r : ignore)
 			{
-				if(r.contains(topLeft))
+				if(((topLeft.x == r.getMinX() || topLeft.x == r.getMaxX()) || (topLeft.y == r.getMinY() || topLeft.y == r.getMaxY())))
 					done = false;
 			}
 			if(!done)
@@ -641,7 +642,7 @@ public class BoxCalc extends JFrame
 		{
 			calculateBoxes();
 
-			frame = new animFrame(actionable, airborne, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x + offset.x, origin.y - offset.y));
+			frame = new animFrame(actionable, airborne, chCancel, spCancel, suCancel, frames, sprite, boxes.toArray(new Box[0]), new Point(origin.x - offset.x, origin.y - offset.y));
 		}
 	}
 

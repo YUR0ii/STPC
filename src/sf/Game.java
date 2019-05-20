@@ -15,6 +15,7 @@ import BoxCalc.BoxCalc;
 
 //http://zachd.com/nki/ST/data.html
 //https://classicreload.com/super-street-fighter-2-turbo.html
+//TODO all currently existing animations have the wrong xcoords because HHHHHHHHHH
 public class Game extends JFrame
 {
 	Graphics2D g2;
@@ -107,7 +108,7 @@ public class Game extends JFrame
 
 		public void Update()
 		{
-			this.width = (int) (scale(150 * ((double) p.getHealth() / 30)));
+			this.width = (int) (scale(150 * ((double) p.getHealth() / 144)));
 
 			if(!p1)
 				//				this.x = 1600-this.width;
@@ -311,7 +312,8 @@ public class Game extends JFrame
 				p.hitboxCalc(other);
 
 			p.Animate();
-			p.posUpdate(other.getX());
+			p.checkFlip(other.getX(), other.isGrounded());
+			p.posUpdate();
 		}
 
 		doMovement();
