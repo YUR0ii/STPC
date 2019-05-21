@@ -15,6 +15,12 @@ public class HumanInputManager extends InputManager implements KeyListener
 
     //first is progress, second is frames since last input
     private int[][] commandValid;
+    
+    HumanInputManager(Command[] c)
+    {
+    	super(c);
+		commandValid = new int[c.length][2];
+    }
 
     @Override
     public int getDir(boolean right)
@@ -129,7 +135,7 @@ public class HumanInputManager extends InputManager implements KeyListener
             return 5;
     }
 
-    public boolean buttonCheck(int key)
+    public boolean normal(int key)
     {
         if(keyDown[keys[key]] && !(lastFrame[keys[key]] == 1))
         {
@@ -158,4 +164,10 @@ public class HumanInputManager extends InputManager implements KeyListener
     {
         return keyUp[keys[key]];
     }
+
+	@Override
+	boolean command(Command c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

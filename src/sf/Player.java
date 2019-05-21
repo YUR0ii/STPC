@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import sf.Box.BoxType;
+import sf.InputManager;
 
 public class Player
 {
@@ -15,8 +16,7 @@ public class Player
 	private static final int LEFT = 1;
 	private static final int DOWN = 2;
 	private static final int RIGHT = 3;
-	private static final int JAB = 4, STRONG = 5, FIERCE = 6;
-	private static final int SHORT = 7, FORWARD = 8, ROUNDHOUSE = 9;
+	
 
 	public Character character;
 	private InputManager inputs;
@@ -168,37 +168,41 @@ public class Player
 
 	public boolean normalActionable()
 	{
-		return currentFrame.actionable || (currentFrame.chCancel && hitThisFrame());
+		return !command && (currentFrame.actionable || (currentFrame.chCancel && hitThisFrame()));
 	}
 
+	boolean command = false;
+	
 	public boolean checkCommands()
 	{
 		for(int i = 0; i < character.Commands.length; i++)
 		{
 			Command c = character.Commands[i];
-			if(inputs.buttonCheck(c.button, true) && inputs.getCommandProgress(i) == c.directions.length-1)
+//			 
+			if(inputs.command(c))
 			{
-				if(c.Super && !currentFrame.suCancel)
+				if(c.Super)
 				{
+					System.out.println("super");
 					meter = 0;
 					return false;
 				}
 				else
 				{
-					attack(c.anim);
+					System.out.println("attack");
+					command = true;
+					attack(c);
 					return true;
 				}
 
 			}
-			else
-			{
-				if(inputs.getDir(right) == c.directions[inputs.getCommandProgress(i)][0])
-				{
-					inputs.checkCommandValid(c,i);
-				}
-			}
 		}
 		return false;
+	}
+	
+	public void createProjectile(Projectile p)
+	{
+		
 	}
 
 	public void checkNormals(int distance)
@@ -210,32 +214,32 @@ public class Player
 			{
 				if(!(inputs.getDir(right) == 1 || inputs.getDir(right) == 2 || inputs.getDir(right) == 3))
 				{
-					if(inputs.buttonCheck(FIERCE))
+					if(inputs.normal(InputManager.FIERCE))
 						if(distance < character.fierceRange)
 							attack(character.FierceCl);
 						else
 							attack(character.FierceFa);
-					if(inputs.buttonCheck(ROUNDHOUSE))
+					if(inputs.normal(InputManager.ROUNDHOUSE))
 						if(distance < character.roundhouseRange)
 							attack(character.RoundhouseCl);
 						else
 							attack(character.RoundhouseFa);
-					if(inputs.buttonCheck(STRONG))
+					if(inputs.normal(InputManager.STRONG))
 						if(distance < character.strongRange)
 							attack(character.StrongCl);
 						else
 							attack(character.StrongFa);
-					if(inputs.buttonCheck(FORWARD))
+					if(inputs.normal(InputManager.FORWARD))
 						if(distance < character.forwardRange)
 							attack(character.ForwardCl);
 						else
 							attack(character.ForwardFa);
-					if(inputs.buttonCheck(JAB))
+					if(inputs.normal(InputManager.JAB))
 						if(distance < character.jabRange)
 							attack(character.JabCl);
 						else
 							attack(character.JabFa);
-					if(inputs.buttonCheck(SHORT))
+					if(inputs.normal(InputManager.SHORT))
 						if(distance < character.shortRange)
 							attack(character.ShortCl);
 						else
@@ -243,48 +247,48 @@ public class Player
 				}
 				else
 				{
-					if(inputs.buttonCheck(FIERCE))
+					if(inputs.normal(InputManager.FIERCE))
 						attack(character.FierceC);
-					if(inputs.buttonCheck(ROUNDHOUSE))
+					if(inputs.normal(InputManager.ROUNDHOUSE))
 						attack(character.RoundhouseC);
-					if(inputs.buttonCheck(STRONG))
+					if(inputs.normal(InputManager.STRONG))
 						attack(character.StrongC);
-					if(inputs.buttonCheck(FORWARD))
+					if(inputs.normal(InputManager.FORWARD))
 						attack(character.ForwardC);
-					if(inputs.buttonCheck(JAB))
+					if(inputs.normal(InputManager.JAB))
 						attack(character.JabC);
-					if(inputs.buttonCheck(SHORT))
+					if(inputs.normal(InputManager.SHORT))
 						attack(character.ShortC);
 				}
 			}
 			else
 			{
-				if(inputs.buttonCheck(FIERCE))
+				if(inputs.normal(InputManager.FIERCE))
 				    if(moving == 0)
 					    attack(character.FierceA);
 				    else
 				        attack(character.FierceAD);
-				if(inputs.buttonCheck(ROUNDHOUSE))
+				if(inputs.normal(InputManager.ROUNDHOUSE))
                     if(moving == 0)
 					    attack(character.RoundhouseA);
                     else
                         attack(character.RoundhouseAD);
-				if(inputs.buttonCheck(STRONG))
+				if(inputs.normal(InputManager.STRONG))
                     if(moving == 0)
 				        attack(character.StrongA);
                     else
                         attack(character.StrongAD);
-				if(inputs.buttonCheck(FORWARD))
+				if(inputs.normal(InputManager.FORWARD))
                     if(moving == 0)
 					    attack(character.ForwardA);
                     else
                         attack(character.ForwardAD);
-				if(inputs.buttonCheck(JAB))
+				if(inputs.normal(InputManager.JAB))
                     if(moving == 0)
 					    attack(character.JabA);
                     else
                         attack(character.JabAD);
-				if(inputs.buttonCheck(SHORT))
+				if(inputs.normal(InputManager.SHORT))
                     if(moving == 0)
 					    attack(character.ShortA);
                     else
@@ -334,6 +338,15 @@ public class Player
 	{
 		anim = a;
 		frame = -1;
+		if(isGrounded())
+			moving = 0;
+	}
+	
+	private void attack(Command c)
+	{
+		anim = c.anim;
+		frame = 0;
+		currentFrame = c.anim.getFrame(0);
 		if(isGrounded())
 			moving = 0;
 	}

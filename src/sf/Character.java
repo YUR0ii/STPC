@@ -104,7 +104,7 @@ public abstract class Character
 		setupWinAnims();
 	}
 
-	Animation animFromFile(String filename)
+	protected Animation animFromFile(String filename)
 	{
 		try
 		{

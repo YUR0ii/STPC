@@ -8,18 +8,20 @@ public class Animation implements Serializable
 	animFrame[] frames;
 	transient int id;
 	static int maxID = 0;
+	Command c = null;
 
 	public Animation(animFrame[] frames)
 	{
 		this.frames = frames;
 	}
 
-	public Animation(animFrame[] frames, boolean custom)
+	public Animation(animFrame[] frames, Command c)
 	{
 		this.frames = frames;
 		id = maxID;
 		System.out.println(maxID);
 		maxID++;
+		this.c = c;
 	}
 
 	public animFrame getFrame(int frame)
@@ -45,8 +47,12 @@ public class Animation implements Serializable
 		return this.id == a.id;
 //		return false;
 	}
-
-	void customEvents(Player parent, int frame) {};
+	
+	public void customEvents(Player parent, int frame)
+	{
+		if(c != null)
+			c.customEvents(parent, frame);
+	}
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
 	{

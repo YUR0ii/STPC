@@ -46,14 +46,13 @@ public class BogoBoxer extends InputManager
     }
 
     @Override
-    boolean buttonCheck(int key)
+    boolean normal(int key)
     {
         return rand.nextDouble() < .05;
     }
 
-    @Override
-    boolean buttonCheck(int key, boolean special)
-    {
-        return rand.nextBoolean();
-    }
+	@Override
+	boolean command(Command c) {
+		return rand.nextDouble() < .001;
+	}
 }

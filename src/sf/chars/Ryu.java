@@ -25,8 +25,35 @@ public class Ryu extends sf.Character {
 
 	@Override
 	protected void setupCommands() {
-		Commands = new Command[0];
-
+		Commands = new Command[1];
+		Commands[0] = new JHadoken();
+//		Commands[1] = new SHadoken();
+//		Commands[2] = new FHadoken();
+	}
+	
+	class JHadoken extends Command
+	{
+		class Fireball extends Projectile
+		{
+			
+		}
+		JHadoken()
+		{
+			directions = new int[][] {{2,6},{3,6},{6,10}};
+			button = InputManager.JAB;
+			anim = animFromFile(dir + "\\commands\\jhadoken.anim");;
+			Super = false;
+		}
+		
+		@Override
+		public void customEvents(Player parent, int frame)
+		{
+			if(frame == 12)
+			{
+				parent.createProjectile(null);
+			}
+		}
+		
 	}
 
 	@Override

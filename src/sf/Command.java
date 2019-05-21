@@ -7,4 +7,6 @@ public abstract class Command
 	public int button;
 	public Animation anim;
 	public boolean Super;
+	
+	public abstract void customEvents(Player parent, int frame);
 }
