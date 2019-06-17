@@ -33,10 +33,10 @@ public class Ryu extends sf.Character {
 	
 	class JHadoken extends Command
 	{
-		class Fireball extends Projectile
-		{
-			
-		}
+//		class Fireball extends Projectile
+//		{
+//			
+//		}
 		JHadoken()
 		{
 			directions = new int[][] {{2,6},{3,6},{6,10}};
