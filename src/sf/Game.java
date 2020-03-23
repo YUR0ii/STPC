@@ -40,6 +40,7 @@ public class Game extends JFrame
 
 	Game(Character p1, Character p2, Stage stage, boolean versus)
 	{
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.versus = versus;
 		this.stage = stage;
 		initCharacters(p1, p2);
@@ -246,18 +247,18 @@ public class Game extends JFrame
 						KeyEvent.VK_NUMPAD3,
 						KeyEvent.VK_ENTER
 				};
-		HumanInputManager p1CH = new HumanInputManager(p1Controls, p1Char.Commands);
+		HumanInputManager p1CH = new HumanInputManager(p1Controls);
 		p1C = p1CH;
 		addKeyListener(p1CH);
 
 		if(versus)
 		{
-			HumanInputManager p2CH = new HumanInputManager(p2Controls, p2Char.Commands);
+			HumanInputManager p2CH = new HumanInputManager(p2Controls);
 			p2C = p2CH;
 			addKeyListener(p2CH);
 		}
 		else
-			p2C = new BogoBoxer(p2Char.Commands);
+			p2C = new BogoBoxer();
 
 		p1 = new Player(p1Char, new Point(80,0), p1C, true);
 		p2 = new Player(p2Char, new Point(300,0), p2C, false);
@@ -302,10 +303,8 @@ public class Game extends JFrame
                     p.checkMovement();
 
 				if (p.commandActionable())
-					p.checkCommands();
-
-                if (p.normalActionable())
-                    p.checkNormals(Math.abs(p1.getX() - p2.getX()));
+					if(!p.checkCommands() && p.normalActionable())
+						p.checkNormals(Math.abs(p1.getX() - p2.getX()));
             }
 
 			if(!p.hitThisFrame())

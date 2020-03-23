@@ -175,10 +175,8 @@ public class Player
 	
 	public boolean checkCommands()
 	{
-		for(int i = 0; i < character.Commands.length; i++)
+		for(Command c : character.Commands)
 		{
-			Command c = character.Commands[i];
-//			 
 			if(inputs.command(c))
 			{
 				if(c.Super)
@@ -202,7 +200,7 @@ public class Player
 	
 	public void createProjectile(Projectile p)
 	{
-		
+
 	}
 
 	public void checkNormals(int distance)

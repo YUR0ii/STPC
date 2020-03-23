@@ -12,15 +12,7 @@ public class HumanInputManager extends InputManager implements KeyListener
     private boolean[] keyDown = new boolean[256];
     private int[] lastFrame = new int[256];
     private int[] keys = new int[10];
-
-    //first is progress, second is frames since last input
-    private int[][] commandValid;
-    
-    HumanInputManager(Command[] c)
-    {
-    	super(c);
-		commandValid = new int[c.length][2];
-    }
+    private int[] dirHistory = new int[60];
 
     @Override
     public int getDir(boolean right)
@@ -49,16 +41,9 @@ public class HumanInputManager extends InputManager implements KeyListener
             return dir;
     }
 
-    public HumanInputManager(int[] keys, Command[] commands)
+    public HumanInputManager(int[] keys)
     {
-        super(commands);
         this.keys = keys;
-        commandValid = new int[commands.length][2];
-    }
-
-    public int getCommandProgress(int command)
-    {
-        return commandValid[command][0];
     }
 
     public void keyPressed(KeyEvent e)
@@ -84,20 +69,39 @@ public class HumanInputManager extends InputManager implements KeyListener
 
     public void keyTyped(KeyEvent e){}
 
-    public void checkCommandValid(Command c, int i)
-    {
-        if(commandValid[i][1] < c.directions[commandValid[i][0]][1])
-        {
-            commandValid[i][0]++;
-            commandValid[i][1] = 0;
-        }
-    }
 
     public void Update()
     {
         dir = directionCheck(keys);
-        for(int i = 0; i < commandValid.length; i++)
-            commandValid[i][1]++;
+        for(int i = dirHistory.length-1; i > 0; i--)
+        {
+            dirHistory[i] = dirHistory[i-1];
+        }
+        dirHistory[0]=dir;
+    }
+
+    @Override
+    boolean command(Command c)
+    {
+        if(buttonCheck(c.button, true))
+        {
+            boolean commandValid = true;
+            int lastPlace = 0;
+            for (int i = c.directions.length - 1; commandValid && i >= 0; i--)
+            {
+                commandValid = false;
+                for (int j = 0; j < c.directions[i][1]; j++)
+                {
+                    if (dirHistory[lastPlace + j] == c.directions[i][0])
+                    {
+                        commandValid = true;
+                        lastPlace += j;
+                    }
+                }
+            }
+            return commandValid;
+        }
+        return false;
     }
 
     private int directionCheck(int[] keys)
@@ -164,10 +168,4 @@ public class HumanInputManager extends InputManager implements KeyListener
     {
         return keyUp[keys[key]];
     }
-
-	@Override
-	boolean command(Command c) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

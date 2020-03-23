@@ -6,9 +6,8 @@ public class BogoBoxer extends InputManager
 {
     Random rand = new Random();
 
-    public BogoBoxer(Command[] commands)
+    public BogoBoxer()
     {
-        super(commands);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class Ryu extends sf.Character {
 		{
 			directions = new int[][] {{2,6},{3,6},{6,10}};
 			button = InputManager.JAB;
-			anim = animFromFile(dir + "\\commands\\jhadoken.anim");;
+			anim = animFromFile(dir + "/commands/jhadouken.anim");;
 			Super = false;
 		}
 		

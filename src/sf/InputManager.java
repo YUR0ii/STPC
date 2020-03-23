@@ -8,13 +8,9 @@ public abstract class InputManager
 {
 	public static final int JAB = 4, STRONG = 5, FIERCE = 6;
 	public static final int SHORT = 7, FORWARD = 8, ROUNDHOUSE = 9;
-	Command[] commands;
 	protected int dir;
 
-	public InputManager(Command[] commands) 
-	{
-		this.commands = commands;
-	}
+	public InputManager(){ }
 	
 	abstract boolean normal(int key);
 	abstract boolean command(Command c);
